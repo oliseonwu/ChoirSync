@@ -1,0 +1,6 @@
+// By default in typescript, the module resolution resolves the 
+// import using only the files with extension: .ts .tsx or .d.ts
+// So it doesn't know how to handle other types of files
+
+declare module "*.jpg";
+declare module "*.png";
