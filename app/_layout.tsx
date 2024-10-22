@@ -1,13 +1,14 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import BackButton from "@/assets/images/SVG/back-Button.svg"
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -17,11 +18,6 @@ export {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-export const unstable_settings = {
-  // Ensure any route can link back to `/`
-  initialRouteName: 'landingPage',
-};
 
 
 export default function RootLayout() {
@@ -59,15 +55,27 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
 
   
   
 
   return (
-      <Stack initialRouteName='landingPage'>
+      <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false}} />
+        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false}} /> */}
+        <Stack.Screen name="signUpOptions" options={{  animation:"none",  
+          headerTransparent:true, headerTitle:"", headerBackTitleVisible:false,
+          headerLeft: ()=> <TouchableOpacity onPress={router.back} >
+            <BackButton></BackButton>
+          </TouchableOpacity>}} />
+
+        
+          <Stack.Screen name="loginOptions" options={{  animation:"none",  
+          headerTransparent:true, headerTitle:"", headerBackTitleVisible:false,
+          headerLeft: ()=> <TouchableOpacity onPress={router.back} >
+            <BackButton></BackButton>
+          </TouchableOpacity>}} />
+
       </Stack>
 
   );
