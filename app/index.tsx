@@ -5,8 +5,9 @@ import LandingPageImage from "../assets/images/landing-Page.png";
 import { useNavigation, router } from 'expo-router';
 import { horizontalScale, moderateScale, verticalScale } from '@/utilities/TrueScale';
 import { StatusBar } from 'expo-status-bar';
+import BackButton from "@/assets/images/SVG/back-Button.svg"
 
-export default function landingPage() {
+export default function LandingPage() {
   const navigation = useNavigation()
 
   return (
@@ -14,7 +15,11 @@ export default function landingPage() {
       <StatusBar style="light" />
 
       <View style={styles.TopContainer}>
-        <Image style={styles.LandingPageImage} source={LandingPageImage} contentFit="cover"></Image>
+        <Image style={styles.LandingPageImage} source={LandingPageImage} 
+        contentFit="cover"
+        cachePolicy={"memory"}
+        ></Image>
+
       </View>
 
       <View style={styles.BottomContainer}>
@@ -23,17 +28,16 @@ export default function landingPage() {
         " access to rehearsal recordings for their choir members."}</Text>
 
         <View style={styles.BtnRowContainer}>
-          <TouchableOpacity style={[ styles.Btn,styles.btnHollow]} >
+          <TouchableOpacity style={[ styles.Btn,styles.btnHollow]} onPress={()=>router.navigate("/loginOptions")}>
             <Text style={[styles.btnText, {color: "#313234"}]}>Login</Text>
           </TouchableOpacity>
 
           <View style={styles.HorizontalSpaceView}></View>
 
-          <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} >
+          <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} onPress={()=>router.navigate("/signUpOptions")}>
             <Text style={[styles.btnText, {color: "#ffff"}]}>Get Started</Text>
           </TouchableOpacity>
         </View>
-
       </View>
     </View>
   )
@@ -48,6 +52,7 @@ const styles = StyleSheet.create({
     TopContainer:{
         flex: 7,
     },
+    
     LandingPageImage:{
       width: "100%",
       height: "100%",
