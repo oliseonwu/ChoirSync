@@ -28,13 +28,13 @@ export default function LandingPage() {
         " access to rehearsal recordings for their choir members."}</Text>
 
         <View style={styles.BtnRowContainer}>
-          <TouchableOpacity style={[ styles.Btn,styles.btnHollow]} onPress={()=>router.navigate("/loginOptions")}>
+          <TouchableOpacity style={[ styles.Btn,styles.btnHollow]} onPress={()=>router.navigate("/login/loginOptions")}>
             <Text style={[styles.btnText, {color: "#313234"}]}>Login</Text>
           </TouchableOpacity>
 
           <View style={styles.HorizontalSpaceView}></View>
 
-          <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} onPress={()=>router.navigate("/signUpOptions")}>
+          <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} onPress={()=>router.navigate("/signUp/signUpOptions")}>
             <Text style={[styles.btnText, {color: "#ffff"}]}>Get Started</Text>
           </TouchableOpacity>
         </View>
