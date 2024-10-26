@@ -1,13 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { horizontalScale, moderateScale } from '@/utilities/TrueScale';
-import LandingPageImage from "../assets/images/landing-Page.png";
+import LandingPageImage from "@/assets/images/login-option-landing-image.png";
 import { Image } from 'expo-image'
 import { StatusBar } from 'expo-status-bar'
 import BackButton from "@/assets/images/SVG/back-Button.svg"
+import { router } from 'expo-router';
 
 
-const SignUpOptions = () => {
+const LoginOptions = () => {
   return (
     <View style={styles.MainContainer}>
 
@@ -27,7 +28,7 @@ const SignUpOptions = () => {
             <Text style={[styles.btnText, {color: "#313234"}]}>Continue with Google</Text>
           </TouchableOpacity>
       
-          <TouchableOpacity style={[styles.Btn,styles.btnHollow]} >
+          <TouchableOpacity style={[styles.Btn,styles.btnHollow]} onPress={()=>router.navigate("/login")} >
             <Text style={[styles.btnText, {color: "#313234"}]}>Continue with Email</Text>
           </TouchableOpacity>
       </View>
@@ -35,7 +36,7 @@ const SignUpOptions = () => {
   )
 }
 
-export default SignUpOptions
+export default LoginOptions;
 
 const styles = StyleSheet.create({
     MainContainer:{

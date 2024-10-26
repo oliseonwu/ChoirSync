@@ -8,7 +8,8 @@ import 'react-native-reanimated';
 import BackButton from "@/assets/images/SVG/back-Button.svg"
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { horizontalScale } from '@/utilities/TrueScale';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -63,20 +64,48 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         {/* <Stack.Screen name="(tabs)" options={{ headerShown: false}} /> */}
-        <Stack.Screen name="signUpOptions" options={{  animation:"none",  
+        <Stack.Screen name="signUp/signUpOptions" options={{  animation:"none",  
           headerTransparent:true, headerTitle:"", headerBackTitleVisible:false,
           headerLeft: ()=> <TouchableOpacity onPress={router.back} >
             <BackButton></BackButton>
           </TouchableOpacity>}} />
 
-        
-          <Stack.Screen name="loginOptions" options={{  animation:"none",  
+          <Stack.Screen name="signUp/index" options={{  animation:"none", 
+           headerTitle:"", headerBackTitleVisible:false,
+           
+           headerTransparent: true,
+           
+          headerLeft: ()=> <TouchableOpacity onPress={router.back} >
+            <BackButton style={styles.BackButton}></BackButton>
+          </TouchableOpacity>}} />
+
+          <Stack.Screen name="login/index" options={{  animation:"none", 
+           headerTitle:"", headerBackTitleVisible:false,
+           
+           headerTransparent: true,
+           
+          headerLeft: ()=> <TouchableOpacity onPress={router.back} >
+            <BackButton style={styles.BackButton}></BackButton>
+          </TouchableOpacity>}} />
+
+          
+
+          <Stack.Screen name="login/loginOptions" options={{  animation:"none",  
           headerTransparent:true, headerTitle:"", headerBackTitleVisible:false,
           headerLeft: ()=> <TouchableOpacity onPress={router.back} >
-            <BackButton></BackButton>
+            <BackButton style={styles.BackButton}></BackButton>
           </TouchableOpacity>}} />
+
+          
 
       </Stack>
 
   );
 }
+
+
+const styles = StyleSheet.create({
+  BackButton:{
+    marginLeft: horizontalScale(0),
+  }
+})
