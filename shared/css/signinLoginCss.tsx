@@ -22,6 +22,7 @@ export const styles = StyleSheet.create({
   },
   Input:{
       borderColor : "#000000",
+      color: "#313234",
       borderWidth: moderateScale(1),
       // padding: Platform.OS == "android"? 
       // moderateScale(21) - (0.4/100) * getWindowSize().height: 
@@ -49,5 +50,10 @@ export const styles = StyleSheet.create({
       fontFamily: "Inter-SemiBold",
       fontSize: moderateScale(16),
     },
+    regularText:{
+      color: "#595959",
+      fontSize: moderateScale(16),
+      fontFamily: "Inter-Light",
+    }
 
 })

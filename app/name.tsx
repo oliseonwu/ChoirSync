@@ -4,8 +4,8 @@ import { getWindowSize, horizontalScale, moderateScale, verticalScale } from '@/
 import {useHeaderHeight} from "@react-navigation/elements"
 import { StatusBar } from 'expo-status-bar'
 import {styles} from "@/shared/css/signinLoginCss"
-import { router } from 'expo-router'
-const SignUpPage = () => {
+
+const NamePage = () => {
     const headerHeight = useHeaderHeight();
   return (
     
@@ -14,23 +14,24 @@ const SignUpPage = () => {
         <StatusBar style="dark" />  
 
     <View style={styles.TopContainer}>
-      <Text style={styles.H1}>SignUp</Text>
+      <Text style={[styles.H1,{marginBottom: verticalScale(32)}]}>Tell us about yourself</Text>
+      <Text style={[styles.regularText, {paddingBottom: verticalScale(34)}]}>
+        Please enter your legal name below</Text>
       
       <TextInput
       style={styles.Input}
-        placeholder="Enter Email"
+        placeholder="First Name"
       />
       
       <TextInput
-      secureTextEntry={true}
       style={[styles.Input, {marginTop: verticalScale(19.28)}]}
-        placeholder="Enter Password"
+        placeholder="Last Name"
       />
 
     </View>
 
-    <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} onPress={()=> router.navigate("/name")}>
-            <Text style={[styles.btnText, {color: "#ffff"}]}>Sign Up</Text>
+    <TouchableOpacity style={[styles.Btn,styles.BtnBlack]} >
+            <Text style={[styles.btnText, {color: "#ffff"}]}>Next</Text>
           </TouchableOpacity>
     
     </View>
@@ -38,4 +39,4 @@ const SignUpPage = () => {
   )
 }
 
-export default SignUpPage
+export default NamePage
