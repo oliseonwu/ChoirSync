@@ -17,6 +17,7 @@ import {
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
+import { router } from "expo-router";
 
 const NamePage = () => {
   const headerHeight = useHeaderHeight();
@@ -47,7 +48,10 @@ const NamePage = () => {
         />
       </View>
 
-      <TouchableOpacity style={[styles.Btn, styles.BtnBlack]}>
+      <TouchableOpacity
+        style={[styles.Btn, styles.BtnBlack]}
+        onPress={() => router.navigate("/chooseYourPath")}
+      >
         <Text style={[styles.btnText, { color: "#ffff" }]}>Next</Text>
       </TouchableOpacity>
     </View>
