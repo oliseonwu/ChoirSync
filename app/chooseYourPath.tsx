@@ -18,6 +18,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
+import LabeledCard from "@/components/LabeledCard";
 
 const ChooseYourPath = () => {
   const headerHeight = useHeaderHeight();
@@ -34,51 +35,25 @@ const ChooseYourPath = () => {
         <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
           Choose Your Path
         </Text>
-        <Text
-          style={[styles.regularText, { paddingBottom: verticalScale(34) }]}
-        >
+        <Text style={[styles.regularText]}>
           Choose to create a new group or join an existing one to connect with
           your choir.
         </Text>
 
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <TouchableOpacity
-            style={{
-              alignItems: "center",
-              alignSelf: "flex-start",
-            }}
-          >
-            <View
-              style={{
-                width: moderateScale(130),
-                height: moderateScale(130),
-                backgroundColor: "#D9D9D9",
-                borderRadius: 10,
-              }}
-            ></View>
-            <Text style={{ paddingTop: verticalScale(12) }}>Join a Group</Text>
-          </TouchableOpacity>
+        <View style={style2.Cards}>
+          <LabeledCard
+            imgUrl=""
+            label="Join a Group"
+            onPress={() => {}}
+          ></LabeledCard>
 
           <View style={{ width: "12%" }}></View>
 
-          <TouchableOpacity
-            style={{
-              alignItems: "center",
-              alignSelf: "flex-start",
-            }}
-          >
-            <View
-              style={{
-                width: moderateScale(130),
-                height: moderateScale(130),
-                backgroundColor: "#D9D9D9",
-                borderRadius: 10,
-              }}
-            ></View>
-            <Text style={{ paddingTop: verticalScale(12) }}>
-              Create a Group
-            </Text>
-          </TouchableOpacity>
+          <LabeledCard
+            imgUrl=""
+            label="Create a Group"
+            onPress={() => {}}
+          ></LabeledCard>
         </View>
       </View>
 
@@ -90,3 +65,11 @@ const ChooseYourPath = () => {
 };
 
 export default ChooseYourPath;
+
+const style2 = StyleSheet.create({
+  Cards: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: "12%",
+  },
+});
