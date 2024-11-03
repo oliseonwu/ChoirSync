@@ -19,7 +19,7 @@ const LabeledCard: React.FC<LabeledCardProps> = ({
   return (
     <TouchableOpacity
       disabled={disabled}
-      style={styles.container}
+      style={[styles.container, !props.selected && { opacity: 0.7 }]}
       activeOpacity={1}
       onPress={props.onPress}
     >
