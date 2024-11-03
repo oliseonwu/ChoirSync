@@ -5,16 +5,32 @@ import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 type LabeledCardProps = {
   imgUrl: string; // image url for the car
   label: string; // text underneath the card
+  selected: boolean;
+  disabled?: boolean;
   onPress: () => void; // callback function when card is pressed
 };
 
 // FC is just type function component. React components
 // are made with functional components
-const LabeledCard: React.FC<LabeledCardProps> = (props) => {
+const LabeledCard: React.FC<LabeledCardProps> = ({
+  disabled = false,
+  ...props
+}) => {
   return (
-    <TouchableOpacity style={styles.container}>
-      <View style={styles.card}></View>
-      <Text style={styles.label}>{props.label}</Text>
+    <TouchableOpacity
+      disabled={disabled}
+      style={styles.container}
+      activeOpacity={1}
+      onPress={props.onPress}
+    >
+      <View style={[styles.card, props.selected && styles.selected]}>
+        <View style={[styles.ImgContainer]}></View>
+      </View>
+      <Text
+        style={[styles.label, props.selected && { fontFamily: "Inter-Bold" }]}
+      >
+        {props.label}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -29,10 +45,21 @@ const styles = StyleSheet.create({
   card: {
     width: moderateScale(130),
     height: moderateScale(130),
+    borderRadius: 10,
+  },
+  ImgContainer: {
+    flex: 1,
     backgroundColor: "#D9D9D9",
     borderRadius: 10,
   },
+  selected: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#313234",
+  },
   label: {
     paddingTop: verticalScale(12),
+    fontSize: moderateScale(14),
+    fontFamily: "Inter-Light",
   },
 });

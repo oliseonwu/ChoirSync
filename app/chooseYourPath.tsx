@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import {
   getWindowSize,
   horizontalScale,
@@ -22,6 +22,8 @@ import LabeledCard from "@/components/LabeledCard";
 
 const ChooseYourPath = () => {
   const headerHeight = useHeaderHeight();
+  const [selectedPath, setSelectedPath] = useState<"join" | "create">("join");
+
   return (
     <View
       style={[
@@ -44,7 +46,10 @@ const ChooseYourPath = () => {
           <LabeledCard
             imgUrl=""
             label="Join a Group"
-            onPress={() => {}}
+            onPress={() => {
+              setSelectedPath("join");
+            }}
+            selected={selectedPath === "join"}
           ></LabeledCard>
 
           <View style={{ width: "12%" }}></View>
@@ -52,7 +57,11 @@ const ChooseYourPath = () => {
           <LabeledCard
             imgUrl=""
             label="Create a Group"
-            onPress={() => {}}
+            onPress={() => {
+              setSelectedPath("create");
+            }}
+            selected={selectedPath === "create"}
+            disabled={true}
           ></LabeledCard>
         </View>
       </View>
