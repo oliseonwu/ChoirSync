@@ -154,6 +154,21 @@ function RootLayoutNav() {
           ),
         }}
       />
+
+      <Stack.Screen
+        name="chooseYourGroup"
+        options={{
+          animation: "none",
+          headerTransparent: true,
+          headerTitle: "",
+          headerBackTitleVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <BackButton style={styles.BackButton}></BackButton>
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 }

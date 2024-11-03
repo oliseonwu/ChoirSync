@@ -66,7 +66,10 @@ const ChooseYourPath = () => {
         </View>
       </View>
 
-      <TouchableOpacity style={[styles.Btn, styles.BtnBlack]}>
+      <TouchableOpacity
+        style={[styles.Btn, styles.BtnBlack]}
+        onPress={() => router.navigate("/chooseYourGroup")}
+      >
         <Text style={[styles.btnText, { color: "#ffff" }]}>Next</Text>
       </TouchableOpacity>
     </View>
