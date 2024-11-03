@@ -1,9 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+
 import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,9 +7,8 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import BackButton from "@/assets/images/SVG/back-Button.svg";
 
-import { useColorScheme } from "@/components/useColorScheme";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { horizontalScale } from "@/utilities/TrueScale";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,7 +55,7 @@ function RootLayoutNav() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      {/* <Stack.Screen name="(tabs)" options={{ headerShown: false}} /> */}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="signUp/signUpOptions"
         options={{
@@ -161,6 +156,20 @@ function RootLayoutNav() {
           animation: "none",
           headerTransparent: true,
           headerTitle: "",
+          headerBackTitleVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <BackButton style={styles.BackButton}></BackButton>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="inviteCode"
+        options={{
+          animation: "none",
+          headerTransparent: true,
           headerBackTitleVisible: false,
           headerLeft: () => (
             <TouchableOpacity onPress={router.back}>

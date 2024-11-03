@@ -40,7 +40,10 @@ const ChooseYourGroup = () => {
       <TouchableOpacity
         style={style2.joinButton}
         onPress={() => {
-          // Handle join action
+          router.navigate({
+            pathname: "/inviteCode",
+            params: { groupName: item.name },
+          });
         }}
       >
         <Text style={style2.joinButtonText}>Join</Text>
@@ -77,9 +80,7 @@ const ChooseYourGroup = () => {
 export default ChooseYourGroup;
 
 const style2 = StyleSheet.create({
-  listContainer: {
-    paddingHorizontal: horizontalScale(20),
-  },
+  listContainer: {},
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",

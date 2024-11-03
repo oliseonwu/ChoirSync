@@ -3,8 +3,6 @@ import React from "react";
 import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 import LandingPageImage from "@/assets/images/landing-Page.png";
 import { Image } from "expo-image";
-import { StatusBar } from "expo-status-bar";
-import BackButton from "@/assets/images/SVG/back-Button.svg";
 import { router } from "expo-router";
 
 const SignUpOptions = () => {

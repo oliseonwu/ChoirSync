@@ -23,9 +23,7 @@ const LabeledCard: React.FC<LabeledCardProps> = ({
       activeOpacity={1}
       onPress={props.onPress}
     >
-      <View style={[styles.card, props.selected && styles.selected]}>
-        <View style={[styles.ImgContainer]}></View>
-      </View>
+      <View style={[styles.card, props.selected && styles.selected]}></View>
       <Text
         style={[styles.label, props.selected && { fontFamily: "Inter-Bold" }]}
       >
@@ -45,13 +43,11 @@ const styles = StyleSheet.create({
   card: {
     width: moderateScale(130),
     height: moderateScale(130),
-    borderRadius: 10,
-  },
-  ImgContainer: {
-    flex: 1,
     backgroundColor: "#D9D9D9",
+
     borderRadius: 10,
   },
+
   selected: {
     borderWidth: 1,
     borderRadius: 10,
