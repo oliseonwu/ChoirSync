@@ -55,6 +55,6 @@ export const styles = StyleSheet.create({
   regularText: {
     color: "#595959",
     fontSize: moderateScale(16),
-    fontFamily: "Inter-Light",
+    fontFamily: "Inter-Regular",
   },
 });

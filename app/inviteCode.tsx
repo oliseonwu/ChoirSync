@@ -9,11 +9,7 @@ import {
   Keyboard,
 } from "react-native";
 import React from "react";
-import {
-  horizontalScale,
-  moderateScale,
-  verticalScale,
-} from "@/utilities/TrueScale";
+import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
@@ -29,6 +25,7 @@ const InviteCodePage = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: groupName || "",
+      headerTitleAlign: "center",
       headerTitleStyle: {
         fontFamily: "Inter-Regular",
         fontSize: moderateScale(14),

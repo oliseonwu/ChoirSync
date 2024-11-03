@@ -80,9 +80,7 @@ const ChooseYourGroup = () => {
 export default ChooseYourGroup;
 
 const style2 = StyleSheet.create({
-  listContainer: {
-    paddingHorizontal: horizontalScale(20),
-  },
+  listContainer: {},
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -37,7 +37,9 @@ const ChooseYourPath = () => {
         <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
           Choose Your Path
         </Text>
-        <Text style={[styles.regularText]}>
+        <Text
+          style={[styles.regularText, { paddingBottom: verticalScale(34) }]}
+        >
           Choose to create a new group or join an existing one to connect with
           your choir.
         </Text>
