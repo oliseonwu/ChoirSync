@@ -23,8 +23,10 @@ export default function LandingPage() {
           style={styles.LandingPageImage}
           source={LandingPageImage}
           contentFit="cover"
-          cachePolicy={"memory"}
-        ></Image>
+          cachePolicy="memory-disk"
+          priority="high"
+          transition={0}
+        />
       </View>
 
       <View style={styles.BottomContainer}>

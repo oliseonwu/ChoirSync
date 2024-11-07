@@ -3,19 +3,20 @@ import React from "react";
 import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 import LandingPageImage from "@/assets/images/login-option-landing-image.png";
 import { Image } from "expo-image";
-import { StatusBar } from "expo-status-bar";
-import BackButton from "@/assets/images/SVG/back-Button.svg";
+
 import { router } from "expo-router";
 
 const LoginOptions = () => {
   return (
     <View style={styles.MainContainer}>
-      <View style={styles.TopContainer}>
+      <View style={[styles.TopContainer, { backgroundColor: "#C9C8CA" }]}>
         <Image
           style={styles.LandingPageImage}
           source={LandingPageImage}
           contentFit="cover"
-          cachePolicy={"memory"}
+          cachePolicy="memory-disk"
+          priority="high"
+          transition={0}
         ></Image>
       </View>
 

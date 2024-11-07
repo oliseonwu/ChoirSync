@@ -43,11 +43,16 @@ const NamePage = () => {
             Please enter your legal name below
           </Text>
 
-          <TextInput style={styles.Input} placeholder="First Name" />
+          <TextInput
+            style={styles.Input}
+            placeholder="First Name"
+            placeholderTextColor="#C9C8CA"
+          />
 
           <TextInput
             style={[styles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Last Name"
+            placeholderTextColor="#C9C8CA"
           />
         </View>
 
