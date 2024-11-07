@@ -32,12 +32,17 @@ const LoginPage = () => {
         <View style={styles.TopContainer}>
           <Text style={styles.H1}>Login</Text>
 
-          <TextInput style={styles.Input} placeholder="Enter Email" />
+          <TextInput
+            style={styles.Input}
+            placeholder="Enter Email"
+            placeholderTextColor="#C9C8CA"
+          />
 
           <TextInput
             secureTextEntry={true}
             style={[styles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Enter Password"
+            placeholderTextColor="#C9C8CA"
           />
         </View>
 

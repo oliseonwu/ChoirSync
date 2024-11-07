@@ -57,6 +57,7 @@ const InviteCodePage = () => {
             style={[styles.Input, { marginTop: verticalScale(32) }]}
             placeholder="Enter Password"
             secureTextEntry={true}
+            placeholderTextColor="#C9C8CA"
           />
         </View>
 

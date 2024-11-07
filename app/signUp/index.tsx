@@ -7,12 +7,7 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import {
-  getWindowSize,
-  horizontalScale,
-  moderateScale,
-  verticalScale,
-} from "@/utilities/TrueScale";
+import { verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
@@ -32,12 +27,17 @@ const SignUpPage = () => {
         <View style={styles.TopContainer}>
           <Text style={styles.H1}>SignUp</Text>
 
-          <TextInput style={styles.Input} placeholder="Enter Email" />
+          <TextInput
+            style={styles.Input}
+            placeholder="Enter Email"
+            placeholderTextColor="#C9C8CA"
+          />
 
           <TextInput
             secureTextEntry={true}
             style={[styles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Enter Password"
+            placeholderTextColor="#C9C8CA"
           />
         </View>
 

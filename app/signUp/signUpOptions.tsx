@@ -13,7 +13,9 @@ const SignUpOptions = () => {
           style={styles.LandingPageImage}
           source={LandingPageImage}
           contentFit="cover"
-          cachePolicy={"memory"}
+          cachePolicy="memory-disk"
+          priority="high"
+          transition={0}
         ></Image>
       </View>
 
