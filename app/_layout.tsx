@@ -10,6 +10,7 @@ import { Asset } from "expo-asset";
 
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
+import BackButtonComponent from "@/components/BackButtonComponent";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -18,6 +19,12 @@ export {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+type LoginScreenParams = {
+  params?: {
+    isLoading?: string;
+  };
+};
 
 export default function RootLayout() {
   const [fontLoaded, error] = useFonts({
@@ -96,46 +103,40 @@ function RootLayoutNav() {
           headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
 
       <Stack.Screen
         name="signUp/index"
-        options={{
+        options={({ route }: { route: LoginScreenParams }) => ({
           animation: "none",
+          headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-
-          headerTransparent: true,
-
           headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
+            <BackButtonComponent
+              isLoading={route.params?.isLoading === "true"}
+              style={styles.BackButton}
+            />
           ),
-        }}
+        })}
       />
 
       <Stack.Screen
         name="login/index"
-        options={{
+        options={({ route }: { route: LoginScreenParams }) => ({
           animation: "none",
+          headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-
-          headerTransparent: true,
-
           headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
+            <BackButtonComponent
+              isLoading={route.params?.isLoading === "true"}
+              style={styles.BackButton}
+            />
           ),
-        }}
+        })}
       />
 
       <Stack.Screen
@@ -145,11 +146,7 @@ function RootLayoutNav() {
           headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
 
@@ -160,11 +157,7 @@ function RootLayoutNav() {
           headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
 
@@ -175,11 +168,7 @@ function RootLayoutNav() {
           headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
 
@@ -190,11 +179,7 @@ function RootLayoutNav() {
           headerTransparent: true,
           headerTitle: "",
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
 
@@ -204,11 +189,7 @@ function RootLayoutNav() {
           animation: "none",
           headerTransparent: true,
           headerBackTitleVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <BackButton style={styles.BackButton}></BackButton>
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <BackButtonComponent style={styles.BackButton} />,
         }}
       />
     </Stack>
