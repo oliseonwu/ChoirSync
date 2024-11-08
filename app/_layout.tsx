@@ -74,12 +74,6 @@ export default function RootLayout() {
     prepare();
   }, []);
 
-  // useEffect(() => {
-  //   if (isReady) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [isReady]);
-
   if (!fontLoaded || !isReady) {
     return null;
   }
@@ -91,7 +85,10 @@ function RootLayoutNav() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(tabs)"
+        options={{ headerShown: false, animation: "none" }}
+      />
       <Stack.Screen
         name="signUp/signUpOptions"
         options={{
