@@ -61,23 +61,24 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        await SplashScreen.preventAutoHideAsync();
+        SplashScreen.preventAutoHideAsync();
         await preloadLocalImgAssets();
       } catch (error) {
         console.error(error);
       } finally {
         setIsReady(true);
+        SplashScreen.hideAsync();
       }
     }
 
     prepare();
   }, []);
 
-  useEffect(() => {
-    if (isReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [isReady]);
+  // useEffect(() => {
+  //   if (isReady) {
+  //     SplashScreen.hideAsync();
+  //   }
+  // }, [isReady]);
 
   if (!fontLoaded || !isReady) {
     return null;
