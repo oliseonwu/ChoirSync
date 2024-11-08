@@ -21,6 +21,16 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
 import Parse from "@/services/Parse";
+import Animated, {
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withDelay,
+  withSequence,
+  FadeIn,
+  useSharedValue,
+} from "react-native-reanimated";
+import { SkeletonLoader } from "@/components/SkeletonLoader";
 
 type GroupItem = {
   id: string;
@@ -29,6 +39,7 @@ type GroupItem = {
 
 const ChooseYourGroup = () => {
   const headerHeight = useHeaderHeight();
+  const { width } = getWindowSize();
   const [groups, setGroups] = useState<GroupItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -86,31 +97,27 @@ const ChooseYourGroup = () => {
     >
       <StatusBar style="dark" />
 
-      {isLoading ? (
-        <View style={style2.loadingContainer}>
-          <ActivityIndicator size="large" color="#313234" />
-        </View>
-      ) : (
-        <View style={styles.TopContainer}>
-          <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
-            Choose your Group
-          </Text>
+      <View style={styles.TopContainer}>
+        <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
+          Choose your Group
+        </Text>
 
-          {groups.length === 0 ? (
-            <View style={style2.emptyContainer}>
-              <Text style={style2.emptyText}>No choir groups available</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={groups}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={style2.listContainer}
-              showsVerticalScrollIndicator={true}
-            />
-          )}
-        </View>
-      )}
+        {isLoading ? (
+          <SkeletonLoader width={width} />
+        ) : groups.length === 0 ? (
+          <View style={style2.emptyContainer}>
+            <Text style={style2.emptyText}>No choir groups available</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={groups}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={style2.listContainer}
+            showsVerticalScrollIndicator={true}
+          />
+        )}
+      </View>
     </View>
   );
 };
