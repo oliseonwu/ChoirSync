@@ -19,6 +19,7 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
 import LabeledCard from "@/components/LabeledCard";
+import LoadingButton from "@/components/LoadingButton";
 
 const ChooseYourPath = () => {
   const headerHeight = useHeaderHeight();
@@ -68,12 +69,14 @@ const ChooseYourPath = () => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={[styles.Btn, styles.BtnBlack]}
+      <LoadingButton
+        isLoading={false}
         onPress={() => router.navigate("/chooseYourGroup")}
-      >
-        <Text style={[styles.btnText, { color: "#ffff" }]}>Next</Text>
-      </TouchableOpacity>
+        buttonText="Next"
+        style={[styles.Btn, styles.BtnBlack]}
+        textStyle={[styles.btnText, { color: "#ffff" }]}
+        backgroundColor="#313234"
+      />
     </View>
   );
 };

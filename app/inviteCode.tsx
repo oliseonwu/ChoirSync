@@ -16,6 +16,7 @@ import { styles } from "@/shared/css/signinLoginCss";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import LoadingButton from "@/components/LoadingButton";
 
 const InviteCodePage = () => {
   const headerHeight = useHeaderHeight();
@@ -61,15 +62,14 @@ const InviteCodePage = () => {
           />
         </View>
 
-        <TouchableOpacity
+        <LoadingButton
+          isLoading={false}
+          onPress={() => router.navigate("/(tabs)")}
+          buttonText="Next"
           style={[styles.Btn, styles.BtnBlack]}
-          onPress={() => {
-            // Handle join action
-            router.navigate("/(tabs)");
-          }}
-        >
-          <Text style={[styles.btnText, { color: "#ffff" }]}>Next</Text>
-        </TouchableOpacity>
+          textStyle={[styles.btnText, { color: "#ffff" }]}
+          backgroundColor="#313234"
+        />
       </View>
     </TouchableWithoutFeedback>
   );

@@ -14,12 +14,14 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
+import LoadingButton from "@/components/LoadingButton";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 const SignUpPage = () => {
   const headerHeight = useHeaderHeight();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useLoadingState(false);
 
   // Email validation function
   const isValidEmail = (email: string) => {
@@ -39,6 +41,7 @@ const SignUpPage = () => {
     }
 
     setIsLoading(true);
+
     try {
       const result = await authService.signUp({
         email,
@@ -47,15 +50,16 @@ const SignUpPage = () => {
         lastName: "",
       });
 
+      setIsLoading(false);
+
       if (result.success) {
         router.navigate("/name");
       } else {
         Alert.alert("Error", result.error || "Failed to sign up");
       }
     } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
-    } finally {
       setIsLoading(false);
+      Alert.alert("Error", "An unexpected error occurred");
     }
   };
 
@@ -94,19 +98,16 @@ const SignUpPage = () => {
           />
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.Btn,
-            styles.BtnBlack,
-            (!isFormValid || isLoading) && { opacity: 0.7 },
-          ]}
+        <LoadingButton
+          isLoading={isLoading}
           onPress={handleSignUp}
-          disabled={!isFormValid || isLoading}
-        >
-          <Text style={[styles.btnText, { color: "#ffff" }]}>
-            {isLoading ? "Signing up..." : "Sign Up"}
-          </Text>
-        </TouchableOpacity>
+          disabled={!isFormValid}
+          loadingText="Signing up..."
+          buttonText="Sign Up"
+          style={[styles.Btn, styles.BtnBlack]}
+          textStyle={[styles.btnText, { color: "#ffff" }]}
+          backgroundColor="#313234"
+        />
       </View>
     </TouchableWithoutFeedback>
   );

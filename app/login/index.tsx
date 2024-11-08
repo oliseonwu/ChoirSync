@@ -18,12 +18,14 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
+import LoadingButton from "@/components/LoadingButton";
+import { useLoadingState } from "@/hooks/useLoadingState";
 
 const LoginPage = () => {
   const headerHeight = useHeaderHeight();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useLoadingState(false);
 
   // Email validation function
   const isValidEmail = (email: string) => {
@@ -37,16 +39,34 @@ const LoginPage = () => {
     return isValidEmail(email) && password.length >= 1;
   }, [email, password]);
 
-  const handleMembershipCheck = async (user: Parse.User) => {
-    const membershipResult = await authService.checkChoirMembership(user.id);
+  type UserStatus = {
+    hasName: boolean;
+    isMemberOfAnyChoir: boolean;
+  };
 
+  const getUserStatus = async (user: Parse.User): Promise<UserStatus> => {
+    const firstName = user.get("firstName");
+    const lastName = user.get("lastName");
+    const hasName = Boolean(firstName && lastName);
+
+    const membershipResult = await authService.checkChoirMembership(user.id);
     if (!membershipResult.success) {
       throw new Error(
         membershipResult.error || "Failed to check choir membership"
       );
     }
 
-    return membershipResult.isMember
+    return {
+      hasName,
+      isMemberOfAnyChoir: membershipResult.isMember,
+    };
+  };
+
+  const navigateBasedOnUserStatus = (userStatus: UserStatus) => {
+    if (!userStatus.hasName) {
+      return router.navigate("/name");
+    }
+    return userStatus.isMemberOfAnyChoir
       ? router.navigate("/(tabs)")
       : router.navigate("/chooseYourPath");
   };
@@ -65,16 +85,30 @@ const LoginPage = () => {
     return result.user;
   };
 
-  const handleLogin = async () => {
-    setIsLoading(true);
+  const handleLoginError = (error: any) => {
+    console.error("Login error:", error);
 
+    const message = error.message?.includes("Invalid username/password")
+      ? "The email or password you entered is incorrect."
+      : "An unexpected error occurred. Please try again.";
+
+    Alert.alert("Oops!", message, [{ text: "OK" }]);
+  };
+
+  const handleLogin = async () => {
     try {
+      setIsLoading(true);
+
+      // Login flow
       const user = await validateAndLogin();
-      await handleMembershipCheck(user);
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "An unexpected error occurred");
-    } finally {
+      const userStatus = await getUserStatus(user);
+
+      // Complete login
       setIsLoading(false);
+      navigateBasedOnUserStatus(userStatus);
+    } catch (error: any) {
+      setIsLoading(false);
+      handleLoginError(error);
     }
   };
 
@@ -115,19 +149,16 @@ const LoginPage = () => {
           />
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.Btn,
-            styles.BtnBlack,
-            (!isFormValid || isLoading) && { opacity: 0.7 },
-          ]}
+        <LoadingButton
+          isLoading={isLoading}
           onPress={handleLogin}
-          disabled={!isFormValid || isLoading}
-        >
-          <Text style={[styles.btnText, { color: "#ffff" }]}>
-            {isLoading ? "Logging in..." : "Login"}
-          </Text>
-        </TouchableOpacity>
+          disabled={!isFormValid}
+          loadingText="Logging in..."
+          buttonText="Login"
+          style={[styles.Btn, styles.BtnBlack]}
+          textStyle={[styles.btnText, { color: "#ffff" }]}
+          backgroundColor="#313234"
+        />
       </View>
     </TouchableWithoutFeedback>
   );
