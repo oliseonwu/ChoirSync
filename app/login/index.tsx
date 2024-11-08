@@ -31,32 +31,48 @@ const LoginPage = () => {
     return emailPattern.test(email);
   };
 
-  // Check if form is valid using useMemo to prevent unnecessary recalculations
+  // Check if form is valid using useMemo
+  // to prevent unnecessary recalculations
   const isFormValid = useMemo(() => {
     return isValidEmail(email) && password.length >= 1;
   }, [email, password]);
 
-  const handleLogin = async () => {
-    if (!isFormValid) {
-      Alert.alert("Error", "Please enter a valid email and password");
-      return;
+  const handleMembershipCheck = async (user: Parse.User) => {
+    const membershipResult = await authService.checkChoirMembership(user.id);
+
+    if (!membershipResult.success) {
+      throw new Error(
+        membershipResult.error || "Failed to check choir membership"
+      );
     }
 
-    setIsLoading(true);
-    try {
-      // We'll need to add this method to AuthService
-      const result = await authService.login({
-        email,
-        password,
-      });
+    return membershipResult.isMember
+      ? router.navigate("/(tabs)")
+      : router.navigate("/chooseYourPath");
+  };
 
-      if (result.success) {
-        router.navigate("/(tabs)");
-      } else {
-        Alert.alert("Error", result.error || "Failed to login");
-      }
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
+  const validateAndLogin = async () => {
+    if (!isFormValid) {
+      throw new Error("Please enter a valid email and password");
+    }
+
+    const result = await authService.login({ email, password });
+
+    if (!result.success || !result.user) {
+      throw new Error(result.error || "Failed to login");
+    }
+
+    return result.user;
+  };
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+
+    try {
+      const user = await validateAndLogin();
+      await handleMembershipCheck(user);
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +100,8 @@ const LoginPage = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
+            textContentType="emailAddress" // for iOS
+            inputMode="email" // for better keyboard layout
           />
 
           <TextInput
