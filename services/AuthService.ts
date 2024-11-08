@@ -7,6 +7,11 @@ interface SignUpData {
   lastName: string;
 }
 
+interface LoginData {
+  email: string;
+  password: string;
+}
+
 class AuthService {
   async signUp({ email, password, firstName, lastName }: SignUpData) {
     try {
@@ -41,6 +46,21 @@ class AuthService {
     try {
       await Parse.User.logOut();
       return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  async login({ email, password }: LoginData) {
+    try {
+      const user = await Parse.User.logIn(email, password);
+      return {
+        success: true,
+        user,
+      };
     } catch (error: any) {
       return {
         success: false,

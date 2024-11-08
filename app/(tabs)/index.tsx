@@ -1,8 +1,29 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import Parse from "@/services/Parse";
 import { Text, View } from "@/components/Themed";
+import { authService } from "@/services/AuthService";
+import { router } from "expo-router";
+import { useNavigation, StackActions } from "@react-navigation/native";
+import { useEffect } from "react";
+import { Alert } from "react-native";
 
 export default function TabOneScreen() {
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      const result = await authService.logout();
+
+      if (result.success) {
+        navigation.dispatch(StackActions.popToTop());
+      } else {
+        Alert.alert("Error", "Failed to logout");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    }
+  };
+
   const testParse = async () => {
     try {
       // Create a test object
@@ -30,6 +51,13 @@ export default function TabOneScreen() {
       <TouchableOpacity style={styles.button} onPress={testParse}>
         <Text style={styles.buttonText}>Test Parse Connection</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.logoutButton]}
+        onPress={handleLogout}
+      >
+        <Text style={styles.buttonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -49,6 +77,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#313234",
     padding: 15,
     borderRadius: 10,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  logoutButton: {
+    marginTop: 20,
+    backgroundColor: "#FF3B30", // Red color for logout
   },
   buttonText: {
     color: "#fff",
