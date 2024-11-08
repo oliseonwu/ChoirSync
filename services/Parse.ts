@@ -8,7 +8,6 @@ Parse.initialize(
   process.env.EXPO_PUBLIC_PARSE_JAVASCRIPT_KEY!
 );
 
-// console.log(Parse.applicationId);
 Parse.serverURL = process.env.EXPO_PUBLIC_PARSE_SERVER_URL!;
 
 export default Parse;

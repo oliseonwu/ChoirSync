@@ -12,6 +12,12 @@ interface LoginData {
   password: string;
 }
 
+//The AuthService class is a central manager for all
+// authentication-related operations in your app.
+//Think of it as a dedicated helper that handles
+// all the complexities of user authentication,
+// including signup, login, logout, and error handling.
+
 class AuthService {
   async signUp({ email, password, firstName, lastName }: SignUpData) {
     try {
@@ -65,6 +71,36 @@ class AuthService {
       return {
         success: false,
         error: error.message,
+      };
+    }
+  }
+
+  async checkChoirMembership(userId: string) {
+    try {
+      // Create a pointer to the User
+      const userPointer = {
+        __type: "Pointer",
+        className: "_User",
+        objectId: userId,
+      };
+
+      // Query ChoirMembers
+      const ChoirMembers = Parse.Object.extend("ChoirMembers");
+      const query = new Parse.Query(ChoirMembers);
+      query.equalTo("user_id", userPointer);
+
+      const result = await query.first();
+
+      return {
+        success: true,
+        isMember: !!result,
+        choirMember: result,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+        isMember: false,
       };
     }
   }
