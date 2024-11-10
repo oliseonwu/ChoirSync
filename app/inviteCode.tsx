@@ -7,8 +7,9 @@ import {
   TouchableWithoutFeedback,
   View,
   Keyboard,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
@@ -17,11 +18,18 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import LoadingButton from "@/components/LoadingButton";
+import { inviteCodeService } from "@/services/InviteCodeService";
+import Parse from "@/services/Parse";
 
 const InviteCodePage = () => {
   const headerHeight = useHeaderHeight();
-  const { groupName } = useLocalSearchParams<{ groupName: string }>();
+  const { groupName, groupId } = useLocalSearchParams<{
+    groupName: string;
+    groupId: string;
+  }>();
   const navigation = useNavigation();
+  const [inviteCode, setInviteCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -34,6 +42,46 @@ const InviteCodePage = () => {
       },
     });
   }, [navigation, groupName]);
+
+  const handleValidateCode = async () => {
+    if (!inviteCode.trim()) {
+      Alert.alert("Error", "Please enter an invite code");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const validationResult = await inviteCodeService.validateInviteCode(
+        inviteCode,
+        groupId
+      );
+
+      if (validationResult.success) {
+        const currentUser = await Parse.User.currentAsync();
+        if (!currentUser) {
+          Alert.alert("Error", "You must be logged in to join a group");
+          return;
+        }
+
+        const addUserResult = await inviteCodeService.addUserToChoirGroup(
+          groupId,
+          currentUser.id
+        );
+
+        if (addUserResult.success) {
+          router.navigate("/(tabs)");
+        } else {
+          Alert.alert("Error", "Failed to join the group");
+        }
+      } else {
+        Alert.alert("Error", validationResult.error || "Invalid invite code");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to validate invite code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -56,19 +104,24 @@ const InviteCodePage = () => {
 
           <TextInput
             style={[styles.Input, { marginTop: verticalScale(32) }]}
-            placeholder="Enter Password"
-            secureTextEntry={true}
+            placeholder="Enter Invite Code"
+            value={inviteCode}
+            onChangeText={setInviteCode}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={6}
             placeholderTextColor="#C9C8CA"
           />
         </View>
 
         <LoadingButton
-          isLoading={false}
-          onPress={() => router.navigate("/(tabs)")}
-          buttonText="Next"
+          isLoading={isLoading}
+          onPress={handleValidateCode}
+          buttonText="Join Group"
           style={[styles.Btn, styles.BtnBlack]}
           textStyle={[styles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
+          disabled={!inviteCode.trim()}
         />
       </View>
     </TouchableWithoutFeedback>
