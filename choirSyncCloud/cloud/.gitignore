@@ -1,0 +1,15 @@
+# Ignore environment-specific files
+.env
+.env.*
+config/global.json
+config/local.json
+
+# Ignore npm dependencies
+node_modules/
+
+# Ignore logs
+*.log
+
+# Ignore IDE specific files
+.idea/
+.vscode/

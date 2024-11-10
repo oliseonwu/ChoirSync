@@ -21,15 +21,7 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "@/shared/css/signinLoginCss";
 import { router } from "expo-router";
 import Parse from "@/services/Parse";
-import Animated, {
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withDelay,
-  withSequence,
-  FadeIn,
-  useSharedValue,
-} from "react-native-reanimated";
+
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 
 type GroupItem = {
@@ -72,7 +64,15 @@ const ChooseYourGroup = () => {
   };
 
   const renderItem = ({ item }: { item: GroupItem }) => (
-    <View style={style2.listItem}>
+    <TouchableOpacity
+      style={style2.listItem}
+      onPress={() => {
+        router.navigate({
+          pathname: "/inviteCode",
+          params: { groupName: item.name, groupId: item.id },
+        });
+      }}
+    >
       <Text style={style2.groupName}>{item.name}</Text>
       <TouchableOpacity
         style={style2.joinButton}
@@ -85,7 +85,7 @@ const ChooseYourGroup = () => {
       >
         <Text style={style2.joinButtonText}>Join</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
