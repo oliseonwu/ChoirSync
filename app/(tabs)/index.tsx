@@ -1,91 +1,131 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
-import Parse from "@/services/Parse";
+import { StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Text, View } from "@/components/Themed";
-import { authService } from "@/services/AuthService";
-import { router } from "expo-router";
-import { useNavigation, StackActions } from "@react-navigation/native";
-import { useEffect } from "react";
-import { Alert } from "react-native";
+import {
+  moderateScale,
+  horizontalScale,
+  verticalScale,
+  getWindowSize,
+} from "@/utilities/TrueScale";
+import { Image } from "expo-image";
+import ThisWeekCard from "@/components/ThisWeekCard";
+import MiniMusicPlayer from "@/components/MiniMusicPlayer";
+// import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
+// import { Portal } from "react-native-paper";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-export default function TabOneScreen() {
-  const navigation = useNavigation();
-
-  const handleLogout = async () => {
-    try {
-      const result = await authService.logout();
-
-      if (result.success) {
-        navigation.dispatch(StackActions.popToTop());
-      } else {
-        Alert.alert("Error", "Failed to logout");
-      }
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
-    }
-  };
-
-  const testParse = async () => {
-    try {
-      // Create a test object
-      const TestObject = Parse.Object.extend("TestObject");
-      const testObject = new TestObject();
-      testObject.set("message", "Hello from ChoirSync!");
-
-      // Save it
-      const savedObject = await testObject.save();
-      console.log("✅ Parse Test Successful!");
-      console.log("Created object with id:", savedObject.id);
-      console.log("Message:", savedObject.get("message"));
-
-      // Clean up by deleting the test object
-      await savedObject.destroy();
-      console.log("🧹 Test object cleaned up");
-    } catch (error) {
-      console.error("❌ Parse Test Failed:", error);
-    }
-  };
+export default function HomeScreen() {
+  // const { isPlaying, togglePlay } = useMusicPlayer();
+  const tabBarHeight = useBottomTabBarHeight();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>HomePage</Text>
-      <TouchableOpacity style={styles.button} onPress={testParse}>
-        <Text style={styles.buttonText}>Test Parse Connection</Text>
-      </TouchableOpacity>
+    <View style={styles.Container}>
+      <View style={styles.Section1}>
+        <Text
+          style={[styles.SectionTitle, { marginBottom: verticalScale(26) }]}
+        >
+          This Week
+        </Text>
+        <View style={styles.Section1Content}>
+          <ThisWeekCard
+            title="Recordings"
+            icon={require("@/assets/images/mic-icon.png")}
+            showDot={true}
+            onPress={() => {
+              /* handle press */
+            }}
+          />
+          <ThisWeekCard
+            title="New Songs"
+            icon={require("@/assets/images/music-icon-2.png")}
+            showDot={true}
+          />
 
-      <TouchableOpacity
-        style={[styles.button, styles.logoutButton]}
-        onPress={handleLogout}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+          <ThisWeekCard
+            title="Saved Recordings"
+            icon={require("@/assets/images/bookmark-icon.png")}
+          />
+        </View>
+      </View>
+
+      <View style={styles.Section2}>
+        <Text style={styles.SectionTitle}>Trending</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.ScrollViewContentContainer}
+        >
+          <TouchableOpacity
+            style={styles.ScrollViewContent}
+            activeOpacity={0.8}
+          >
+            <Image
+              source={require("@/assets/images/Praise card.png")}
+              style={{ flex: 1 }}
+              contentFit="cover"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.ScrollViewContent}
+            activeOpacity={0.8}
+          >
+            <Image
+              style={{ flex: 1 }}
+              source={require("@/assets/images/Worship card.png")}
+            />
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+
+      {/* <Portal>
+        <MiniMusicPlayer
+          songName="Praise"
+          artistName="Sister Nike"
+          isPlaying={isPlaying}
+          onTogglePlayback={togglePlay}
+          bottomOffset={tabBarHeight}
+        />
+      </Portal> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  Container: {
+    position: "relative",
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
+  SectionTitle: {
+    fontSize: moderateScale(20),
+    fontFamily: "Inter-Medium",
+    color: "#3E3C48",
   },
-  button: {
-    backgroundColor: "#313234",
-    padding: 15,
-    borderRadius: 10,
-    minWidth: 200,
-    alignItems: "center",
+  Section1: {
+    marginTop: verticalScale(20),
+    marginHorizontal: horizontalScale(16),
   },
-  logoutButton: {
-    marginTop: 20,
-    backgroundColor: "#FF3B30", // Red color for logout
+  Section1Content: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: horizontalScale(18),
+    rowGap: verticalScale(30),
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
+  Section2: {
+    marginTop: "12%",
+    marginLeft: horizontalScale(16),
+    flex: 1,
+  },
+  ScrollViewContentContainer: {
+    gap: horizontalScale(22),
+    marginTop: verticalScale(24),
+  },
+  ScrollViewContent: {
+    width: verticalScale(342),
+    height: "78%",
+    backgroundColor: "#F0F0F0",
+    borderRadius: moderateScale(10),
+
+    overflow: "hidden",
   },
 });
