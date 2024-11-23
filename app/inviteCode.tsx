@@ -129,19 +129,3 @@ const InviteCodePage = () => {
 };
 
 export default InviteCodePage;
-
-const style2 = StyleSheet.create({
-  groupName: {
-    fontFamily: "Inter-Regular",
-    fontSize: moderateScale(16),
-    color: "#595959",
-    textAlign: "center",
-    marginBottom: verticalScale(32),
-  },
-  description: {
-    color: "#595959",
-    fontSize: moderateScale(16),
-    fontFamily: "Inter-Light",
-    marginBottom: verticalScale(8),
-  },
-});
