@@ -31,7 +31,6 @@ Parse.Cloud.define("regenerateInviteCode", async (request) => {
 
     if (inviteCode) {
       inviteCode.set("code", code);
-      inviteCode.set("createdAt", currentTime);
     } else {
       const InviteCode = Parse.Object.extend("InviteCode");
       inviteCode = new InviteCode();
@@ -72,9 +71,9 @@ Parse.Cloud.define("validateInviteCode", async (request) => {
       };
     }
 
-    const createdAt = inviteCode.createdAt;
+    const updatedAt = inviteCode.updatedAt;
     const currentTime = new Date();
-    const timeDiff = currentTime - createdAt;
+    const timeDiff = currentTime - updatedAt;
 
     if (timeDiff > INVITE_CODE_EXPIRY) {
       return {
