@@ -67,8 +67,8 @@ const LoginPage = () => {
       return router.navigate("/name");
     }
     return userStatus.isMemberOfAnyChoir
-      ? setTimeout(() => router.navigate("/(tabs)"), 300)
-      : setTimeout(() => router.navigate("/chooseYourPath"), 300);
+      ? router.navigate("/(tabs)")
+      : router.navigate("/chooseYourPath");
   };
 
   const validateAndLogin = async () => {
