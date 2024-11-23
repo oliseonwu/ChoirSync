@@ -11,6 +11,8 @@ import { Asset } from "expo-asset";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 import BackButtonComponent from "@/components/BackButtonComponent";
+import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext";
+import { Portal, Provider as PaperProvider } from "react-native-paper";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -85,7 +87,13 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <PaperProvider>
+      <MusicPlayerProvider>
+        <RootLayoutNav />
+      </MusicPlayerProvider>
+    </PaperProvider>
+  );
 }
 
 function RootLayoutNav() {
