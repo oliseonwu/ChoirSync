@@ -9,12 +9,12 @@ import {
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/MiniMusicPlayer";
-// import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
-// import { Portal } from "react-native-paper";
+import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
+import { Portal } from "react-native-paper";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 export default function HomeScreen() {
-  // const { isPlaying, togglePlay } = useMusicPlayer();
+  const { isPlaying, togglePlay } = useMusicPlayer();
   const tabBarHeight = useBottomTabBarHeight();
 
   return (
@@ -77,7 +77,7 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* <Portal>
+      <Portal>
         <MiniMusicPlayer
           songName="Praise"
           artistName="Sister Nike"
@@ -85,7 +85,7 @@ export default function HomeScreen() {
           onTogglePlayback={togglePlay}
           bottomOffset={tabBarHeight}
         />
-      </Portal> */}
+      </Portal>
     </View>
   );
 }
