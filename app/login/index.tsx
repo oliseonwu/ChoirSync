@@ -67,8 +67,8 @@ const LoginPage = () => {
       return router.navigate("/name");
     }
     return userStatus.isMemberOfAnyChoir
-      ? router.navigate("/(tabs)")
-      : router.navigate("/chooseYourPath");
+      ? setTimeout(() => router.navigate("/(tabs)"), 300)
+      : setTimeout(() => router.navigate("/chooseYourPath"), 300);
   };
 
   const validateAndLogin = async () => {
@@ -105,6 +105,7 @@ const LoginPage = () => {
 
       // Complete login
       setIsLoading(false);
+
       navigateBasedOnUserStatus(userStatus);
     } catch (error: any) {
       setIsLoading(false);
