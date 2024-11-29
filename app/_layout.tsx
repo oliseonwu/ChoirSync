@@ -8,8 +8,12 @@ import "react-native-reanimated";
 import BackButton from "@/assets/images/SVG/back-Button.svg";
 import { Asset } from "expo-asset";
 
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
+import { StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from "@/utilities/TrueScale";
 import BackButtonComponent from "@/components/BackButtonComponent";
 import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext";
 import { Portal, Provider as PaperProvider } from "react-native-paper";
@@ -101,7 +105,7 @@ function RootLayoutNav() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
-        name="(tabs)"
+        name="(authenticated)"
         options={{ headerShown: false, animation: "none" }}
       />
       <Stack.Screen
@@ -207,5 +211,12 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   BackButton: {
     marginLeft: horizontalScale(0),
+  },
+  profilePic: {
+    width: moderateScale(39),
+    height: moderateScale(39),
+    borderRadius: moderateScale(19.5),
+    marginRight: moderateScale(0),
+    marginBottom: verticalScale(1),
   },
 });

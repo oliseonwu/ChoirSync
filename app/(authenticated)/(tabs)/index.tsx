@@ -15,13 +15,14 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useState } from "react";
 
 export default function HomeScreen() {
-  const { isPlaying, togglePlay } = useMusicPlayer();
+  const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
+    useMusicPlayer();
   const [isContentReady, setIsContentReady] = useState(false);
   const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {
-    setIsContentReady(true);
-  }, [tabBarHeight]);
+    setIsPlayerVisible(true);
+  }, []);
   return (
     <View style={styles.Container}>
       <View style={styles.Section1}>
@@ -81,17 +82,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      {isContentReady && (
-        <Portal>
-          <MiniMusicPlayer
-            songName="Praise"
-            artistName="Sister Nike"
-            isPlaying={isPlaying}
-            onTogglePlayback={togglePlay}
-            bottomOffset={tabBarHeight}
-          />
-        </Portal>
-      )}
+      <MiniMusicPlayer
+        songName="Praise"
+        artistName="Sister Nike"
+        isPlaying={isPlaying}
+        onTogglePlayback={togglePlay}
+        bottomOffset={tabBarHeight}
+        isVisible={isPlayerVisible}
+      />
     </View>
   );
 }

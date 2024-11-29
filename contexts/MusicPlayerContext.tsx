@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState } from "react";
 type MusicPlayerContextType = {
   isPlaying: boolean;
   togglePlay: () => void;
+  isPlayerVisible: boolean;
+  setIsPlayerVisible: (visible: boolean) => void;
 };
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(
@@ -15,13 +17,21 @@ export const MusicPlayerProvider = ({
   children: React.ReactNode;
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
 
   const togglePlay = () => {
     setIsPlaying((prev) => !prev);
   };
 
   return (
-    <MusicPlayerContext.Provider value={{ isPlaying, togglePlay }}>
+    <MusicPlayerContext.Provider
+      value={{
+        isPlaying,
+        togglePlay,
+        isPlayerVisible,
+        setIsPlayerVisible,
+      }}
+    >
       {children}
     </MusicPlayerContext.Provider>
   );
