@@ -10,10 +10,11 @@ import { authService } from "@/services/AuthService";
 import { useState } from "react";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import RightArrow from "@/assets/images/SVG/right-arrow3.svg";
+import { useMusicPlayerVisibility } from "@/hooks/useMusicPlayerVisibility";
 
 export default function SettingsScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
+  useMusicPlayerVisibility();
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     padding: moderateScale(16),
     borderRadius: moderateScale(12),
     marginTop: "auto",
-    marginBottom: verticalScale(32),
+    marginBottom: verticalScale(61),
     alignItems: "center",
     borderWidth: moderateScale(0.5),
     borderColor: "#EBEBEB",

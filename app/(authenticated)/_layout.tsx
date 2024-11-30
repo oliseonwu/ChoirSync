@@ -10,7 +10,10 @@ export default function AuthenticatedLayout() {
     <Stack screenOptions={{ headerShown: false, animation: "none" }}>
       <Stack.Screen
         name="(tabs)"
-        options={{ headerShown: false, animation: "none" }}
+        options={{
+          headerShown: false,
+          animation: "none",
+        }}
       />
       <Stack.Screen
         name="settings"

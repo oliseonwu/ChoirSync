@@ -5,6 +5,8 @@ type MusicPlayerContextType = {
   togglePlay: () => void;
   isPlayerVisible: boolean;
   setIsPlayerVisible: (visible: boolean) => void;
+  hidePlayer: () => void;
+  showPlayer: () => void;
 };
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(
@@ -23,6 +25,14 @@ export const MusicPlayerProvider = ({
     setIsPlaying((prev) => !prev);
   };
 
+  const hidePlayer = () => {
+    setIsPlayerVisible(false);
+  };
+
+  const showPlayer = () => {
+    setIsPlayerVisible(true);
+  };
+
   return (
     <MusicPlayerContext.Provider
       value={{
@@ -30,6 +40,8 @@ export const MusicPlayerProvider = ({
         togglePlay,
         isPlayerVisible,
         setIsPlayerVisible,
+        hidePlayer,
+        showPlayer,
       }}
     >
       {children}

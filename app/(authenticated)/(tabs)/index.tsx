@@ -13,6 +13,7 @@ import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
 import { Portal } from "react-native-paper";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
@@ -25,6 +26,8 @@ export default function HomeScreen() {
   }, []);
   return (
     <View style={styles.Container}>
+      <StatusBar style="dark" />
+
       <View style={styles.Section1}>
         <Text
           style={[styles.SectionTitle, { marginBottom: verticalScale(26) }]}

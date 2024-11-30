@@ -48,6 +48,7 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: false,
+
         tabBarLabelStyle: {
           fontFamily: "Inter-Medium",
           fontSize: moderateScale(11),
