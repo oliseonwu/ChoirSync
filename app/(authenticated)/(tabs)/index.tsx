@@ -12,13 +12,22 @@ import MiniMusicPlayer from "@/components/MiniMusicPlayer";
 import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
 import { Portal } from "react-native-paper";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
-  const { isPlaying, togglePlay } = useMusicPlayer();
+  const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
+    useMusicPlayer();
+  const [isContentReady, setIsContentReady] = useState(false);
   const tabBarHeight = useBottomTabBarHeight();
 
+  useEffect(() => {
+    setIsPlayerVisible(true);
+  }, []);
   return (
     <View style={styles.Container}>
+      <StatusBar style="dark" />
+
       <View style={styles.Section1}>
         <Text
           style={[styles.SectionTitle, { marginBottom: verticalScale(26) }]}
@@ -76,16 +85,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-
-      <Portal>
-        <MiniMusicPlayer
-          songName="Praise"
-          artistName="Sister Nike"
-          isPlaying={isPlaying}
-          onTogglePlayback={togglePlay}
-          bottomOffset={tabBarHeight}
-        />
-      </Portal>
+      <MiniMusicPlayer
+        songName="Praise"
+        artistName="Sister Nike"
+        isPlaying={isPlaying}
+        onTogglePlayback={togglePlay}
+        bottomOffset={tabBarHeight}
+        isVisible={isPlayerVisible}
+      />
     </View>
   );
 }

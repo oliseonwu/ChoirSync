@@ -13,13 +13,7 @@ import { Image } from "expo-image";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import HomeIcon from "@/assets/images/SVG/house-chimney.svg";
 import CatalogIcon from "@/assets/images/SVG/folder-music.svg";
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import { styles } from "@/shared/css/headingCss";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -54,6 +48,7 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: false,
+
         tabBarLabelStyle: {
           fontFamily: "Inter-Medium",
           fontSize: moderateScale(11),
@@ -72,22 +67,19 @@ export default function TabLayout() {
             />
           ),
           headerShown: true,
-          headerTitleStyle: {
-            fontFamily: "Inter-SemiBold",
-            color: "#3E3C48",
-          },
+          headerTitleStyle: styles.headerTitle,
           headerRight: () => (
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.push("/settings")}
+            >
               <Image
                 source={require("@/assets/images/profile-placeholder.png")}
-                style={styles.profilePic}
+                style={styles2.profilePic}
               />
             </TouchableOpacity>
           ),
-          headerShadowVisible: true,
-          headerStyle: {
-            shadowColor: "transparent", // Remove shadow on Android and iOS
-          },
+          headerShadowVisible: false,
         }}
       />
       <Tabs.Screen
@@ -108,7 +100,7 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles2 = StyleSheet.create({
   profilePic: {
     width: moderateScale(39),
     height: moderateScale(39),

@@ -8,11 +8,13 @@ import {
 import SmallMusicClipArt from "@/assets/images/SVG/Small music clip art.svg";
 import PauseIcon from "@/assets/images/SVG/Pause.svg";
 import PlayIcon from "@/assets/images/SVG/Play.svg";
+import { Portal } from "react-native-paper";
 type MiniMusicPlayerProps = {
   songName: string;
   artistName: string;
   isPlaying: boolean;
   bottomOffset: number;
+  isVisible: boolean;
   onTogglePlayback: () => void;
 };
 
@@ -22,38 +24,52 @@ const MiniMusicPlayer = ({
   isPlaying,
   onTogglePlayback,
   bottomOffset,
+  isVisible,
 }: MiniMusicPlayerProps) => {
-  console.log("marginBottom", bottomOffset);
   return (
-    <View
-      style={[
-        styles.MiniMusicPlayer,
-        {
-          bottom:
-            bottomOffset > 90 && Platform.OS === "android" ? 49 : bottomOffset,
-        },
-      ]}
-    >
-      <View style={styles.MiniMusicPlayerContent}>
-        <SmallMusicClipArt
-          width={verticalScale(52)}
-          height={verticalScale(52)}
-        />
+    <>
+      {isVisible && (
+        <Portal>
+          <View
+            style={[
+              styles.MiniMusicPlayer,
+              {
+                bottom:
+                  bottomOffset > 90 && Platform.OS === "android"
+                    ? 49
+                    : bottomOffset,
+              },
+            ]}
+          >
+            <View style={styles.MiniMusicPlayerContent}>
+              <SmallMusicClipArt
+                width={verticalScale(52)}
+                height={verticalScale(52)}
+              />
 
-        <View style={styles.MusicDetailsContainer}>
-          <Text style={styles.MusicName}>{songName}</Text>
-          <Text style={styles.MusicArtist}>{artistName}</Text>
-        </View>
+              <View style={styles.MusicDetailsContainer}>
+                <Text style={styles.MusicName}>{songName}</Text>
+                <Text style={styles.MusicArtist}>{artistName}</Text>
+              </View>
 
-        <TouchableOpacity onPress={onTogglePlayback} activeOpacity={0.7}>
-          {isPlaying ? (
-            <PauseIcon width={verticalScale(30)} height={verticalScale(30)} />
-          ) : (
-            <PlayIcon width={verticalScale(30)} height={verticalScale(30)} />
-          )}
-        </TouchableOpacity>
-      </View>
-    </View>
+              <TouchableOpacity onPress={onTogglePlayback} activeOpacity={0.7}>
+                {isPlaying ? (
+                  <PauseIcon
+                    width={verticalScale(30)}
+                    height={verticalScale(30)}
+                  />
+                ) : (
+                  <PlayIcon
+                    width={verticalScale(30)}
+                    height={verticalScale(30)}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Portal>
+      )}
+    </>
   );
 };
 
