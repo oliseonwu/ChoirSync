@@ -17,15 +17,16 @@ export default function AuthenticatedLayout() {
         options={{
           headerShown: true,
           animation: "none",
-          headerTransparent: true,
           headerTitle: "Settings",
           headerTitleAlign: "center",
           headerTitleStyle: styles.headerTitle,
+          headerShadowVisible: false,
+
           headerBackTitleVisible: false,
-          headerLeft: () => <BackButtonComponent style={{ marginLeft: 0 }} />,
+          headerLeft: () => <BackButtonComponent />,
 
           headerRight: () => (
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity activeOpacity={0.7} disabled>
               <Image
                 source={require("@/assets/images/profile-placeholder.png")}
                 style={styles.profilePic}

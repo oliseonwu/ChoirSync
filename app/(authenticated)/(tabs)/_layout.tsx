@@ -78,10 +78,7 @@ export default function TabLayout() {
               />
             </TouchableOpacity>
           ),
-          headerShadowVisible: true,
-          headerStyle: {
-            shadowColor: "transparent", // Remove shadow on Android and iOS
-          },
+          headerShadowVisible: false,
         }}
       />
       <Tabs.Screen
