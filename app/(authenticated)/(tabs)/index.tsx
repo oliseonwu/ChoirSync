@@ -12,13 +12,12 @@ import MiniMusicPlayer from "@/components/MiniMusicPlayer";
 import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
 import { Portal } from "react-native-paper";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
     useMusicPlayer();
-  const [isContentReady, setIsContentReady] = useState(false);
   const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {

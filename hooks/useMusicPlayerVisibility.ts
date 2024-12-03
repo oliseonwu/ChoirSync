@@ -1,11 +1,11 @@
 // hooks/useMusicPlayerVisibility.ts
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
 
 export const useMusicPlayerVisibility = () => {
   const { hidePlayer, showPlayer } = useMusicPlayer();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     hidePlayer();
     return () => {
       showPlayer();
