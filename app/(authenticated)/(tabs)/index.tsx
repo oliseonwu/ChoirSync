@@ -1,5 +1,10 @@
-import { StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Text, View } from "@/components/Themed";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import {
   moderateScale,
   horizontalScale,

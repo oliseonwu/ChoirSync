@@ -16,7 +16,6 @@ import CatalogIcon from "@/assets/images/SVG/folder-music.svg";
 import { styles } from "@/shared/css/headingCss";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const navigation = useNavigation();
 
   useEffect(() => {
