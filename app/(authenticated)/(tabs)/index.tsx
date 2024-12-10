@@ -14,7 +14,7 @@ import {
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/MiniMusicPlayer";
-import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
+import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { Portal } from "react-native-paper";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -22,7 +22,7 @@ import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
-    useMusicPlayer();
+    useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {

@@ -4,8 +4,9 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PlayIcon from "@/assets/images/SVG/item-play.svg";
+import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
 
 type SongListItemProps = {
@@ -26,7 +27,10 @@ export default function SongListItem({
   space,
 }: SongListItemProps) {
   return (
-    <View style={[styles.container, space && { marginTop: verticalScale(44) }]}>
+    <TouchableOpacity
+      activeOpacity={0.5}
+      style={[styles.container, space && { marginTop: verticalScale(44) }]}
+    >
       <Text style={styles.order}>{order}</Text>
       <View style={styles.clipArtCover}>
         {/* <Image
@@ -40,8 +44,9 @@ export default function SongListItem({
         <Text style={styles.songName}>{songName}</Text>
         <Text style={styles.artistName}>{artistName}</Text>
       </View>
-      <PlayIcon width={moderateScale(25)} />
-    </View>
+      {isPlaying === false && <PlayIcon width={moderateScale(25)} />}
+      {isPlaying === true && <PauseIcon width={moderateScale(25)} />}
+    </TouchableOpacity>
   );
 }
 

@@ -15,7 +15,7 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import BackButtonComponent from "@/components/BackButtonComponent";
-import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext";
+import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { Portal, Provider as PaperProvider } from "react-native-paper";
 
 export {
@@ -93,9 +93,9 @@ export default function RootLayout() {
 
   return (
     <PaperProvider>
-      <MusicPlayerProvider>
+      <MiniPlayerProvider>
         <RootLayoutNav />
-      </MusicPlayerProvider>
+      </MiniPlayerProvider>
     </PaperProvider>
   );
 }
