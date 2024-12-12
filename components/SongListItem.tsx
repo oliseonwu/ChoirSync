@@ -41,7 +41,9 @@ export default function SongListItem({
         <EarPhoneIcon />
       </View>
       <View style={styles.songInfo}>
-        <Text style={styles.songName}>{songName}</Text>
+        <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
+          {songName}
+        </Text>
         <Text style={styles.artistName}>{artistName}</Text>
       </View>
       {isPlaying === false && <PlayIcon width={moderateScale(25)} />}
@@ -55,6 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: horizontalScale(30),
+    paddingBottom: verticalScale(2),
   },
 
   order: {
@@ -92,6 +95,7 @@ const styles = StyleSheet.create({
 
   songInfo: {
     flex: 1,
+    marginRight: horizontalScale(21),
   },
 
   songName: {
