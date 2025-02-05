@@ -2,7 +2,7 @@ import { StyleSheet, ScrollView } from "react-native";
 import { Text, View } from "@/components/Themed";
 import SongListItem from "@/components/SongListItem";
 import { verticalScale, moderateScale } from "@/utilities/TrueScale";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Parse from "@/services/Parse";
 import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
@@ -24,6 +24,7 @@ type Recording = {
 export default function CatalogueScreen() {
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const rehearsalRecordCount = useRef(0);
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function CatalogueScreen() {
         currentUser.id
       );
       if (!membershipResult.success || !membershipResult.isMember) return;
+
       const choirGroupId =
         membershipResult.choirMember?.get("choir_groups_id").id;
 
@@ -115,6 +117,12 @@ export default function CatalogueScreen() {
             recordings[index - 1].rehearsalDate.toDateString() !==
               recording.rehearsalDate.toDateString(); // Show header when date changes
 
+          if (showHeader) {
+            rehearsalRecordCount.current = 1;
+          } else {
+            rehearsalRecordCount.current++;
+          }
+
           return (
             <View key={recording.id}>
               {showHeader && (
@@ -128,7 +136,7 @@ export default function CatalogueScreen() {
                 </Text>
               )}
               <SongListItem
-                order={showHeader ? 1 : index + 1}
+                order={rehearsalRecordCount.current}
                 imgUrl="https://picsum.photos/200/300"
                 songName={recording.name}
                 artistName={recording.singerName}
