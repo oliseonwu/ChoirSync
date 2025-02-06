@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
 type MiniPlayerContextType = {
-  isPlaying: boolean;
-  togglePlay: () => void;
   isPlayerVisible: boolean;
   setIsPlayerVisible: (visible: boolean) => void;
   hidePlayer: () => void;
@@ -23,12 +21,7 @@ export const MiniPlayerProvider = ({
 {
   children: React.ReactNode;
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
-
-  const togglePlay = () => {
-    setIsPlaying((prev) => !prev);
-  };
 
   const hidePlayer = () => {
     setIsPlayerVisible(false);
@@ -41,8 +34,6 @@ export const MiniPlayerProvider = ({
   return (
     <MiniPlayerContext.Provider
       value={{
-        isPlaying,
-        togglePlay,
         isPlayerVisible,
         setIsPlayerVisible,
         hidePlayer,

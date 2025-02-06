@@ -8,49 +8,98 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PlayIcon from "@/assets/images/SVG/item-play.svg";
 import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
+import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+import { memo } from "react";
 
-type SongListItemProps = {
-  order: number;
-  imgUrl?: string;
-  songName: string;
-  artistName: string;
-  isPlaying: boolean;
-  space: boolean;
+type Recording = {
+  id: string;
+  name: string;
+  singerName: string;
+  channel: "YT" | "file";
+  link?: string;
+  file?: string;
+  isMultiTracked: boolean;
+  rehearsalDate: Date;
+  categoryId: string;
+  choirGroupId: string;
 };
 
-export default function SongListItem({
-  order,
-  imgUrl,
-  songName,
-  artistName,
+type SongListItemProps = {
+  recording: Recording;
+  index: number;
+  isPlaying: boolean;
+  space: boolean;
+  onPress: () => void;
+  showHeader: boolean;
+  isFirst: boolean;
+};
+
+export function SongListItem({
+  recording,
+  index,
   isPlaying,
   space,
+  showHeader,
+  onPress,
+  isFirst,
 }: SongListItemProps) {
+  const getHeaderText = (date: Date, index: number) => {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const oneWeekAgo = new Date(
+      currentDate.getTime() - 7 * 24 * 60 * 60 * 1000
+    );
+
+    // Check if this is the most recent recording and within the last week
+    const isFirstGroup = index === 0;
+    const isWithinWeek = new Date(date) >= oneWeekAgo;
+
+    if (isFirstGroup && isWithinWeek) {
+      return "This Week's Rehearsal";
+    }
+    return new Date(date).toLocaleDateString("en-US", { timeZone: "UTC" });
+  };
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.5}
-      style={[styles.container, space && { marginTop: verticalScale(44) }]}
-    >
-      <Text style={styles.order}>{order}</Text>
-      <View style={styles.clipArtCover}>
-        {/* <Image
+    <>
+      {showHeader && (
+        <Text style={[styles.title, isFirst ? styles.title1 : styles.title2]}>
+          {getHeaderText(recording.rehearsalDate, index)}
+        </Text>
+      )}
+
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={() => {
+          onPress();
+        }}
+        style={[styles.container, space && { marginTop: verticalScale(44) }]}
+      >
+        <Text style={styles.order}>{index}</Text>
+        <View style={styles.clipArtCover}>
+          {/* <Image
           source={{ uri: imgUrl }}
           style={styles.clipArt}
           contentFit="cover"
         /> */}
-        <EarPhoneIcon />
-      </View>
-      <View style={styles.songInfo}>
-        <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
-          {songName}
-        </Text>
-        <Text style={styles.artistName}>{artistName}</Text>
-      </View>
-      {isPlaying === false && <PlayIcon width={moderateScale(25)} />}
-      {isPlaying === true && <PauseIcon width={moderateScale(25)} />}
-    </TouchableOpacity>
+          <EarPhoneIcon />
+        </View>
+        <View style={styles.songInfo}>
+          <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
+            {recording.name}
+          </Text>
+          <Text style={styles.artistName}>{recording.singerName}</Text>
+        </View>
+        {isPlaying === false && <PlayIcon width={moderateScale(25)} />}
+        {isPlaying === true && <PauseIcon width={moderateScale(25)} />}
+      </TouchableOpacity>
+    </>
   );
 }
+// export default ThisWeekCard;
+export default memo(SongListItem, (prevProps, nextProps) => {
+  return prevProps.isPlaying === nextProps.isPlaying;
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -58,6 +107,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: horizontalScale(30),
     paddingBottom: verticalScale(2),
+  },
+
+  title: {
+    fontSize: moderateScale(20),
+    fontFamily: "Inter-Medium",
+    color: "#3E3C48",
+    marginBottom: verticalScale(26),
+    paddingHorizontal: moderateScale(16),
+  },
+  title1: {
+    marginTop: verticalScale(32),
+  },
+  title2: {
+    marginTop: verticalScale(97),
   },
 
   order: {

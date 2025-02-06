@@ -7,7 +7,8 @@ import Parse from "@/services/Parse";
 import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
-
+import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 type Recording = {
   id: string;
   name: string;
@@ -26,6 +27,8 @@ export default function CatalogueScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const rehearsalRecordCount = useRef(0);
   const { width } = useWindowDimensions();
+  const { currentTrackDetails, setCurrentTrack, currentTrackState } =
+    useCurrentTrack();
 
   useEffect(() => {
     fetchRecordings();
@@ -80,23 +83,6 @@ export default function CatalogueScreen() {
     }
   };
 
-  const getHeaderText = (date: Date, index: number) => {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    const oneWeekAgo = new Date(
-      currentDate.getTime() - 7 * 24 * 60 * 60 * 1000
-    );
-
-    // Check if this is the most recent recording and within the last week
-    const isFirstGroup = index === 0;
-    const isWithinWeek = new Date(date) >= oneWeekAgo;
-
-    if (isFirstGroup && isWithinWeek) {
-      return "This Week's Rehearsal";
-    }
-    return new Date(date).toLocaleDateString("en-US", { timeZone: "UTC" });
-  };
-
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -124,26 +110,26 @@ export default function CatalogueScreen() {
           }
 
           return (
-            <View key={recording.id}>
-              {showHeader && (
-                <Text
-                  style={[
-                    styles.title,
-                    index === 0 ? styles.title1 : styles.title2,
-                  ]}
-                >
-                  {getHeaderText(recording.rehearsalDate, index)}
-                </Text>
-              )}
-              <SongListItem
-                order={rehearsalRecordCount.current}
-                imgUrl="https://picsum.photos/200/300"
-                songName={recording.name}
-                artistName={recording.singerName}
-                isPlaying={false}
-                space={!showHeader && index !== 0}
-              />
-            </View>
+            <SongListItem
+              key={recording.id}
+              recording={recording}
+              index={rehearsalRecordCount.current}
+              isPlaying={
+                recording.id === currentTrackDetails.songId &&
+                currentTrackState === "playing"
+              }
+              space={!showHeader && index !== 0}
+              showHeader={showHeader}
+              onPress={() => {
+                setCurrentTrack(
+                  recording.id,
+                  recording.name,
+                  recording.singerName,
+                  recording.link ?? ""
+                );
+              }}
+              isFirst={index === 0}
+            />
           );
         })}
       </ScrollView>
@@ -159,19 +145,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: verticalScale(100),
   },
-  title: {
-    fontSize: moderateScale(20),
-    fontFamily: "Inter-Medium",
-    color: "#3E3C48",
-    marginBottom: verticalScale(26),
-    paddingHorizontal: moderateScale(16),
-  },
-  title1: {
-    marginTop: verticalScale(32),
-  },
-  title2: {
-    marginTop: verticalScale(97),
-  },
+
   loadingContainer: {
     flex: 1,
     paddingHorizontal: moderateScale(16),
