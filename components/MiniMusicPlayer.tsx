@@ -9,23 +9,16 @@ import SmallMusicClipArt from "@/assets/images/SVG/Small music clip art.svg";
 import PauseIcon from "@/assets/images/SVG/Pause.svg";
 import PlayIcon from "@/assets/images/SVG/Play.svg";
 import { Portal } from "react-native-paper";
+import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 type MiniMusicPlayerProps = {
-  songName: string;
-  artistName: string;
-  isPlaying: boolean;
   bottomOffset: number;
   isVisible: boolean;
-  onTogglePlayback: () => void;
 };
 
-const MiniMusicPlayer = ({
-  songName,
-  artistName,
-  isPlaying,
-  onTogglePlayback,
-  bottomOffset,
-  isVisible,
-}: MiniMusicPlayerProps) => {
+const MiniMusicPlayer = ({ bottomOffset, isVisible }: MiniMusicPlayerProps) => {
+  const { currentTrackDetails, togglePlay, currentTrackState } =
+    useCurrentTrack();
+
   return (
     <>
       {isVisible && (
@@ -48,12 +41,16 @@ const MiniMusicPlayer = ({
               />
 
               <View style={styles.MusicDetailsContainer}>
-                <Text style={styles.MusicName}>{songName}</Text>
-                <Text style={styles.MusicArtist}>{artistName}</Text>
+                <Text style={styles.MusicName}>
+                  {currentTrackDetails.songName}
+                </Text>
+                <Text style={styles.MusicArtist}>
+                  {currentTrackDetails.artistName}
+                </Text>
               </View>
 
-              <TouchableOpacity onPress={onTogglePlayback} activeOpacity={0.7}>
-                {isPlaying ? (
+              <TouchableOpacity onPress={togglePlay} activeOpacity={0.7}>
+                {currentTrackState === "playing" ? (
                   <PauseIcon
                     width={verticalScale(30)}
                     height={verticalScale(30)}

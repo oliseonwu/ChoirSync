@@ -45,7 +45,7 @@ class AuthService {
   }
 
   async getCurrentUser() {
-    return Parse.User.current();
+    return Parse.User.currentAsync();
   }
 
   async logout() {

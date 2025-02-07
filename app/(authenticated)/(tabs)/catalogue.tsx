@@ -1,14 +1,138 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from "react-native";
+import { Text, View } from "@/components/Themed";
+import SongListItem from "@/components/SongListItem";
+import { verticalScale, moderateScale } from "@/utilities/TrueScale";
+import { useState, useEffect, useRef } from "react";
+import Parse from "@/services/Parse";
+import { authService } from "@/services/AuthService";
+import { SkeletonLoader } from "@/components/SkeletonLoader";
+import { useWindowDimensions } from "react-native";
+import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+type Recording = {
+  id: string;
+  name: string;
+  singerName: string;
+  channel: "YT" | "file";
+  link?: string;
+  file?: string;
+  isMultiTracked: boolean;
+  rehearsalDate: Date;
+  categoryId: string;
+  choirGroupId: string;
+};
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function CatalogueScreen() {
+  const [recordings, setRecordings] = useState<Recording[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const rehearsalRecordCount = useRef(0);
+  const { width } = useWindowDimensions();
+  const { currentTrackDetails, setCurrentTrack, currentTrackState } =
+    useCurrentTrack();
 
-export default function TabTwoScreen() {
+  useEffect(() => {
+    fetchRecordings();
+  }, []);
+
+  const fetchRecordings = async () => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+
+      if (!currentUser) return;
+
+      const membershipResult = await authService.checkChoirMembership(
+        currentUser.id
+      );
+      if (!membershipResult.success || !membershipResult.isMember) return;
+
+      const choirGroupId =
+        membershipResult.choirMember?.get("choir_groups_id").id;
+
+      const Recordings = Parse.Object.extend("Recordings");
+      const query = new Parse.Query(Recordings);
+
+      query.equalTo("choir_group_id", {
+        __type: "Pointer",
+        className: "ChoirGroups",
+        objectId: choirGroupId,
+      });
+
+      query.include("category_id");
+      query.descending("rehearsal_date");
+
+      const results = await query.find();
+
+      const processedRecordings = results.map((recording) => ({
+        id: recording.id,
+        name: recording.get("name"),
+        singerName: recording.get("singer_name"),
+        channel: recording.get("channel"),
+        link: recording.get("Link"),
+        file: recording.get("File"),
+        isMultiTracked: recording.get("is_multi_tracked"),
+        rehearsalDate: recording.get("rehearsal_date"),
+        categoryId: recording.get("category_id")?.id,
+        choirGroupId: recording.get("choir_group_id").id,
+      }));
+
+      setRecordings(processedRecordings);
+    } catch (error) {
+      console.error("Error fetching recordings:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <SkeletonLoader width={width} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {recordings.map((recording, index) => {
+          const showHeader =
+            index === 0 || // Always show header for first recording
+            recordings[index - 1].rehearsalDate.toDateString() !==
+              recording.rehearsalDate.toDateString(); // Show header when date changes
+
+          if (showHeader) {
+            rehearsalRecordCount.current = 1;
+          } else {
+            rehearsalRecordCount.current++;
+          }
+
+          return (
+            <SongListItem
+              key={recording.id}
+              recording={recording}
+              index={rehearsalRecordCount.current}
+              isPlaying={
+                recording.id === currentTrackDetails.songId &&
+                currentTrackState === "playing"
+              }
+              space={!showHeader && index !== 0}
+              showHeader={showHeader}
+              onPress={() => {
+                setCurrentTrack(
+                  recording.id,
+                  recording.name,
+                  recording.singerName,
+                  recording.link ?? ""
+                );
+              }}
+              isFirst={index === 0}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -16,16 +140,14 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  scrollViewContent: {
+    paddingBottom: verticalScale(100),
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+
+  loadingContainer: {
+    flex: 1,
+    paddingHorizontal: moderateScale(16),
   },
 });

@@ -1,5 +1,10 @@
-import { StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Text, View } from "@/components/Themed";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import {
   moderateScale,
   horizontalScale,
@@ -9,16 +14,13 @@ import {
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/MiniMusicPlayer";
-import { useMusicPlayer } from "@/contexts/MusicPlayerContext";
-import { Portal } from "react-native-paper";
+import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-
 export default function HomeScreen() {
-  const { isPlaying, togglePlay, isPlayerVisible, setIsPlayerVisible } =
-    useMusicPlayer();
-  const [isContentReady, setIsContentReady] = useState(false);
+  const { isPlayerVisible, setIsPlayerVisible } = useMiniPlayer();
+
   const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {
@@ -86,10 +88,6 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
       <MiniMusicPlayer
-        songName="Praise"
-        artistName="Sister Nike"
-        isPlaying={isPlaying}
-        onTogglePlayback={togglePlay}
         bottomOffset={tabBarHeight}
         isVisible={isPlayerVisible}
       />
