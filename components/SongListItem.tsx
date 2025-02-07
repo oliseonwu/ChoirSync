@@ -3,13 +3,16 @@ import {
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
-import { Image } from "expo-image";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PlayIcon from "@/assets/images/SVG/item-play.svg";
 import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
-import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { memo } from "react";
+import SongListItemDetails from "./SongListItemDetails";
+
+const MemoizedEarPhoneIcon = memo(() => <EarPhoneIcon />);
+const MemoizedPlayIcon = memo(() => <PlayIcon width={moderateScale(25)} />);
+const MemoizedPauseIcon = memo(() => <PauseIcon width={moderateScale(25)} />);
 
 type Recording = {
   id: string;
@@ -43,23 +46,6 @@ export function SongListItem({
   onPress,
   isFirst,
 }: SongListItemProps) {
-  const getHeaderText = (date: Date, index: number) => {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    const oneWeekAgo = new Date(
-      currentDate.getTime() - 7 * 24 * 60 * 60 * 1000
-    );
-
-    // Check if this is the most recent recording and within the last week
-    const isFirstGroup = index === 0;
-    const isWithinWeek = new Date(date) >= oneWeekAgo;
-
-    if (isFirstGroup && isWithinWeek) {
-      return "This Week's Rehearsal";
-    }
-    return new Date(date).toLocaleDateString("en-US", { timeZone: "UTC" });
-  };
-
   return (
     <>
       {showHeader && (
@@ -70,32 +56,65 @@ export function SongListItem({
 
       <TouchableOpacity
         activeOpacity={0.5}
-        onPress={() => {
-          onPress();
-        }}
+        onPress={onPress}
         style={[styles.container, space && { marginTop: verticalScale(44) }]}
       >
-        <Text style={styles.order}>{index}</Text>
-        <View style={styles.clipArtCover}>
-          {/* <Image
-          source={{ uri: imgUrl }}
-          style={styles.clipArt}
-          contentFit="cover"
-        /> */}
-          <EarPhoneIcon />
+        <SongListItemDetails
+          index={index}
+          songName={recording.name}
+          singerName={recording.singerName}
+        />
+        <View
+          style={{
+            position: "relative",
+            width: moderateScale(25),
+            height: moderateScale(25),
+          }}
+        >
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              opacity: isPlaying ? 0 : 1,
+            }}
+          >
+            <MemoizedPlayIcon />
+          </View>
+
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              opacity: isPlaying ? 1 : 0,
+            }}
+          >
+            <MemoizedPauseIcon />
+          </View>
         </View>
-        <View style={styles.songInfo}>
-          <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
-            {recording.name}
-          </Text>
-          <Text style={styles.artistName}>{recording.singerName}</Text>
-        </View>
-        {isPlaying === false && <PlayIcon width={moderateScale(25)} />}
-        {isPlaying === true && <PauseIcon width={moderateScale(25)} />}
+        {/* {isPlaying === false && <MemoizedPlayIcon />}
+        {isPlaying === true && <MemoizedPauseIcon />} */}
       </TouchableOpacity>
     </>
   );
 }
+
+const getHeaderText = (date: Date, index: number) => {
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  // Check if this is the most recent recording and within the last week
+  const isFirstGroup = index === 0;
+  const isWithinWeek = new Date(date) >= oneWeekAgo;
+
+  if (isFirstGroup && isWithinWeek) {
+    return "This Week's Rehearsal";
+  }
+  return new Date(date).toLocaleDateString("en-US", { timeZone: "UTC" });
+};
+
 // export default ThisWeekCard;
 export default memo(SongListItem, (prevProps, nextProps) => {
   return prevProps.isPlaying === nextProps.isPlaying;

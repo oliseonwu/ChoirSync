@@ -15,14 +15,11 @@ import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
-import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 export default function HomeScreen() {
   const { isPlayerVisible, setIsPlayerVisible } = useMiniPlayer();
-  const { currentTrackDetails, currentTrackState, togglePlay } =
-    useCurrentTrack();
 
   const tabBarHeight = useBottomTabBarHeight();
 
@@ -91,10 +88,6 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
       <MiniMusicPlayer
-        songName={currentTrackDetails.songName}
-        artistName={currentTrackDetails.artistName}
-        isPlaying={currentTrackState === "playing"}
-        onTogglePlayback={togglePlay}
         bottomOffset={tabBarHeight}
         isVisible={isPlayerVisible}
       />
