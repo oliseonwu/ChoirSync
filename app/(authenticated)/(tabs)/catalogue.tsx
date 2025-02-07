@@ -27,8 +27,13 @@ export default function CatalogueScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const rehearsalRecordCount = useRef(0);
   const { width } = useWindowDimensions();
-  const { currentTrackDetails, setCurrentTrack, currentTrackState } =
-    useCurrentTrack();
+  const {
+    currentTrackDetails,
+    setCurrentTrack,
+    currentTrackState,
+    returnCurrentSongDetailsSV,
+  } = useCurrentTrack();
+  const currentSongDetailsSV = returnCurrentSongDetailsSV();
 
   useEffect(() => {
     fetchRecordings();
@@ -129,6 +134,7 @@ export default function CatalogueScreen() {
                 );
               }}
               isFirst={index === 0}
+              currentSongDetailsSV={currentSongDetailsSV}
             />
           );
         })}

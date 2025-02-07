@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 type CurrentTrackDetailsType = {
   songId: string;
@@ -17,6 +18,11 @@ type CurrentTrackContextType = {
     artistName: string,
     songUrl: string
   ) => void;
+
+  returnCurrentSongDetailsSV: () => SharedValue<{
+    songId: string;
+    state: string;
+  }>;
 };
 
 const CurrentTrackContext = createContext<CurrentTrackContextType | undefined>(
@@ -28,6 +34,14 @@ export const CurrentTrackProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  // Shared value to store the current song details and state
+  // This is used to update the catalog screen when the current song changes
+  // and avoid re-rendering the catalog screen when the current song changes
+  const currentSongDetailsSV = useSharedValue({
+    songId: "",
+    state: "paused",
+  });
+
   const [currentTrackDetails, setCurrentTrackDetails] =
     useState<CurrentTrackDetailsType>({
       songId: "",
@@ -48,12 +62,17 @@ export const CurrentTrackProvider = ({
   ) => {
     setCurrentTrackDetails({ songId, songName, artistName, songUrl });
     setCurrentTrackState("playing");
+    currentSongDetailsSV.value = { songId, state: "playing" };
   };
 
   const togglePlay = () => {
     setCurrentTrackState((prevState) =>
       prevState === "playing" ? "paused" : "playing"
     );
+  };
+
+  const returnCurrentSongDetailsSV = () => {
+    return currentSongDetailsSV;
   };
 
   return (
@@ -63,6 +82,7 @@ export const CurrentTrackProvider = ({
         setCurrentTrack,
         currentTrackState,
         togglePlay,
+        returnCurrentSongDetailsSV,
       }}
     >
       {children}
