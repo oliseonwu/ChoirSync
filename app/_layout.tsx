@@ -94,11 +94,9 @@ export default function RootLayout() {
 
   return (
     <PaperProvider>
-      <CurrentTrackProvider>
-        <MiniPlayerProvider>
-          <RootLayoutNav />
-        </MiniPlayerProvider>
-      </CurrentTrackProvider>
+      <MiniPlayerProvider>
+        <RootLayoutNav />
+      </MiniPlayerProvider>
     </PaperProvider>
   );
 }

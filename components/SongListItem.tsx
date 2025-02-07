@@ -10,7 +10,6 @@ import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
 import { memo } from "react";
 import SongListItemDetails from "./SongListItemDetails";
 
-const MemoizedEarPhoneIcon = memo(() => <EarPhoneIcon />);
 const MemoizedPlayIcon = memo(() => <PlayIcon width={moderateScale(25)} />);
 const MemoizedPauseIcon = memo(() => <PauseIcon width={moderateScale(25)} />);
 
@@ -56,7 +55,6 @@ export function SongListItem({
 
       <TouchableOpacity
         activeOpacity={0.5}
-        onPress={onPress}
         style={[styles.container, space && { marginTop: verticalScale(44) }]}
       >
         <SongListItemDetails
