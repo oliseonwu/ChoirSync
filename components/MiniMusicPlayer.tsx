@@ -5,68 +5,72 @@ import {
   horizontalScale,
   moderateScale,
 } from "@/utilities/TrueScale";
+
 import SmallMusicClipArt from "@/assets/images/SVG/Small music clip art.svg";
 import PauseIcon from "@/assets/images/SVG/Pause.svg";
 import PlayIcon from "@/assets/images/SVG/Play.svg";
 import { Portal } from "react-native-paper";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
 type MiniMusicPlayerProps = {
   bottomOffset: number;
-  isVisible: boolean;
+  isVisibleSV: SharedValue<boolean>;
 };
 
-const MiniMusicPlayer = ({ bottomOffset, isVisible }: MiniMusicPlayerProps) => {
+const MiniMusicPlayer = ({
+  bottomOffset,
+  isVisibleSV,
+}: MiniMusicPlayerProps) => {
   const { currentTrackDetails, togglePlay, currentTrackState } =
     useCurrentTrack();
 
+  const miniplayerStyleSV = useAnimatedStyle(() => {
+    return {
+      opacity: isVisibleSV.value ? 1 : 0,
+      pointerEvents: isVisibleSV.value ? "auto" : "none",
+    };
+  });
   return (
-    <>
-      {isVisible && (
-        <Portal>
-          <View
-            style={[
-              styles.MiniMusicPlayer,
-              {
-                bottom:
-                  bottomOffset > 90 && Platform.OS === "android"
-                    ? 49
-                    : bottomOffset,
-              },
-            ]}
-          >
-            <View style={styles.MiniMusicPlayerContent}>
-              <SmallMusicClipArt
-                width={verticalScale(52)}
-                height={verticalScale(52)}
-              />
+    <Portal>
+      <Animated.View
+        style={[
+          styles.MiniMusicPlayer,
+          {
+            bottom:
+              bottomOffset > 90 && Platform.OS === "android"
+                ? 49
+                : bottomOffset,
+          },
+          miniplayerStyleSV,
+        ]}
+      >
+        <View style={styles.MiniMusicPlayerContent}>
+          <SmallMusicClipArt
+            width={verticalScale(52)}
+            height={verticalScale(52)}
+          />
 
-              <View style={styles.MusicDetailsContainer}>
-                <Text style={styles.MusicName}>
-                  {currentTrackDetails.songName}
-                </Text>
-                <Text style={styles.MusicArtist}>
-                  {currentTrackDetails.artistName}
-                </Text>
-              </View>
-
-              <TouchableOpacity onPress={togglePlay} activeOpacity={0.7}>
-                {currentTrackState === "playing" ? (
-                  <PauseIcon
-                    width={verticalScale(30)}
-                    height={verticalScale(30)}
-                  />
-                ) : (
-                  <PlayIcon
-                    width={verticalScale(30)}
-                    height={verticalScale(30)}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
+          <View style={styles.MusicDetailsContainer}>
+            <Text style={styles.MusicName}>{currentTrackDetails.songName}</Text>
+            <Text style={styles.MusicArtist}>
+              {currentTrackDetails.artistName}
+            </Text>
           </View>
-        </Portal>
-      )}
-    </>
+
+          <TouchableOpacity onPress={togglePlay} activeOpacity={0.7}>
+            {currentTrackState === "playing" ? (
+              <PauseIcon width={verticalScale(30)} height={verticalScale(30)} />
+            ) : (
+              <PlayIcon width={verticalScale(30)} height={verticalScale(30)} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </Portal>
   );
 };
 
