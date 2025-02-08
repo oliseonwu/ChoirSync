@@ -19,7 +19,7 @@ export default function AuthenticatedLayout() {
         name="settings"
         options={{
           headerShown: true,
-          animation: "none",
+          animation: "fade",
           headerTitle: "Settings",
           headerTitleAlign: "center",
           headerTitleStyle: styles.headerTitle,

@@ -92,13 +92,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <PaperProvider>
-      <MiniPlayerProvider>
-        <RootLayoutNav />
-      </MiniPlayerProvider>
-    </PaperProvider>
-  );
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
