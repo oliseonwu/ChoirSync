@@ -19,9 +19,13 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
+import NowPlayingComponent from "@/components/NowPlayingComponent";
+import { useHeaderHeight } from "@react-navigation/elements";
+
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
+  const headerHeight = useHeaderHeight();
 
   useEffect(() => {
     showPlayer();
@@ -87,6 +91,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <NowPlayingComponent />
       <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );

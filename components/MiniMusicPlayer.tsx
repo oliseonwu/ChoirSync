@@ -15,16 +15,17 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { memo } from "react";
 
 type MiniMusicPlayerProps = {
   bottomOffset: number;
   isVisibleSV: SharedValue<boolean>;
 };
 
-const MiniMusicPlayer = ({
+export function MiniMusicPlayer({
   bottomOffset,
   isVisibleSV,
-}: MiniMusicPlayerProps) => {
+}: MiniMusicPlayerProps) {
   const { currentTrackDetails, togglePlay, currentTrackState } =
     useCurrentTrack();
 
@@ -72,8 +73,14 @@ const MiniMusicPlayer = ({
       </Animated.View>
     </Portal>
   );
-};
+}
 
+export default memo(MiniMusicPlayer, (prev, next) => {
+  return (
+    prev.bottomOffset === next.bottomOffset &&
+    prev.isVisibleSV === next.isVisibleSV
+  );
+});
 const styles = StyleSheet.create({
   MiniMusicPlayer: {
     backgroundColor: "#A3A2A2",
@@ -108,5 +115,3 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-
-export default MiniMusicPlayer;

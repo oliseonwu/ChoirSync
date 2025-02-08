@@ -13,4 +13,9 @@ export const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     color: "#3E3C48",
   },
+  smallHeaderTitle: {
+    fontFamily: "Inter-Medium",
+    color: "#868686",
+    fontSize: moderateScale(14),
+  },
 });

@@ -4,6 +4,7 @@ import BackButtonComponent from "@/components/BackButtonComponent";
 import { TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { styles } from "@/shared/css/headingCss";
+import { PaperProvider } from "react-native-paper";
 
 export default function AuthenticatedLayout() {
   return (
