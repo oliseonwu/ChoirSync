@@ -11,6 +11,7 @@ import PauseIcon from "@/assets/images/SVG/Pause.svg";
 import PlayIcon from "@/assets/images/SVG/Play.svg";
 import { Portal } from "react-native-paper";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -28,6 +29,7 @@ export function MiniMusicPlayer({
 }: MiniMusicPlayerProps) {
   const { currentTrackDetails, togglePlay, currentTrackState } =
     useCurrentTrack();
+  const { openPlayer } = useNowPlayingContext();
 
   const miniplayerStyleSV = useAnimatedStyle(() => {
     return {
@@ -35,6 +37,13 @@ export function MiniMusicPlayer({
       pointerEvents: isVisibleSV.value ? "auto" : "none",
     };
   });
+
+  const handlePress = () => {
+    if (currentTrackState === "paused") {
+      openPlayer();
+      togglePlay();
+    }
+  };
   return (
     <Portal>
       <Animated.View
@@ -49,7 +58,11 @@ export function MiniMusicPlayer({
           miniplayerStyleSV,
         ]}
       >
-        <View style={styles.MiniMusicPlayerContent}>
+        <TouchableOpacity
+          style={styles.MiniMusicPlayerContent}
+          activeOpacity={0.8}
+          onPress={handlePress}
+        >
           <SmallMusicClipArt
             width={verticalScale(52)}
             height={verticalScale(52)}
@@ -62,14 +75,14 @@ export function MiniMusicPlayer({
             </Text>
           </View>
 
-          <TouchableOpacity onPress={togglePlay} activeOpacity={0.7}>
+          <View>
             {currentTrackState === "playing" ? (
               <PauseIcon width={verticalScale(30)} height={verticalScale(30)} />
             ) : (
               <PlayIcon width={verticalScale(30)} height={verticalScale(30)} />
             )}
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </Animated.View>
     </Portal>
   );
@@ -83,7 +96,6 @@ export default memo(MiniMusicPlayer, (prev, next) => {
 });
 const styles = StyleSheet.create({
   MiniMusicPlayer: {
-    backgroundColor: "#A3A2A2",
     width: "100%",
     height: "7.5%",
     position: "absolute",
@@ -93,9 +105,10 @@ const styles = StyleSheet.create({
   MiniMusicPlayerContent: {
     flex: 1,
     flexDirection: "row",
-    marginLeft: horizontalScale(12),
-    marginRight: horizontalScale(30),
-    backgroundColor: "rgba(0, 0, 0, 0)",
+    paddingLeft: horizontalScale(12),
+    paddingRight: horizontalScale(30),
+    // backgroundColor: "rgba(0, 0, 0, 0)",
+    backgroundColor: "#A3A2A2",
     alignItems: "center",
   },
   MusicDetailsContainer: {

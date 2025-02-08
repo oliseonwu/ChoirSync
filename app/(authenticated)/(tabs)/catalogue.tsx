@@ -56,7 +56,7 @@ export default function CatalogueScreen() {
         name: recording.get("name"),
         singerName: recording.get("singer_name"),
         channel: recording.get("channel"),
-        link: recording.get("Link"),
+        link: recording.get("link"),
         file: recording.get("File"),
         isMultiTracked: recording.get("is_multi_tracked"),
         rehearsalDate: recording.get("rehearsal_date"),

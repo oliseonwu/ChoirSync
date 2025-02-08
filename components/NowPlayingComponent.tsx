@@ -5,7 +5,7 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -18,27 +18,50 @@ import {
 } from "@/utilities/TrueScale";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
+import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import YoutubePlayer from "react-native-youtube-iframe";
 
 export function NowPlayingComponent() {
   const headerAndStatusBarHeight = useHeaderHeight();
-  console.log(headerAndStatusBarHeight);
   const headingContainerHeight =
     headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
+  const { togglePlay, currentTrackState, currentTrackDetails } =
+    useCurrentTrack();
+  const [headingText, setHeadingText] = useState("");
+  const [ytVideoId, setYtVideoId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setHeadingText(currentTrackDetails.songName);
+    setYtVideoId(getYouTubeVideoId(currentTrackDetails.songUrl));
+  }, [currentTrackDetails.songId]);
 
   const translateYStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: yOffsetSV.value }],
   }));
 
+  function getYouTubeVideoId(url: string): string | undefined {
+    const regex =
+      /(?:youtu\.be\/|youtube\.com\/(?:.*v=|embed\/|v\/|shorts\/|live\/))([^?&\/]+)/;
+    const match = url.match(regex);
+    return match ? match[1] : undefined;
+  }
+
+  const handleClose = () => {
+    if (currentTrackState === "playing") {
+      togglePlay();
+      closePlayer();
+    }
+  };
+
   return (
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
         <View style={styles.statusBar}></View>
-
         <View
           style={[styles.headingContainer, { height: headingContainerHeight }]}
         >
-          <TouchableOpacity onPress={closePlayer}>
+          <TouchableOpacity onPress={handleClose}>
             <ArrownDown
               height={verticalScale(25)}
               width={horizontalScale(22)}
@@ -46,13 +69,19 @@ export function NowPlayingComponent() {
             />
           </TouchableOpacity>
 
-          <Text style={styles.headingText}>NowPlayingComponent</Text>
+          <Text style={styles.headingText}>{headingText}</Text>
 
           <TouchableOpacity>
             <SaveIcon height={verticalScale(25)} width={horizontalScale(22)} />
           </TouchableOpacity>
         </View>
-        {/* <Text>NowPlayingComponent</Text> */}
+
+        <YoutubePlayer
+          height={verticalScale(300)}
+          videoId={ytVideoId}
+          play={currentTrackState === "playing"}
+          webViewStyle={{ opacity: 0.99, marginTop: verticalScale(10) }}
+        />
       </Animated.View>
     </Portal>
   );
@@ -67,10 +96,10 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     height: Constants.statusBarHeight,
-    backgroundColor: "blue",
+    // backgroundColor: "blue",
   },
   headingContainer: {
-    backgroundColor: "pink",
+    // backgroundColor: "pink",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
