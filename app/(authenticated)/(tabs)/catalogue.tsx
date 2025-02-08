@@ -8,19 +8,7 @@ import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
-
-type Recording = {
-  id: string;
-  name: string;
-  singerName: string;
-  channel: "YT" | "file";
-  link?: string;
-  file?: string;
-  isMultiTracked: boolean;
-  rehearsalDate: Date;
-  categoryId: string;
-  choirGroupId: string;
-};
+import { Recording } from "@/types/music.types";
 
 export default function CatalogueScreen() {
   const [recordings, setRecordings] = useState<Recording[]>([]);

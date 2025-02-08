@@ -1,29 +1,10 @@
 import { createContext, useContext, useState } from "react";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
-
-type CurrentTrackDetailsType = {
-  songId: string;
-  songName: string;
-  artistName: string;
-  songUrl: string;
-};
-
-type CurrentTrackContextType = {
-  currentTrackDetails: CurrentTrackDetailsType;
-  currentTrackState: "playing" | "paused";
-  togglePlay: () => void;
-  changeCurrentTrack: (
-    songId: string,
-    songName: string,
-    artistName: string,
-    songUrl: string
-  ) => void;
-
-  currentSongDetailsSV: SharedValue<{
-    songId: string;
-    state: string;
-  }>;
-};
+import { useSharedValue } from "react-native-reanimated";
+import {
+  CurrentTrackContextType,
+  CurrentTrackDetailsType,
+  CurrentTrackState,
+} from "@/types/currentTrackContext.types";
 
 const CurrentTrackContext = createContext<CurrentTrackContextType | undefined>(
   undefined
@@ -52,9 +33,8 @@ export const CurrentTrackProvider = ({
     });
 
   // State to store the current song state
-  const [currentTrackState, setCurrentTrackState] = useState<
-    "playing" | "paused"
-  >("paused");
+  const [currentTrackState, setCurrentTrackState] =
+    useState<CurrentTrackState>("paused");
 
   // Custom Function to set the current song details and state
   const changeCurrentTrack = (
