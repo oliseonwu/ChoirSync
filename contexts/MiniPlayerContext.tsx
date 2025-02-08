@@ -2,8 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 
 type MiniPlayerContextType = {
-  isPlayerVisible: SharedValue<boolean>;
-  setIsPlayerVisible: (visible: boolean) => void;
+  isVisibleSV: SharedValue<boolean>;
   hidePlayer: () => void;
   showPlayer: () => void;
 };
@@ -22,25 +21,24 @@ export const MiniPlayerProvider = ({
 {
   children: React.ReactNode;
 }) => {
-  const isPlayerVisible = useSharedValue(false);
+  const isVisibleSV = useSharedValue(false);
 
   const hidePlayer = () => {
-    setIsPlayerVisible(false);
+    setPlayerVisibility(false);
   };
 
   const showPlayer = () => {
-    setIsPlayerVisible(true);
+    setPlayerVisibility(true);
   };
 
-  const setIsPlayerVisible = (visible: boolean) => {
-    isPlayerVisible.value = visible;
+  const setPlayerVisibility = (visible: boolean) => {
+    isVisibleSV.value = visible;
   };
 
   return (
     <MiniPlayerContext.Provider
       value={{
-        isPlayerVisible,
-        setIsPlayerVisible,
+        isVisibleSV,
         hidePlayer,
         showPlayer,
       }}

@@ -20,11 +20,11 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
 export default function HomeScreen() {
-  const { isPlayerVisible, setIsPlayerVisible } = useMiniPlayer();
+  const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {
-    setIsPlayerVisible(true);
+    showPlayer();
   }, []);
   return (
     <View style={styles.Container}>
@@ -87,10 +87,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      <MiniMusicPlayer
-        bottomOffset={tabBarHeight}
-        isVisibleSV={isPlayerVisible}
-      />
+      <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );
 }
