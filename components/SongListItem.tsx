@@ -9,6 +9,10 @@ import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
 import { memo } from "react";
 import SongListItemDetails from "./SongListItemDetails";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 const MemoizedPlayIcon = memo(() => <PlayIcon width={moderateScale(25)} />);
 const MemoizedPauseIcon = memo(() => <PauseIcon width={moderateScale(25)} />);
@@ -29,22 +33,50 @@ type Recording = {
 type SongListItemProps = {
   recording: Recording;
   index: number;
-  isPlaying: boolean;
   space: boolean;
   onPress: () => void;
   showHeader: boolean;
   isFirst: boolean;
+  currentSongDetailsSV: SharedValue<{
+    songId: string;
+    state: string;
+  }>;
 };
 
 export function SongListItem({
   recording,
   index,
-  isPlaying,
   space,
   showHeader,
   onPress,
   isFirst,
+  currentSongDetailsSV,
 }: SongListItemProps) {
+  const showPlayIcon = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      opacity:
+        currentSongDetailsSV.value.songId === recording.id &&
+        currentSongDetailsSV.value.state === "playing"
+          ? 0
+          : 1,
+    };
+  });
+
+  const showPauseIcon = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      opacity:
+        currentSongDetailsSV.value.songId === recording.id &&
+        currentSongDetailsSV.value.state === "playing"
+          ? 1
+          : 0,
+    };
+  });
   return (
     <>
       {showHeader && (
@@ -55,6 +87,7 @@ export function SongListItem({
 
       <TouchableOpacity
         activeOpacity={0.5}
+        onPress={onPress}
         style={[styles.container, space && { marginTop: verticalScale(44) }]}
       >
         <SongListItemDetails
@@ -69,27 +102,13 @@ export function SongListItem({
             height: moderateScale(25),
           }}
         >
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              opacity: isPlaying ? 0 : 1,
-            }}
-          >
+          <Animated.View style={showPlayIcon}>
             <MemoizedPlayIcon />
-          </View>
+          </Animated.View>
 
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              opacity: isPlaying ? 1 : 0,
-            }}
-          >
+          <Animated.View style={showPauseIcon}>
             <MemoizedPauseIcon />
-          </View>
+          </Animated.View>
         </View>
         {/* {isPlaying === false && <MemoizedPlayIcon />}
         {isPlaying === true && <MemoizedPauseIcon />} */}
@@ -113,9 +132,9 @@ const getHeaderText = (date: Date, index: number) => {
   return new Date(date).toLocaleDateString("en-US", { timeZone: "UTC" });
 };
 
-// export default ThisWeekCard;
+//Never rerender the song list item
 export default memo(SongListItem, (prevProps, nextProps) => {
-  return prevProps.isPlaying === nextProps.isPlaying;
+  return true;
 });
 
 const styles = StyleSheet.create({

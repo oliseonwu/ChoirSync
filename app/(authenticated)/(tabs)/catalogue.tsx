@@ -8,7 +8,7 @@ import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
-import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+
 type Recording = {
   id: string;
   name: string;
@@ -27,8 +27,7 @@ export default function CatalogueScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const rehearsalRecordCount = useRef(0);
   const { width } = useWindowDimensions();
-  const { currentTrackDetails, setCurrentTrack, currentTrackState } =
-    useCurrentTrack();
+  const { changeCurrentTrack, currentSongDetailsSV } = useCurrentTrack();
 
   useEffect(() => {
     fetchRecordings();
@@ -114,14 +113,10 @@ export default function CatalogueScreen() {
               key={recording.id}
               recording={recording}
               index={rehearsalRecordCount.current}
-              isPlaying={
-                recording.id === currentTrackDetails.songId &&
-                currentTrackState === "playing"
-              }
               space={!showHeader && index !== 0}
               showHeader={showHeader}
               onPress={() => {
-                setCurrentTrack(
+                changeCurrentTrack(
                   recording.id,
                   recording.name,
                   recording.singerName,
@@ -129,6 +124,7 @@ export default function CatalogueScreen() {
                 );
               }}
               isFirst={index === 0}
+              currentSongDetailsSV={currentSongDetailsSV}
             />
           );
         })}
