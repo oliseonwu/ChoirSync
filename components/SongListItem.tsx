@@ -13,22 +13,10 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { Recording } from "@/types/music.types";
 
 const MemoizedPlayIcon = memo(() => <PlayIcon width={moderateScale(25)} />);
 const MemoizedPauseIcon = memo(() => <PauseIcon width={moderateScale(25)} />);
-
-type Recording = {
-  id: string;
-  name: string;
-  singerName: string;
-  channel: "YT" | "file";
-  link?: string;
-  file?: string;
-  isMultiTracked: boolean;
-  rehearsalDate: Date;
-  categoryId: string;
-  choirGroupId: string;
-};
 
 type SongListItemProps = {
   recording: Recording;
