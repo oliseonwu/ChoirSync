@@ -33,7 +33,6 @@ type Recording = {
 type SongListItemProps = {
   recording: Recording;
   index: number;
-  isPlaying: boolean;
   space: boolean;
   onPress: () => void;
   showHeader: boolean;
@@ -47,7 +46,6 @@ type SongListItemProps = {
 export function SongListItem({
   recording,
   index,
-  isPlaying,
   space,
   showHeader,
   onPress,
@@ -59,7 +57,11 @@ export function SongListItem({
       position: "absolute",
       top: 0,
       left: 0,
-      opacity: currentSongDetailsSV.value.songId === recording.id ? 0 : 1,
+      opacity:
+        currentSongDetailsSV.value.songId === recording.id &&
+        currentSongDetailsSV.value.state === "playing"
+          ? 0
+          : 1,
     };
   });
 
@@ -68,7 +70,11 @@ export function SongListItem({
       position: "absolute",
       top: 0,
       left: 0,
-      opacity: currentSongDetailsSV.value.songId === recording.id ? 1 : 0,
+      opacity:
+        currentSongDetailsSV.value.songId === recording.id &&
+        currentSongDetailsSV.value.state === "playing"
+          ? 1
+          : 0,
     };
   });
   return (
