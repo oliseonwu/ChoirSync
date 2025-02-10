@@ -7,7 +7,7 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   horizontalScale,
   moderateScale,
@@ -26,6 +26,10 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useLoadingState(false);
+
+  useEffect(() => {
+    handleAutoLogin();
+  }, []);
 
   // Email validation function
   const isValidEmail = (email: string) => {
@@ -76,7 +80,7 @@ const LoginPage = () => {
       throw new Error("Please enter a valid email and password");
     }
 
-    const result = await authService.login({ email, password });
+    const result = await authService.loginWithCredentials({ email, password });
 
     if (!result.success || !result.user) {
       throw new Error(result.error || "Failed to login");
@@ -110,6 +114,26 @@ const LoginPage = () => {
     } catch (error: any) {
       setIsLoading(false);
       handleLoginError(error);
+    }
+  };
+
+  const handleAutoLogin = async () => {
+    try {
+      setIsLoading(true);
+
+      // Login flow
+      const user = await authService.getCurrentUser();
+      if (!user) {
+        throw new Error("No previous session found");
+      }
+      const userStatus = await getUserStatus(user);
+
+      // Complete login
+      setIsLoading(false);
+
+      navigateBasedOnUserStatus(userStatus);
+    } catch (error: any) {
+      setIsLoading(false);
     }
   };
 

@@ -20,6 +20,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import YoutubePlayer from "react-native-youtube-iframe";
+import SectionDisplay from "./SectionDisplay";
 
 export function NowPlayingComponent() {
   const headerAndStatusBarHeight = useHeaderHeight();
@@ -76,12 +77,19 @@ export function NowPlayingComponent() {
           </TouchableOpacity>
         </View>
 
-        <YoutubePlayer
-          height={verticalScale(300)}
-          videoId={ytVideoId}
-          play={currentTrackState === "playing"}
-          webViewStyle={{ opacity: 0.99, marginTop: verticalScale(10) }}
-        />
+        <View style={styles.videoPlayerContainer}>
+          <YoutubePlayer
+            height={verticalScale(250)}
+            videoId={ytVideoId}
+            play={currentTrackState === "playing" && ytVideoId !== undefined}
+            webViewStyle={styles.videoPlayer}
+            onError={(e) => {
+              console.log("Error:", e);
+              console.log("ytVideoId:", ytVideoId);
+            }}
+          />
+        </View>
+        <SectionDisplay />
       </Animated.View>
     </Portal>
   );
@@ -110,5 +118,14 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
     color: "#868686",
     fontSize: moderateScale(14),
+  },
+  videoPlayerContainer: {
+    // backgroundColor: "red",
+    paddingTop: verticalScale(9),
+    paddingBottom: "1.8%",
+    // paddingVertical: "2%",
+  },
+  videoPlayer: {
+    opacity: 0.99,
   },
 });
