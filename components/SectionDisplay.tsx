@@ -1,79 +1,108 @@
 // SectionDisplay.tsx helps to display the section in a recording
 
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import React from "react";
-import { moderateScale } from "@/utilities/TrueScale";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import SectionItem from "./SectionItem";
-
-// Add this data array outside the component
-const songData = [
-  {
-    id: 1,
-    songName: "Song 1",
-    artistName: "Artist 1",
-    timeStamp: "00:00",
-    isSelected: true,
-  },
-  {
-    id: 2,
-    songName: "Song 2",
-    artistName: "Artist 2",
-    timeStamp: "01:00",
-    isSelected: false,
-  },
-  {
-    id: 3,
-    songName: "Song 3",
-    artistName: "Artist 3",
-    timeStamp: "02:00",
-    isSelected: false,
-  },
-  {
-    id: 4,
-    songName: "Song 4",
-    artistName: "Artist 4",
-    timeStamp: "03:00",
-    isSelected: false,
-  },
-  {
-    id: 5,
-    songName: "Song 5",
-    artistName: "Artist 5",
-    timeStamp: "04:00",
-    isSelected: false,
-  },
-  {
-    id: 6,
-    songName: "Song 6",
-    artistName: "Artist 6",
-    timeStamp: "05:00",
-    isSelected: false,
-  },
-];
+import { isEnabled } from "react-native/Libraries/Performance/Systrace";
+import { EventRegister } from "react-native-event-listeners";
+import { FlashList } from "@shopify/flash-list";
+import { useSharedValue } from "react-native-reanimated";
+type SongData = {
+  id: number;
+  songName: string;
+  artistName: string;
+  timeStamp: string;
+};
 
 export default function SectionDisplay() {
-  const renderItem = ({ item }: { item: (typeof songData)[0] }) => (
-    <SectionItem
-      key={item.id}
-      index={item.id}
-      songName={item.songName}
-      artistName={item.artistName}
-      timeStamp={item.timeStamp}
-      isSelected={item.isSelected}
-    />
+  const selectedSongSV = useSharedValue<SongData | null>(null);
+
+  const unclickSong = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const unclickListener: any = EventRegister.addEventListener(
+      "selectedSong",
+      (unClickFunc: () => void) => {
+        // if the song is already selected, then unclick it
+        if (unclickSong.current !== null) {
+          unclickSong.current();
+        }
+
+        // set the unclick function for the new song
+        unclickSong.current = unClickFunc;
+      }
+    );
+
+    return () => {
+      EventRegister.removeEventListener(unclickListener);
+    };
+  }, []);
+
+  const getSelectedSongSV = () => {
+    return selectedSongSV;
+  };
+
+  const changeSelectedSong = (song: SongData) => {
+    selectedSongSV.value = song;
+  };
+
+  const songData = useMemo(
+    () =>
+      Array.from({ length: 200 }, (_, i) => {
+        const id = i + 1;
+        const minutes = Math.floor(i);
+        const formattedMinutes = minutes.toString().padStart(2, "0");
+
+        return {
+          id,
+          songName: `Song ${id}`,
+          artistName: `Artist ${id}`,
+          timeStamp: `${formattedMinutes}:00`,
+        };
+      }),
+    []
   );
+
+  const renderItem = ({ item }: { item: (typeof songData)[0] }) => {
+    return (
+      <SectionItem
+        item={item}
+        changeSelectedSong={changeSelectedSong}
+        getSelectedSongSV={getSelectedSongSV}
+      />
+    );
+  };
+
+  const renderContent = useMemo(() => {
+    return songData.length > 0 ? (
+      <View style={styles.sectionContent}>
+        <FlashList
+          data={songData}
+          renderItem={renderItem}
+          estimatedItemSize={verticalScale(80)}
+          keyExtractor={(item: SongData) => item.id.toString()}
+        />
+      </View>
+    ) : (
+      <View style={styles.noSongWrapper}>
+        <Text style={styles.noSongText}>No songs found</Text>
+      </View>
+    );
+  }, [songData]);
 
   return (
     <View style={styles.container}>
       <View style={styles.sectionHeading}>
         <Text style={styles.headingText}>Song List</Text>
       </View>
-      <FlatList
-        data={songData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        style={styles.sectionContent}
-      />
+      {renderContent}
     </View>
   );
 }
@@ -88,7 +117,9 @@ const styles = StyleSheet.create({
     flex: 0.12,
     // backgroundColor: "blue",
     justifyContent: "center",
-    marginLeft: moderateScale(19),
+    paddingLeft: moderateScale(19),
+    borderBottomWidth: moderateScale(0.7),
+    borderColor: "#E8E8E8",
   },
   headingText: {
     fontSize: moderateScale(21),
@@ -97,6 +128,15 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     flex: 1,
-    // backgroundColor: "green",
+  },
+  noSongWrapper: {
+    flex: 1,
+    alignItems: "center",
+  },
+  noSongText: {
+    fontSize: moderateScale(15),
+    fontFamily: "Inter-Medium",
+    color: "#868686",
+    marginTop: "8%",
   },
 });

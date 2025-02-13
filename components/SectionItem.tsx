@@ -1,50 +1,91 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef } from "react";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
-export default function SectionItem({
-  index,
-  songName,
-  artistName,
-  isSelected,
-  timeStamp,
-}: {
-  index: number;
+type SongData = {
+  id: number;
   songName: string;
   artistName: string;
-  isSelected: boolean;
   timeStamp: string;
-}) {
+};
+
+type SectionItemProps = {
+  item: SongData;
+  changeSelectedSong: (song: SongData) => void;
+  getSelectedSongSV: () => SharedValue<SongData | null>;
+};
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export default function SectionItem({
+  item,
+  changeSelectedSong,
+  getSelectedSongSV,
+}: SectionItemProps) {
+  const selectedSongSV = useRef(getSelectedSongSV());
+
+  useEffect(() => {
+    const tempSV = getSelectedSongSV();
+
+    if (selectedSongSV.current.value?.id !== tempSV.value?.id) {
+      console.log("Refreshing selectedSongSV");
+      selectedSongSV.current.value = tempSV.value;
+    }
+  }, [item]);
+
+  const handlePress = () => {
+    changeSelectedSong(item);
+  };
+
+  // Animated styles
+  const setTextStyle1 = useAnimatedStyle(() => {
+    return {
+      fontFamily:
+        selectedSongSV.current.value?.id === item.id
+          ? "Inter-Bold"
+          : "Inter-Medium",
+    };
+  });
+
+  const setTextStyle2 = useAnimatedStyle(() => {
+    return {
+      fontFamily:
+        selectedSongSV.current.value?.id === item.id
+          ? "Inter-Bold"
+          : "Inter-Light",
+    };
+  });
+  const setContainerStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor:
+        selectedSongSV.current.value?.id === item.id ? "#EEEDED" : "#fff",
+    };
+  });
+
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isSelected ? "#EEEDED" : "#fff" },
-      ]}
+    <AnimatedPressable
+      onPress={handlePress}
+      style={[styles.container, setContainerStyle]}
     >
-      <Text
-        style={[
-          styles.songIndex,
-          { fontFamily: isSelected ? "Inter-Bold" : "Inter-Medium" },
-        ]}
-      >
-        {index}.
-      </Text>
+      <Animated.Text style={[styles.songIndex, setTextStyle1]}>
+        {item.id}.
+      </Animated.Text>
       <View style={styles.songInfoContainer}>
-        <Text
-          style={[
-            styles.songName,
-            { fontFamily: isSelected ? "Inter-Bold" : "Inter-Medium" },
-          ]}
-        >
-          {songName}
-        </Text>
-        <Text style={[styles.artistName]}>{artistName}</Text>
+        <Animated.Text style={[styles.songName, setTextStyle1]}>
+          {item.songName}
+        </Animated.Text>
+        <Animated.Text style={[styles.artistName]}>
+          {item.artistName}
+        </Animated.Text>
       </View>
-      <View style={styles.timeStampContainer}>
-        <Text style={styles.timeStamp}>{timeStamp}</Text>
-      </View>
-    </View>
+      <Animated.Text style={[styles.timeStamp, setTextStyle2]}>
+        {item.timeStamp}
+      </Animated.Text>
+    </AnimatedPressable>
   );
 }
 
@@ -60,6 +101,7 @@ const styles = StyleSheet.create({
     color: "#3E3C48",
   },
   songInfoContainer: {
+    flex: 1,
     marginLeft: moderateScale(21),
   },
   songName: {
@@ -75,12 +117,6 @@ const styles = StyleSheet.create({
   timeStamp: {
     fontSize: moderateScale(14),
     color: "#3E3C48",
-    fontFamily: "Inter-Light",
     marginRight: moderateScale(26),
-  },
-  timeStampContainer: {
-    flex: 1,
-    alignContent: "center",
-    alignItems: "flex-end",
   },
 });
