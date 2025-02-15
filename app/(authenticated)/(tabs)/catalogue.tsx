@@ -48,21 +48,27 @@ export default function CatalogueScreen() {
 
       query.include("category_id");
       query.descending("rehearsal_date");
+      query.limit(15);
 
       const results = await query.find();
 
-      const processedRecordings = results.map((recording) => ({
-        id: recording.id,
-        name: recording.get("name"),
-        singerName: recording.get("singer_name"),
-        channel: recording.get("channel"),
-        link: recording.get("link"),
-        file: recording.get("File"),
-        isMultiTracked: recording.get("is_multi_tracked"),
-        rehearsalDate: recording.get("rehearsal_date"),
-        categoryId: recording.get("category_id")?.id,
-        choirGroupId: recording.get("choir_group_id").id,
-      }));
+      const lastTwoRehearsalRecordings =
+        fetchLastTwoRehearsalRecordings(results);
+
+      const processedRecordings = lastTwoRehearsalRecordings.map(
+        (recording) => ({
+          id: recording.id,
+          name: recording.get("name"),
+          singerName: recording.get("singer_name"),
+          channel: recording.get("channel"),
+          link: recording.get("link"),
+          file: recording.get("File"),
+          isMultiTracked: recording.get("is_multi_tracked"),
+          rehearsalDate: recording.get("rehearsal_date"),
+          categoryId: recording.get("category_id")?.id,
+          choirGroupId: recording.get("choir_group_id").id,
+        })
+      );
 
       setRecordings(processedRecordings);
     } catch (error) {
@@ -70,6 +76,35 @@ export default function CatalogueScreen() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchLastTwoRehearsalRecordings = (
+    recordings: Parse.Object<Parse.Attributes>[]
+  ) => {
+    if (recordings.length === 0) return [];
+
+    // Get the first (most recent) rehearsal date
+    const firstRehearsalDate = recordings[0].get("rehearsal_date");
+    let secondRehearsalDate: any = null;
+
+    return recordings.filter((recording) => {
+      const currentDate = recording.get("rehearsal_date");
+
+      // If it matches the first date, include it
+      if (currentDate.toDateString() === firstRehearsalDate.toDateString()) {
+        return true;
+      }
+
+      // If we haven't found second date yet,
+      // set it and include this recording
+      if (!secondRehearsalDate) {
+        secondRehearsalDate = currentDate;
+        return true;
+      }
+
+      // Include if it matches the second date
+      return currentDate.toDateString() === secondRehearsalDate.toDateString();
+    });
   };
 
   if (isLoading) {
