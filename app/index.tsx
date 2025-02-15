@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     flex: 5,
     justifyContent: "center",
     marginHorizontal: horizontalScale(21),
+    // paddingBottom: verticalScale(10),
   },
   Heading1: {
     fontFamily: "Inter-Medium",

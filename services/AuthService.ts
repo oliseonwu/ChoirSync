@@ -60,7 +60,7 @@ class AuthService {
     }
   }
 
-  async login({ email, password }: LoginData) {
+  async loginWithCredentials({ email, password }: LoginData) {
     try {
       const user = await Parse.User.logIn(email, password);
       return {

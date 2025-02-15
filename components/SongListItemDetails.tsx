@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 2,
-    // Android shadow
-    elevation: 4,
+    // // Android shadow
+    elevation: 2,
   },
 
   clipArt: {

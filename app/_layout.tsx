@@ -18,6 +18,7 @@ import BackButtonComponent from "@/components/BackButtonComponent";
 import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { Portal, Provider as PaperProvider } from "react-native-paper";
 import { CurrentTrackProvider } from "@/contexts/CurrentTrackContext";
+import NowPlayingComponent from "@/components/NowPlayingComponent";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -92,13 +93,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <PaperProvider>
-      <MiniPlayerProvider>
-        <RootLayoutNav />
-      </MiniPlayerProvider>
-    </PaperProvider>
-  );
+  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {

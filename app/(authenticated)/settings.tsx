@@ -14,7 +14,7 @@ import { useMusicPlayerVisibility } from "@/hooks/useMusicPlayerVisibility";
 
 export default function SettingsScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  useMusicPlayerVisibility();
+  // useMusicPlayerVisibility();
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);

@@ -4,6 +4,7 @@ import BackButtonComponent from "@/components/BackButtonComponent";
 import { TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { styles } from "@/shared/css/headingCss";
+import { PaperProvider } from "react-native-paper";
 
 export default function AuthenticatedLayout() {
   return (
@@ -19,7 +20,7 @@ export default function AuthenticatedLayout() {
         name="settings"
         options={{
           headerShown: true,
-          animation: "none",
+          animation: "fade",
           headerTitle: "Settings",
           headerTitleAlign: "center",
           headerTitleStyle: styles.headerTitle,

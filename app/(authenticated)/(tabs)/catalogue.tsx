@@ -8,7 +8,9 @@ import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { Recording } from "@/types/music.types";
+import { router } from "expo-router";
 
 export default function CatalogueScreen() {
   const [recordings, setRecordings] = useState<Recording[]>([]);
@@ -16,7 +18,7 @@ export default function CatalogueScreen() {
   const rehearsalRecordCount = useRef(0);
   const { width } = useWindowDimensions();
   const { changeCurrentTrack, currentSongDetailsSV } = useCurrentTrack();
-
+  const { openPlayer } = useNowPlayingContext();
   useEffect(() => {
     fetchRecordings();
   }, []);
@@ -54,7 +56,7 @@ export default function CatalogueScreen() {
         name: recording.get("name"),
         singerName: recording.get("singer_name"),
         channel: recording.get("channel"),
-        link: recording.get("Link"),
+        link: recording.get("link"),
         file: recording.get("File"),
         isMultiTracked: recording.get("is_multi_tracked"),
         rehearsalDate: recording.get("rehearsal_date"),
@@ -110,6 +112,7 @@ export default function CatalogueScreen() {
                   recording.singerName,
                   recording.link ?? ""
                 );
+                openPlayer();
               }}
               isFirst={index === 0}
               currentSongDetailsSV={currentSongDetailsSV}
