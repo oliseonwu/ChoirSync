@@ -55,7 +55,7 @@ export default function SectionDisplay() {
 
   const songData = useMemo(
     () =>
-      Array.from({ length: 200 }, (_, i) => {
+      Array.from({ length: 0 }, (_, i) => {
         const id = i + 1;
         const minutes = Math.floor(i);
         const formattedMinutes = minutes.toString().padStart(2, "0");
