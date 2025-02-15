@@ -12,6 +12,7 @@ import CatalogIcon from "@/assets/images/SVG/folder-music.svg";
 import { styles } from "@/shared/css/headingCss";
 import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { PaperProvider } from "react-native-paper";
+import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 
 export default function TabLayout() {
   const navigation = useNavigation();

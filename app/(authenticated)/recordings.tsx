@@ -46,18 +46,16 @@ export default function RecordingsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
-      <Text style={styles.title}>Recordings</Text>
       <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
+        // contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
         {recordings.map((recording, index) => {
           const isWithinWeek = new Date(recording.rehearsalDate) >= oneWeekAgo;
 
-          if (!isWithinWeek) {
-            return null;
-          }
+          // if (!isWithinWeek) {
+          //   return null;
+          // }
 
           const showHeader =
             index === 0 ||
@@ -113,8 +111,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-  },
-  scrollViewContent: {
-    padding: horizontalScale(16),
   },
 });

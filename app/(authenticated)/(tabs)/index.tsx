@@ -21,6 +21,7 @@ import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
+import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -93,6 +94,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <NowPlayingComponent />
       <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );

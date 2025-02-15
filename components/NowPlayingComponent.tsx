@@ -4,6 +4,7 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { memo, useEffect, useState } from "react";
 import { Portal } from "react-native-paper";
@@ -59,7 +60,14 @@ export function NowPlayingComponent() {
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
         <View style={styles.statusBar}></View>
-        <View style={[styles.headingContainer, { height: "auto" }]}>
+        <View
+          style={[
+            styles.headingContainer,
+            Platform.OS === "ios"
+              ? { height: headingContainerHeight }
+              : { paddingVertical: verticalScale(10) },
+          ]}
+        >
           <TouchableOpacity onPress={handleClose}>
             <ArrownDown
               height={verticalScale(25)}
@@ -102,10 +110,10 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     height: Constants.statusBarHeight,
-    backgroundColor: "blue",
+    // backgroundColor: "blue",
   },
   headingContainer: {
-    backgroundColor: "pink",
+    // backgroundColor: "pink",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
