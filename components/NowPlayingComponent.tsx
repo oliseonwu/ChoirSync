@@ -59,9 +59,7 @@ export function NowPlayingComponent() {
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
         <View style={styles.statusBar}></View>
-        <View
-          style={[styles.headingContainer, { height: headingContainerHeight }]}
-        >
+        <View style={[styles.headingContainer, { height: "auto" }]}>
           <TouchableOpacity onPress={handleClose}>
             <ArrownDown
               height={verticalScale(25)}
@@ -104,10 +102,10 @@ const styles = StyleSheet.create({
   },
   statusBar: {
     height: Constants.statusBarHeight,
-    // backgroundColor: "blue",
+    backgroundColor: "blue",
   },
   headingContainer: {
-    // backgroundColor: "pink",
+    backgroundColor: "pink",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

@@ -19,8 +19,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
-import NowPlayingComponent from "@/components/NowPlayingComponent";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -46,7 +46,9 @@ export default function HomeScreen() {
             icon={require("@/assets/images/mic-icon.png")}
             showDot={true}
             onPress={() => {
-              /* handle press */
+              router.push({
+                pathname: "/recordings",
+              });
             }}
           />
           <ThisWeekCard
@@ -91,7 +93,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      <NowPlayingComponent />
       <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );
