@@ -94,7 +94,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      <NowPlayingComponent />
       <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );

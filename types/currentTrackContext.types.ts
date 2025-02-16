@@ -7,6 +7,11 @@ export type CurrentTrackDetailsType = {
   songUrl: string;
 };
 
+export type CurrentSongDetailsSVType = SharedValue<{
+  songId: string;
+  state: string;
+}>;
+
 export type CurrentTrackState = "playing" | "paused";
 
 export type CurrentTrackContextType = {
@@ -19,8 +24,5 @@ export type CurrentTrackContextType = {
     artistName: string,
     songUrl: string
   ) => void;
-  currentSongDetailsSV: SharedValue<{
-    songId: string;
-    state: string;
-  }>;
+  currentSongDetailsSV: CurrentSongDetailsSVType;
 };

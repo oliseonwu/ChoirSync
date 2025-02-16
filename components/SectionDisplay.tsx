@@ -55,7 +55,7 @@ export default function SectionDisplay() {
 
   const songData = useMemo(
     () =>
-      Array.from({ length: 0 }, (_, i) => {
+      Array.from({ length: 200 }, (_, i) => {
         const id = i + 1;
         const minutes = Math.floor(i);
         const formattedMinutes = minutes.toString().padStart(2, "0");
@@ -70,7 +70,9 @@ export default function SectionDisplay() {
     []
   );
 
-  const renderItem = ({ item }: { item: (typeof songData)[0] }) => {
+  // we use useCallback to prevent the renderItem function
+  // from being recreated on every render
+  const renderItem = useCallback(({ item }: { item: (typeof songData)[0] }) => {
     return (
       <SectionItem
         item={item}
@@ -78,7 +80,7 @@ export default function SectionDisplay() {
         getSelectedSongSV={getSelectedSongSV}
       />
     );
-  };
+  }, []);
 
   const renderContent = useMemo(() => {
     return songData.length > 0 ? (

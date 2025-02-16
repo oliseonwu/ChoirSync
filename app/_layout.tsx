@@ -104,6 +104,7 @@ function RootLayoutNav() {
       <RecordingsProvider>
         <CurrentTrackProvider>
           <NowPlayingProvider>
+            <NowPlayingComponent />
             <Stack>
               {/* Public routes */}
               <Stack.Screen name="index" options={{ headerShown: false }} />

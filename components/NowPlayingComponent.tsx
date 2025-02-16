@@ -24,9 +24,9 @@ import YoutubePlayer from "react-native-youtube-iframe";
 import SectionDisplay from "./SectionDisplay";
 
 export function NowPlayingComponent() {
-  const headerAndStatusBarHeight = useHeaderHeight();
-  const headingContainerHeight =
-    headerAndStatusBarHeight - Constants.statusBarHeight;
+  // const headerAndStatusBarHeight = useHeaderHeight();
+  // const headingContainerHeight =
+  //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
   const { togglePlay, currentTrackState, currentTrackDetails } =
     useCurrentTrack();
@@ -63,9 +63,9 @@ export function NowPlayingComponent() {
         <View
           style={[
             styles.headingContainer,
-            Platform.OS === "ios"
-              ? { height: headingContainerHeight }
-              : { paddingVertical: verticalScale(10) },
+            {
+              paddingVertical: verticalScale(10),
+            },
           ]}
         >
           <TouchableOpacity onPress={handleClose}>
