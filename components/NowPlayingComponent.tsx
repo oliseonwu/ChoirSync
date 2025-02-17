@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -28,8 +28,12 @@ export function NowPlayingComponent() {
   // const headingContainerHeight =
   //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
-  const { togglePlay, currentTrackState, currentTrackDetails } =
-    useCurrentTrack();
+  const {
+    togglePlay,
+    currentTrackState,
+    currentTrackDetails,
+    currentSongDetailsSV,
+  } = useCurrentTrack();
   const [headingText, setHeadingText] = useState("");
   const [ytVideoId, setYtVideoId] = useState<string | undefined>(undefined);
 
@@ -56,6 +60,21 @@ export function NowPlayingComponent() {
     }
   };
 
+  const SaveIconMemoized = useMemo(
+    () => <SaveIcon height={verticalScale(25)} width={horizontalScale(22)} />,
+    []
+  );
+
+  const ArrownDownMemoized = useMemo(
+    () => (
+      <ArrownDown
+        height={verticalScale(25)}
+        width={horizontalScale(22)}
+        fill={"#313234"}
+      />
+    ),
+    []
+  );
   return (
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
@@ -69,18 +88,11 @@ export function NowPlayingComponent() {
           ]}
         >
           <TouchableOpacity onPress={handleClose}>
-            <ArrownDown
-              height={verticalScale(25)}
-              width={horizontalScale(22)}
-              fill={"#313234"}
-            />
+            {ArrownDownMemoized}
           </TouchableOpacity>
 
           <Text style={styles.headingText}>{headingText}</Text>
-
-          <TouchableOpacity>
-            <SaveIcon height={verticalScale(25)} width={horizontalScale(22)} />
-          </TouchableOpacity>
+          <TouchableOpacity>{SaveIconMemoized}</TouchableOpacity>
         </View>
 
         <View style={styles.videoPlayerContainer}>

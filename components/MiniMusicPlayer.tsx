@@ -129,10 +129,7 @@ export function MiniMusicPlayer({
 }
 
 export default memo(MiniMusicPlayer, (prev, next) => {
-  return (
-    prev.bottomOffset === next.bottomOffset &&
-    prev.isVisibleSV === next.isVisibleSV
-  );
+  return true;
 });
 const styles = StyleSheet.create({
   MiniMusicPlayer: {
