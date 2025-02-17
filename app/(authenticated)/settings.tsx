@@ -21,7 +21,8 @@ export default function SettingsScreen() {
       const result = await authService.logout();
 
       if (result.success) {
-        router.replace("/login");
+        router.dismissAll();
+        // router.replace("/login");
       } else {
         Alert.alert("Error", "Failed to logout");
       }

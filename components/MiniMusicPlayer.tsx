@@ -44,6 +44,14 @@ export function MiniMusicPlayer({
       togglePlay();
     }
   };
+
+  const MemoizedPauseIcon = memo(() => (
+    <PauseIcon width={verticalScale(30)} height={verticalScale(30)} />
+  ));
+  const MemoizedPlayIcon = memo(() => (
+    <PlayIcon width={verticalScale(30)} height={verticalScale(30)} />
+  ));
+
   return (
     <Portal>
       <Animated.View
@@ -62,6 +70,7 @@ export function MiniMusicPlayer({
           style={styles.MiniMusicPlayerContent}
           activeOpacity={0.8}
           onPress={handlePress}
+          disabled={currentTrackDetails.songId === ""}
         >
           <SmallMusicClipArt
             width={verticalScale(52)}
@@ -75,11 +84,42 @@ export function MiniMusicPlayer({
             </Text>
           </View>
 
-          <View>
+          {/* <View
+            style={{
+              position: "relative",
+              width: moderateScale(25),
+              height: moderateScale(25),
+            }}
+          >
+            <View
+              style={{
+                opacity: currentTrackState === "playing" ? 1 : 0,
+                position: "absolute",
+              }}
+            >
+              <MemoizedPauseIcon />
+            </View>
+            <View
+              style={{
+                opacity: currentTrackState === "playing" ? 0 : 1,
+                position: "absolute",
+              }}
+            >
+              <MemoizedPlayIcon />
+            </View>
+          </View> */}
+
+          <View
+            style={{
+              position: "relative",
+              width: moderateScale(25),
+              height: moderateScale(25),
+            }}
+          >
             {currentTrackState === "playing" ? (
-              <PauseIcon width={verticalScale(30)} height={verticalScale(30)} />
+              <MemoizedPauseIcon />
             ) : (
-              <PlayIcon width={verticalScale(30)} height={verticalScale(30)} />
+              <MemoizedPlayIcon />
             )}
           </View>
         </TouchableOpacity>

@@ -70,7 +70,9 @@ export default function SectionDisplay() {
     []
   );
 
-  const renderItem = ({ item }: { item: (typeof songData)[0] }) => {
+  // we use useCallback to prevent the renderItem function
+  // from being recreated on every render
+  const renderItem = useCallback(({ item }: { item: (typeof songData)[0] }) => {
     return (
       <SectionItem
         item={item}
@@ -78,7 +80,7 @@ export default function SectionDisplay() {
         getSelectedSongSV={getSelectedSongSV}
       />
     );
-  };
+  }, []);
 
   const renderContent = useMemo(() => {
     return songData.length > 0 ? (

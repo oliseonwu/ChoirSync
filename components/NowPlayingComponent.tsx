@@ -4,6 +4,7 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { memo, useEffect, useState } from "react";
 import { Portal } from "react-native-paper";
@@ -23,9 +24,9 @@ import YoutubePlayer from "react-native-youtube-iframe";
 import SectionDisplay from "./SectionDisplay";
 
 export function NowPlayingComponent() {
-  const headerAndStatusBarHeight = useHeaderHeight();
-  const headingContainerHeight =
-    headerAndStatusBarHeight - Constants.statusBarHeight;
+  // const headerAndStatusBarHeight = useHeaderHeight();
+  // const headingContainerHeight =
+  //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
   const { togglePlay, currentTrackState, currentTrackDetails } =
     useCurrentTrack();
@@ -60,7 +61,12 @@ export function NowPlayingComponent() {
       <Animated.View style={[styles.container, translateYStyle]}>
         <View style={styles.statusBar}></View>
         <View
-          style={[styles.headingContainer, { height: headingContainerHeight }]}
+          style={[
+            styles.headingContainer,
+            {
+              paddingVertical: verticalScale(10),
+            },
+          ]}
         >
           <TouchableOpacity onPress={handleClose}>
             <ArrownDown

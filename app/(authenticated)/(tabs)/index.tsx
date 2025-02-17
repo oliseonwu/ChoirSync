@@ -19,8 +19,9 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
-import NowPlayingComponent from "@/components/NowPlayingComponent";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { router } from "expo-router";
+import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -46,16 +47,19 @@ export default function HomeScreen() {
             icon={require("@/assets/images/mic-icon.png")}
             showDot={true}
             onPress={() => {
-              /* handle press */
+              router.push({
+                pathname: "/recordings",
+              });
             }}
           />
           <ThisWeekCard
+            disabled={true}
             title="New Songs"
             icon={require("@/assets/images/music-icon-2.png")}
-            showDot={true}
           />
 
           <ThisWeekCard
+            disabled={true}
             title="Saved Recordings"
             icon={require("@/assets/images/bookmark-icon.png")}
           />
@@ -72,6 +76,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.ScrollViewContent}
             activeOpacity={0.8}
+            disabled={true}
           >
             <Image
               source={require("@/assets/images/Praise card.png")}
@@ -83,6 +88,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.ScrollViewContent}
             activeOpacity={0.8}
+            disabled={true}
           >
             <Image
               style={{ flex: 1 }}
@@ -91,7 +97,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      <NowPlayingComponent />
       <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );

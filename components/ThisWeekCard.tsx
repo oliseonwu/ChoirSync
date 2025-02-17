@@ -13,19 +13,22 @@ type ThisWeekCardProps = {
   icon: any;
   showDot?: boolean;
   onPress?: () => void;
+  disabled?: boolean;
 };
 
 const ThisWeekCard: React.FC<ThisWeekCardProps> = ({
   title,
+  disabled = false,
   icon,
   showDot = false,
   onPress,
 }) => {
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, disabled && { opacity: 0.5 }]}
       onPress={onPress}
       activeOpacity={0.8}
+      disabled={disabled}
     >
       <View style={styles.iconContainer}>
         <Image
