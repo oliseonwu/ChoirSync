@@ -13,7 +13,7 @@ import {
 } from "@/utilities/TrueScale";
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
-import MiniMusicPlayer from "@/components/MiniMusicPlayer";
+import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -21,7 +21,6 @@ import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
-import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
