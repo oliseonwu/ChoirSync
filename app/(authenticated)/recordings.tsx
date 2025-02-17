@@ -5,7 +5,6 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import {
   moderateScale,
   verticalScale,
@@ -13,31 +12,42 @@ import {
 } from "@/utilities/TrueScale";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
-import SongListItem from "@/components/SongListItem";
-import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
-import React, { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
-import SongListItemDetails from "@/components/SongListItemDetails";
 import { Recording } from "@/types/music.types";
 import SongItem from "@/components/SongItem";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 
 export default function RecordingsScreen() {
   const { recordings, isLoading, fetchRecordings } = useRecordings();
+  const [thisWeekRecordings, setThisWeekRecordings] = useState<Recording[]>([]);
   const { width } = useWindowDimensions();
 
-  const { openPlayer } = useNowPlayingContext();
   const { currentSongDetailsSV, changeCurrentTrack } = useCurrentTrack();
 
   const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+  currentDate.setUTCHours(0, 0, 0, 0);
+  const oneWeekAgo = new Date(currentDate);
+  oneWeekAgo.setDate(currentDate.getDate() - 7);
 
   useEffect(() => {
     if (recordings.length === 0) {
       fetchRecordings();
+    } else {
+      selectThisWeekRecordings();
     }
-  }, []);
+  }, [recordings]);
+
+  const selectThisWeekRecordings = useCallback(async () => {
+    const tempThisWeekRecordings = recordings.filter((recording) => {
+      const rehearsalDate = new Date(recording.rehearsalDate);
+      rehearsalDate.setUTCHours(0, 0, 0, 0);
+      // return rehearsalDate >= oneWeekAgo;
+      return true;
+    });
+
+    setThisWeekRecordings(tempThisWeekRecordings);
+  }, [recordings]);
 
   const showSkeleton = useCallback(() => {
     return (
@@ -74,6 +84,11 @@ export default function RecordingsScreen() {
     );
   }, []);
 
+  const onLoad = useCallback((info: { elapsedTimeInMs: number }) => {
+    console.log("Flash List elapsed time: `", info.elapsedTimeInMs);
+  }, []);
+
+  // This must always be the last thing to render
   if (isLoading) {
     return showSkeleton();
   }
@@ -83,9 +98,9 @@ export default function RecordingsScreen() {
       <FlashList
         contentContainerStyle={styles.flashListContent}
         ItemSeparatorComponent={ItemSeparatorComponent}
-        data={recordings}
+        data={thisWeekRecordings}
         renderItem={renderItem}
-        estimatedItemSize={100}
+        estimatedItemSize={moderateScale(63)}
         ListEmptyComponent={listEmptyComponent}
       />
     </View>

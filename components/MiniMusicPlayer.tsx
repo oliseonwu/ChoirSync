@@ -70,6 +70,7 @@ export function MiniMusicPlayer({
           style={styles.MiniMusicPlayerContent}
           activeOpacity={0.8}
           onPress={handlePress}
+          disabled={currentTrackDetails.songId === ""}
         >
           <SmallMusicClipArt
             width={verticalScale(52)}

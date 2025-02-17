@@ -53,12 +53,13 @@ export default function HomeScreen() {
             }}
           />
           <ThisWeekCard
+            disabled={true}
             title="New Songs"
             icon={require("@/assets/images/music-icon-2.png")}
-            showDot={true}
           />
 
           <ThisWeekCard
+            disabled={true}
             title="Saved Recordings"
             icon={require("@/assets/images/bookmark-icon.png")}
           />
@@ -75,6 +76,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.ScrollViewContent}
             activeOpacity={0.8}
+            disabled={true}
           >
             <Image
               source={require("@/assets/images/Praise card.png")}
@@ -86,6 +88,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.ScrollViewContent}
             activeOpacity={0.8}
+            disabled={true}
           >
             <Image
               style={{ flex: 1 }}
