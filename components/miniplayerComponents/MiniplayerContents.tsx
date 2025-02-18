@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   horizontalScale,
   moderateScale,
@@ -29,12 +29,12 @@ export default function MiniplayerContents() {
   } = useCurrentTrack();
   const { openPlayer } = useNowPlayingContext();
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     if (currentTrackState === "paused") {
       openPlayer();
       togglePlay();
     }
-  };
+  }, []);
 
   const showPlayIcon = useAnimatedStyle(() => {
     return {

@@ -9,4 +9,5 @@ export type Recording = {
   rehearsalDate: Date;
   categoryId: string;
   choirGroupId: string;
+  isFirstRehearsalRecording: boolean;
 };

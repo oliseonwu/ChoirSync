@@ -42,7 +42,7 @@ export default function RecordingsScreen() {
     const tempThisWeekRecordings = recordings.filter((recording) => {
       const rehearsalDate = new Date(recording.rehearsalDate);
       rehearsalDate.setUTCHours(0, 0, 0, 0);
-      // return rehearsalDate >= oneWeekAgo;
+      return rehearsalDate >= oneWeekAgo;
       return true;
     });
 

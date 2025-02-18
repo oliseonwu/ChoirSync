@@ -41,6 +41,9 @@ export function RecordingsProvider({
     });
   };
 
+  const isSameDate = (date1: Date | null, date2: Date | null) =>
+    date1?.toDateString() === date2?.toDateString();
+
   const fetchRecordings = async () => {
     try {
       const currentUser = await authService.getCurrentUser();
@@ -71,19 +74,39 @@ export function RecordingsProvider({
       const lastTwoRehearsalRecordings =
         fetchLastTwoRehearsalRecordings(results);
 
+      let previousRehearsalDate: Date | null = null;
+      let currentRehearsalDate: Date | null = null;
+      let isFirstRehearsalRecording: boolean = false;
+
       const processedRecordings = lastTwoRehearsalRecordings.map(
-        (recording) => ({
-          id: recording.id,
-          name: recording.get("name"),
-          singerName: recording.get("singer_name"),
-          channel: recording.get("channel"),
-          link: recording.get("link"),
-          file: recording.get("File"),
-          isMultiTracked: recording.get("is_multi_tracked"),
-          rehearsalDate: recording.get("rehearsal_date"),
-          categoryId: recording.get("category_id")?.id,
-          choirGroupId: recording.get("choir_group_id").id,
-        })
+        (recording) => {
+          currentRehearsalDate = recording.get("rehearsal_date");
+
+          if (previousRehearsalDate === null) {
+            isFirstRehearsalRecording = true;
+          } else {
+            isFirstRehearsalRecording = !isSameDate(
+              previousRehearsalDate,
+              currentRehearsalDate
+            );
+          }
+
+          previousRehearsalDate = currentRehearsalDate;
+
+          return {
+            id: recording.id,
+            name: recording.get("name"),
+            singerName: recording.get("singer_name"),
+            channel: recording.get("channel"),
+            link: recording.get("link"),
+            file: recording.get("File"),
+            isMultiTracked: recording.get("is_multi_tracked"),
+            rehearsalDate: recording.get("rehearsal_date"),
+            categoryId: recording.get("category_id")?.id,
+            choirGroupId: recording.get("choir_group_id").id,
+            isFirstRehearsalRecording: isFirstRehearsalRecording,
+          };
+        }
       );
 
       setRecordings(processedRecordings);
