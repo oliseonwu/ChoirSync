@@ -11,11 +11,13 @@ import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
 import { useHeaderHeight } from "@react-navigation/elements";
 import ArrownDown from "@/assets/images/SVG/down-arrow.svg";
+import { PixelRatio } from "react-native";
 import SaveIcon from "@/assets/images/SVG/save-icon.svg";
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
+  getWindowSize,
 } from "@/utilities/TrueScale";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
@@ -36,6 +38,8 @@ export function NowPlayingComponent() {
   } = useCurrentTrack();
   const [headingText, setHeadingText] = useState("");
   const [ytVideoId, setYtVideoId] = useState<string | undefined>(undefined);
+  const VIDEO_ASPECT_RATIO = 16 / 9;
+  const SCREEN_WIDTH = getWindowSize().width;
 
   useEffect(() => {
     setHeadingText(currentTrackDetails.songName);
@@ -97,7 +101,7 @@ export function NowPlayingComponent() {
 
         <View style={styles.videoPlayerContainer}>
           <YoutubePlayer
-            height={verticalScale(250)}
+            height={SCREEN_WIDTH / VIDEO_ASPECT_RATIO}
             videoId={ytVideoId}
             play={currentTrackState === "playing" && ytVideoId !== undefined}
             webViewStyle={styles.videoPlayer}

@@ -81,6 +81,14 @@ export default function MiniplayerContents() {
     );
   }, []);
 
+  const displayMusicDetails = useMemo(() => {
+    return (
+      <View style={styles.MusicDetailsContainer}>
+        <Text style={styles.MusicName}>{currentTrackDetails.songName}</Text>
+        <Text style={styles.MusicArtist}>{currentTrackDetails.artistName}</Text>
+      </View>
+    );
+  }, [currentTrackDetails.songId]);
   return (
     <TouchableOpacity
       style={styles.MiniMusicPlayerContent}
@@ -90,10 +98,7 @@ export default function MiniplayerContents() {
     >
       {MemoizedSmallMusicClipArt}
 
-      <View style={styles.MusicDetailsContainer}>
-        <Text style={styles.MusicName}>{currentTrackDetails.songName}</Text>
-        <Text style={styles.MusicArtist}>{currentTrackDetails.artistName}</Text>
-      </View>
+      {displayMusicDetails}
 
       {displayPauseAndPlayIcons}
       {/* <View

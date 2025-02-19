@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import SectionItem from "./SectionItem";
-import { isEnabled } from "react-native/Libraries/Performance/Systrace";
+
 import { EventRegister } from "react-native-event-listeners";
 import { FlashList } from "@shopify/flash-list";
 import { useSharedValue } from "react-native-reanimated";
