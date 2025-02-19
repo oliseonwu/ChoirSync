@@ -21,11 +21,15 @@ import { StatusBar } from "expo-status-bar";
 import Animated from "react-native-reanimated";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
+import Constants from "expo-constants";
+import CustomHeaderComponent from "@/components/CustomHeaderComponent";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
-  const headerHeight = useHeaderHeight();
+  const headerAndStatusBarHeight = useHeaderHeight();
+  const headingContainerHeight =
+    headerAndStatusBarHeight - Constants.statusBarHeight;
 
   useEffect(() => {
     showPlayer();
@@ -33,6 +37,17 @@ export default function HomeScreen() {
   return (
     <View style={styles.Container}>
       <StatusBar style="dark" />
+      {/* <CustomHeaderComponent>
+        <View style={styles.headerContainer}>
+          <View style={styles.invisibleBox}></View>
+
+          <Text style={styles.headerTitle}>Home</Text>
+          <Image
+            source={require("@/assets/images/profile-placeholder.png")}
+            style={styles.profilePic}
+          />
+        </View>
+      </CustomHeaderComponent> */}
 
       <View style={styles.Section1}>
         <Text
@@ -79,7 +94,7 @@ export default function HomeScreen() {
           >
             <Image
               source={require("@/assets/images/Praise card.png")}
-              style={{ flex: 1 }}
+              style={{ flex: 1, aspectRatio: 1 }}
               contentFit="cover"
             />
           </TouchableOpacity>
@@ -90,7 +105,7 @@ export default function HomeScreen() {
             disabled={true}
           >
             <Image
-              style={{ flex: 1 }}
+              style={{ flex: 1, aspectRatio: 1 }}
               source={require("@/assets/images/Worship card.png")}
             />
           </TouchableOpacity>
@@ -106,6 +121,36 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     backgroundColor: "#fff",
+    paddingBottom: "22%",
+  },
+  statusBar: {
+    height: Constants.statusBarHeight,
+    // backgroundColor: "red",
+  },
+  headerContainer: {
+    width: "100%",
+    // backgroundColor: "pink",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    // marginHorizontal: horizontalScale(30),
+  },
+  invisibleBox: {
+    width: moderateScale(39),
+    height: moderateScale(39),
+    marginLeft: moderateScale(20),
+  },
+  headerTitle: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: moderateScale(16.4),
+    color: "#3E3C48",
+  },
+  profilePic: {
+    width: moderateScale(39),
+    height: moderateScale(39),
+    borderRadius: moderateScale(19.5),
+    marginRight: moderateScale(20),
+    marginBottom: verticalScale(1),
   },
   SectionTitle: {
     fontSize: moderateScale(20),
@@ -132,8 +177,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(24),
   },
   ScrollViewContent: {
-    width: verticalScale(342),
-    height: "78%",
+    width: "auto",
     backgroundColor: "#F0F0F0",
     borderRadius: moderateScale(10),
 

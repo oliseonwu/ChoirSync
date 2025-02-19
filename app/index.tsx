@@ -9,7 +9,6 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
-import BackButton from "@/assets/images/SVG/back-Button.svg";
 
 export default function LandingPage() {
   const navigation = useNavigation();
