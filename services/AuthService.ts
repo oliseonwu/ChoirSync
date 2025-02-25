@@ -58,7 +58,6 @@ class AuthService {
 
   async logout() {
     try {
-      console.log("Current user: ", googleAuthService.getCurrentUser());
       await googleAuthService.signOut();
       await Parse.User.logOut();
       return { success: true };
@@ -113,7 +112,6 @@ class AuthService {
         },
       });
 
-      console.log("logged in user: ", loggedInUser.get("username"));
       return { success: true, user: loggedInUser };
     } catch (error: any) {
       return { success: false, error: error.message };

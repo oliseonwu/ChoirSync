@@ -3,8 +3,13 @@ import React, { useEffect } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import { useNavigation, router } from "expo-router";
-import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
+import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import {
   GoogleSignin,
   isErrorWithCode,
@@ -14,6 +19,7 @@ import {
 import { googleAuthService } from "@/services/GoogleAuthService";
 import { authService } from "@/services/AuthService";
 import Parse from "../services/Parse";
+import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 
 export default function LandingPage() {
   const navigation = useNavigation();
@@ -68,7 +74,7 @@ export default function LandingPage() {
             " access to rehearsal recordings for their choir members."}
         </Text>
 
-        <View style={styles.BtnRowContainer}>
+        {/* <View style={styles.BtnRowContainer}>
           <TouchableOpacity
             style={[styles.Btn, styles.btnHollow]}
             onPress={handleLogin}
@@ -86,8 +92,18 @@ export default function LandingPage() {
               Get Started
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
+        <TouchableOpacity
+          style={styles.googleBtnContainer}
+          onPress={handleLogin}
+        >
+          <SignInWithGoogleBtn
+            width={horizontalScale(230)}
+            height={verticalScale(55)}
+          />
+        </TouchableOpacity>
       </View>
+      <LoadingScreenComponent isVisible={true} />
     </View>
   );
 }
@@ -127,6 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginTop: "10%",
+    backgroundColor: "red",
   },
   Btn: {
     flex: 1,
@@ -151,5 +168,10 @@ const styles = StyleSheet.create({
     color: "#ffff",
     fontFamily: "Inter-SemiBold",
     fontSize: moderateScale(16),
+  },
+  googleBtnContainer: {
+    marginTop: "11%",
+    marginBottom: "1%",
+    alignItems: "center",
   },
 });
