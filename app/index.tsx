@@ -1,17 +1,48 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import { useNavigation, router } from "expo-router";
-import {
-  horizontalScale,
-  moderateScale,
-  verticalScale,
-} from "@/utilities/TrueScale";
+import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+import { googleAuthService } from "@/services/GoogleAuthService";
+import { authService } from "@/services/AuthService";
+import Parse from "../services/Parse";
 
 export default function LandingPage() {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    // Configure the google auth service
+    googleAuthService.configure();
+    attemptToLogin();
+  }, []);
+
+  const attemptToLogin = async () => {
+    console.log("attempting to login");
+    const currentUser = await authService.getCurrentUser();
+    if (currentUser) {
+      const userStatus = await authService.getUserStatus(currentUser);
+      authService.navigateBasedOnUserStatus(userStatus);
+    }
+  };
+
+  const handleLogin = async () => {
+    const loginResponse = await authService.loginWithGoogle();
+    let userStatus;
+
+    if (loginResponse.success) {
+      userStatus = await authService.getUserStatus(loginResponse.user!);
+
+      authService.navigateBasedOnUserStatus(userStatus);
+    }
+  };
 
   return (
     <View style={styles.MainContainer}>
@@ -40,7 +71,7 @@ export default function LandingPage() {
         <View style={styles.BtnRowContainer}>
           <TouchableOpacity
             style={[styles.Btn, styles.btnHollow]}
-            onPress={() => router.navigate("/login/loginOptions")}
+            onPress={handleLogin}
           >
             <Text style={[styles.btnText, { color: "#313234" }]}>Login</Text>
           </TouchableOpacity>

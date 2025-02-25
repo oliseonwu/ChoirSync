@@ -30,12 +30,13 @@ export default function HomeScreen() {
   const headerAndStatusBarHeight = useHeaderHeight();
   const headingContainerHeight =
     headerAndStatusBarHeight - Constants.statusBarHeight;
+  const bottomOffset = tabBarHeight + getWindowSize().height * 0.075;
 
   useEffect(() => {
     showPlayer();
   }, []);
   return (
-    <View style={styles.Container}>
+    <View style={[styles.Container]}>
       <StatusBar style="dark" />
       {/* <CustomHeaderComponent>
         <View style={styles.headerContainer}>
@@ -121,7 +122,8 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     backgroundColor: "#fff",
-    paddingBottom: "22%",
+    // paddingBottom: "22%",
+    paddingBottom: verticalScale(100),
   },
   statusBar: {
     height: Constants.statusBarHeight,
@@ -175,6 +177,8 @@ const styles = StyleSheet.create({
   ScrollViewContentContainer: {
     gap: horizontalScale(22),
     marginTop: verticalScale(24),
+    // backgroundColor: "red",
+    // flex: 1,
   },
   ScrollViewContent: {
     width: "auto",
