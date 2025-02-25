@@ -7,6 +7,7 @@ type RecordingsContextType = {
   recordings: Recording[];
   isLoading: boolean;
   fetchRecordings: () => Promise<void>;
+  resetRecordings: () => void;
 };
 
 const RecordingsContext = createContext<RecordingsContextType | undefined>(
@@ -45,6 +46,7 @@ export function RecordingsProvider({
     date1?.toDateString() === date2?.toDateString();
 
   const fetchRecordings = async () => {
+    console.log("fetchRecordings");
     try {
       const currentUser = await authService.getCurrentUser();
       if (!currentUser) return;
@@ -117,9 +119,14 @@ export function RecordingsProvider({
     }
   };
 
+  const resetRecordings = () => {
+    setRecordings([]);
+    setIsLoading(false);
+  };
+
   return (
     <RecordingsContext.Provider
-      value={{ recordings, isLoading, fetchRecordings }}
+      value={{ recordings, isLoading, fetchRecordings, resetRecordings }}
     >
       {children}
     </RecordingsContext.Provider>

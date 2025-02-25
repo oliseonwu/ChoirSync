@@ -15,7 +15,7 @@ interface LoginData {
   password: string;
 }
 
-interface UserStatus {
+export interface UserStatus {
   hasName: boolean;
   isMemberOfAnyChoir: boolean;
 }

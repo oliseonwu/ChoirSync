@@ -11,7 +11,6 @@ import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
 import { useHeaderHeight } from "@react-navigation/elements";
 import ArrownDown from "@/assets/images/SVG/down-arrow.svg";
-import { PixelRatio } from "react-native";
 import SaveIcon from "@/assets/images/SVG/save-icon.svg";
 import {
   horizontalScale,
@@ -65,7 +64,13 @@ export function NowPlayingComponent() {
   };
 
   const SaveIconMemoized = useMemo(
-    () => <SaveIcon height={verticalScale(25)} width={horizontalScale(22)} />,
+    () => (
+      <SaveIcon
+        opacity={0.5}
+        height={verticalScale(25)}
+        width={horizontalScale(22)}
+      />
+    ),
     []
   );
 
@@ -96,7 +101,9 @@ export function NowPlayingComponent() {
           </TouchableOpacity>
 
           <Text style={styles.headingText}>{headingText}</Text>
-          <TouchableOpacity>{SaveIconMemoized}</TouchableOpacity>
+          <TouchableOpacity disabled={true}>
+            {SaveIconMemoized}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.videoPlayerContainer}>

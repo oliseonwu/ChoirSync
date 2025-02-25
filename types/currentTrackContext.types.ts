@@ -25,4 +25,5 @@ export type CurrentTrackContextType = {
     songUrl: string
   ) => void;
   currentSongDetailsSV: CurrentSongDetailsSVType;
+  resetCurrentTrack: () => void;
 };

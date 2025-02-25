@@ -1,59 +1,127 @@
-import { StyleSheet, TouchableOpacity, View, Alert } from "react-native";
+import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
 import { Text } from "@/components/Themed";
+import { FlashList } from "@shopify/flash-list";
 import {
+  horizontalScale,
   moderateScale,
   verticalScale,
-  horizontalScale,
 } from "@/utilities/TrueScale";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
-import { useState } from "react";
-import { StackActions, useNavigation } from "@react-navigation/native";
-import RightArrow from "@/assets/images/SVG/right-arrow3.svg";
-import { useMusicPlayerVisibility } from "@/hooks/useMusicPlayerVisibility";
+import { useState, useMemo } from "react";
+import { SettingsItem } from "@/components/SettingsItem";
+import NotificationSettingsIcon from "@/assets/images/SVG/notification-settings-icon.svg";
+import ProfileSettingsIcon from "@/assets/images/SVG/profile-settings-icon.svg";
+import PrivacySettingsIcon from "@/assets/images/SVG/Pravacy-settings-Icon.svg";
+import TermsSettingsIcon from "@/assets/images/SVG/terms-settings-icon.svg";
+import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { useRecordings } from "@/contexts/RecordingsContext";
+import { useLoadingState } from "@/hooks/useLoadingState";
+import { useLoading } from "@/contexts/LoadingContext";
+
+type SettingItem = {
+  id: string;
+  Icon: React.ElementType;
+  title: string;
+  onPress?: () => void;
+};
 
 export default function SettingsScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  // useMusicPlayerVisibility();
-  const handleLogout = async () => {
+  const { opacity, showLoading, hideLoading } = useLoading();
+  const { resetCurrentTrack } = useCurrentTrack();
+  const { resetRecordings } = useRecordings();
+
+  const performLogout = async () => {
     try {
-      setIsLoggingOut(true);
+      showLoading();
       const result = await authService.logout();
 
       if (result.success) {
         router.dismissAll();
-        // router.replace("/login");
+        resetCurrentTrack();
+        resetRecordings();
       } else {
         Alert.alert("Error", "Failed to logout");
       }
     } catch (error) {
       Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      hideLoading();
     }
   };
 
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: performLogout,
+      },
+    ]);
+  };
+
+  const settingsData = useMemo<SettingItem[]>(
+    () => [
+      {
+        id: "1",
+        Icon: ProfileSettingsIcon,
+        title: "Profile",
+        onPress: () => {},
+      },
+      {
+        id: "2",
+        Icon: NotificationSettingsIcon,
+        title: "Notifications",
+        onPress: () => {},
+      },
+      {
+        id: "3",
+        Icon: PrivacySettingsIcon,
+        title: "Privacy",
+        onPress: () => {},
+      },
+      {
+        id: "4",
+        Icon: TermsSettingsIcon,
+        title: "Terms and Conditions",
+        onPress: () => {},
+      },
+    ],
+    []
+  );
+
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: SettingItem;
+    index: number;
+  }) => (
+    <SettingsItem
+      Icon={item.Icon}
+      title={item.title}
+      onPress={item.onPress}
+      isLast={index === settingsData.length - 1}
+      isFirst={index === 0}
+    />
+  );
+
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Account</Text>
+      <FlashList
+        data={settingsData}
+        renderItem={renderItem}
+        estimatedItemSize={65}
+        keyExtractor={(item) => item.id}
+      />
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.settingItem}
-        // onPress={() => router.push("/accountSettings")}
-      >
-        <Text style={styles.settingText}>Account Settings</Text>
-        <RightArrow
-          width={moderateScale(21)}
-          height={moderateScale(21)}
-          fill={"#313234"}
-        />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.logoutButton, { opacity: isLoggingOut ? 0.5 : 1 }]}
-        onPress={handleLogout}
-        disabled={isLoggingOut}
-      >
-        <Text style={styles.logoutText}>LogOut</Text>
+      <TouchableOpacity style={[styles.logoutButton]} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </View>
   );
@@ -64,34 +132,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: horizontalScale(16),
+    paddingTop: verticalScale(40),
   },
-  sectionTitle: {
-    fontSize: moderateScale(14),
-    fontFamily: "Inter-SemiBold",
-    color: "#8F8F8F",
-    marginTop: verticalScale(24),
-    marginBottom: verticalScale(14),
-  },
-  settingItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: moderateScale(18),
-    borderRadius: moderateScale(12),
-    borderWidth: moderateScale(0.5),
+  flashListContainer: {
+    borderBottomWidth: verticalScale(0.5),
     borderColor: "#EBEBEB",
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-  },
-  settingText: {
-    fontSize: moderateScale(16),
-    fontFamily: "Inter-Medium",
-    color: "#313234",
+    backgroundColor: "red",
   },
   logoutButton: {
     padding: moderateScale(16),
     borderRadius: moderateScale(12),
-    marginTop: "auto",
+    // marginTop: "auto",
     marginBottom: verticalScale(61),
     alignItems: "center",
     borderWidth: moderateScale(0.5),

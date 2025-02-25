@@ -11,13 +11,12 @@ import {
 import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import { googleAuthService } from "@/services/GoogleAuthService";
-import { authService } from "@/services/AuthService";
+import { authService, UserStatus } from "@/services/AuthService";
 import Parse from "../services/Parse";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
 
 export default function LandingPage() {
-  const navigation = useNavigation();
   const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
@@ -27,11 +26,12 @@ export default function LandingPage() {
   }, []);
 
   const attemptToLogin = async () => {
-    console.log("attempting to login");
     showLoading();
     const currentUser = await authService.getCurrentUser();
+    let userStatus: UserStatus;
+
     if (currentUser) {
-      const userStatus = await authService.getUserStatus(currentUser);
+      userStatus = await authService.getUserStatus(currentUser);
       authService.navigateBasedOnUserStatus(userStatus);
     }
     hideLoading();
@@ -47,6 +47,7 @@ export default function LandingPage() {
 
       authService.navigateBasedOnUserStatus(userStatus);
     }
+
     hideLoading();
   };
 

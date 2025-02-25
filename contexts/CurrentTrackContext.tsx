@@ -60,6 +60,17 @@ export const CurrentTrackProvider = ({
     );
   };
 
+  const resetCurrentTrack = () => {
+    setCurrentTrackDetails({
+      songId: "",
+      songName: "",
+      artistName: "",
+      songUrl: "",
+    });
+    setCurrentTrackState("paused");
+    currentSongDetailsSV.value = { songId: "", state: "paused" };
+  };
+
   return (
     <CurrentTrackContext.Provider
       value={{
@@ -68,6 +79,7 @@ export const CurrentTrackProvider = ({
         currentTrackState,
         togglePlay,
         currentSongDetailsSV,
+        resetCurrentTrack,
       }}
     >
       {children}
