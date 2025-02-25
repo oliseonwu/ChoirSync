@@ -1,17 +1,21 @@
 import { horizontalScale } from "@/utilities/TrueScale";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Portal } from "react-native-paper";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import { useLoading } from "@/contexts/LoadingContext";
+import { memo } from "react";
 
-type LoadingScreenProps = {
-  isVisible: boolean;
-};
+export function LoadingScreenComponent() {
+  const { opacity } = useLoading();
 
-export function LoadingScreenComponent({ isVisible }: LoadingScreenProps) {
-  if (!isVisible) return null;
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    display: opacity.value === 0 ? "none" : "flex",
+  }));
 
   return (
     <Portal>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, animatedStyle]}>
         <View style={styles.loadingBox}>
           <ActivityIndicator
             size="large"
@@ -19,10 +23,12 @@ export function LoadingScreenComponent({ isVisible }: LoadingScreenProps) {
             style={{ opacity: 0.9 }}
           />
         </View>
-      </View>
+      </Animated.View>
     </Portal>
   );
 }
+
+export default memo(LoadingScreenComponent);
 
 const styles = StyleSheet.create({
   container: {

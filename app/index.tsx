@@ -10,19 +10,15 @@ import {
 } from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
 import { googleAuthService } from "@/services/GoogleAuthService";
 import { authService } from "@/services/AuthService";
 import Parse from "../services/Parse";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
+import { useLoading } from "@/contexts/LoadingContext";
 
 export default function LandingPage() {
   const navigation = useNavigation();
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     // Configure the google auth service
@@ -32,14 +28,17 @@ export default function LandingPage() {
 
   const attemptToLogin = async () => {
     console.log("attempting to login");
+    showLoading();
     const currentUser = await authService.getCurrentUser();
     if (currentUser) {
       const userStatus = await authService.getUserStatus(currentUser);
       authService.navigateBasedOnUserStatus(userStatus);
     }
+    hideLoading();
   };
 
   const handleLogin = async () => {
+    showLoading();
     const loginResponse = await authService.loginWithGoogle();
     let userStatus;
 
@@ -48,6 +47,7 @@ export default function LandingPage() {
 
       authService.navigateBasedOnUserStatus(userStatus);
     }
+    hideLoading();
   };
 
   return (
@@ -103,7 +103,7 @@ export default function LandingPage() {
           />
         </TouchableOpacity>
       </View>
-      <LoadingScreenComponent isVisible={true} />
+      <LoadingScreenComponent />
     </View>
   );
 }
