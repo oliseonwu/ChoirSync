@@ -1,4 +1,7 @@
+import { router } from "expo-router";
+import { googleAuthService } from "./GoogleAuthService";
 import Parse from "./Parse";
+import { GoogleUser } from "@/types/user.types";
 
 interface SignUpData {
   email: string;
@@ -10,6 +13,11 @@ interface SignUpData {
 interface LoginData {
   email: string;
   password: string;
+}
+
+interface UserStatus {
+  hasName: boolean;
+  isMemberOfAnyChoir: boolean;
 }
 
 //The AuthService class is a central manager for all
@@ -50,6 +58,7 @@ class AuthService {
 
   async logout() {
     try {
+      await googleAuthService.signOut();
       await Parse.User.logOut();
       return { success: true };
     } catch (error: any) {
@@ -73,6 +82,58 @@ class AuthService {
         error: error.message,
       };
     }
+  }
+
+  async loginWithGoogle() {
+    const googleResponse = await googleAuthService.signIn();
+
+    if (!googleResponse.success) {
+      return { success: false, error: googleResponse.error };
+    }
+
+    try {
+      const { user: googleUser, idToken } = googleResponse.data!;
+      const currentUser = await this.getCurrentUser();
+
+      const userToLogin = currentUser || new Parse.User();
+      if (!currentUser) {
+        userToLogin.set("username", googleUser.email);
+        userToLogin.set("email", googleUser.email);
+      }
+
+      // linkWith will:
+      // 1. Find existing user with this Google ID
+      // 2. Log them in if found
+      // 3. Create new user only if not found
+      const loggedInUser = await userToLogin.linkWith("google", {
+        authData: {
+          id: googleUser.id,
+          id_token: idToken,
+        },
+      });
+
+      return { success: true, user: loggedInUser };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getUserStatus(user: Parse.User): Promise<UserStatus> {
+    const firstName = user.get("firstName");
+    const lastName = user.get("lastName");
+    const hasName = Boolean(firstName && lastName);
+
+    const membershipResult = await authService.checkChoirMembership(user.id);
+    if (!membershipResult.success) {
+      throw new Error(
+        membershipResult.error || "Failed to check choir membership"
+      );
+    }
+
+    return {
+      hasName,
+      isMemberOfAnyChoir: membershipResult.isMember,
+    };
   }
 
   async checkChoirMembership(userId: string) {
@@ -104,6 +165,15 @@ class AuthService {
       };
     }
   }
+
+  navigateBasedOnUserStatus = (userStatus: UserStatus) => {
+    if (!userStatus.hasName) {
+      return router.navigate("/name");
+    }
+    return userStatus.isMemberOfAnyChoir
+      ? router.navigate("/(tabs)")
+      : router.navigate("/chooseYourPath");
+  };
 }
 
 export const authService = new AuthService();

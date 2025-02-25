@@ -10,7 +10,6 @@
     "test": "jest --watchAll",
     "profiler": "react-devtools"
   },
-  
   "jest": {
     "preset": "jest-expo"
   },
@@ -18,7 +17,9 @@
     "@expo/vector-icons": "^14.0.2",
     "@parse/react-native": "^0.0.1-alpha.18",
     "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-native-google-signin/google-signin": "^13.2.0",
     "@react-navigation/native": "^6.0.2",
+    "@shopify/flash-list": "1.6.4",
     "eas-cli": "^12.6.0",
     "expo": "^51.0.38",
     "expo-dev-client": "~4.0.28",
@@ -26,7 +27,7 @@
     "expo-image": "^1.13.0",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.23",
-    "expo-splash-screen": "~0.27.5",
+    "expo-splash-screen": "~0.27.7",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
@@ -45,8 +46,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "react-native-webview": "^13.13.2",
-    "react-native-youtube-iframe": "^2.3.0",
-    "@shopify/flash-list": "1.6.4"
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

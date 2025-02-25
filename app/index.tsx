@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import { useNavigation, router } from "expo-router";
@@ -9,9 +9,46 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
+import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
+import { googleAuthService } from "@/services/GoogleAuthService";
+import { authService } from "@/services/AuthService";
+import Parse from "../services/Parse";
+import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
+import { useLoading } from "@/contexts/LoadingContext";
 
 export default function LandingPage() {
   const navigation = useNavigation();
+  const { showLoading, hideLoading } = useLoading();
+
+  useEffect(() => {
+    // Configure the google auth service
+    googleAuthService.configure();
+    attemptToLogin();
+  }, []);
+
+  const attemptToLogin = async () => {
+    console.log("attempting to login");
+    showLoading();
+    const currentUser = await authService.getCurrentUser();
+    if (currentUser) {
+      const userStatus = await authService.getUserStatus(currentUser);
+      authService.navigateBasedOnUserStatus(userStatus);
+    }
+    hideLoading();
+  };
+
+  const handleLogin = async () => {
+    showLoading();
+    const loginResponse = await authService.loginWithGoogle();
+    let userStatus;
+
+    if (loginResponse.success) {
+      userStatus = await authService.getUserStatus(loginResponse.user!);
+
+      authService.navigateBasedOnUserStatus(userStatus);
+    }
+    hideLoading();
+  };
 
   return (
     <View style={styles.MainContainer}>
@@ -37,10 +74,10 @@ export default function LandingPage() {
             " access to rehearsal recordings for their choir members."}
         </Text>
 
-        <View style={styles.BtnRowContainer}>
+        {/* <View style={styles.BtnRowContainer}>
           <TouchableOpacity
             style={[styles.Btn, styles.btnHollow]}
-            onPress={() => router.navigate("/login/loginOptions")}
+            onPress={handleLogin}
           >
             <Text style={[styles.btnText, { color: "#313234" }]}>Login</Text>
           </TouchableOpacity>
@@ -55,8 +92,18 @@ export default function LandingPage() {
               Get Started
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
+        <TouchableOpacity
+          style={styles.googleBtnContainer}
+          onPress={handleLogin}
+        >
+          <SignInWithGoogleBtn
+            width={horizontalScale(230)}
+            height={verticalScale(55)}
+          />
+        </TouchableOpacity>
       </View>
+      <LoadingScreenComponent />
     </View>
   );
 }
@@ -96,6 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginTop: "10%",
+    backgroundColor: "red",
   },
   Btn: {
     flex: 1,
@@ -120,5 +168,10 @@ const styles = StyleSheet.create({
     color: "#ffff",
     fontFamily: "Inter-SemiBold",
     fontSize: moderateScale(16),
+  },
+  googleBtnContainer: {
+    marginTop: "11%",
+    marginBottom: "1%",
+    alignItems: "center",
   },
 });
