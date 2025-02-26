@@ -50,7 +50,7 @@ const NamePage = () => {
 
     try {
       const currentUser = await Parse.User.currentAsync();
-      console.log(currentUser);
+
       if (!currentUser) {
         Alert.alert("Oops!", "You are not logged in. Please login.", [
           {

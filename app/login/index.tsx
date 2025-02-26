@@ -48,24 +48,6 @@ const LoginPage = () => {
     isMemberOfAnyChoir: boolean;
   };
 
-  const getUserStatus = async (user: Parse.User): Promise<UserStatus> => {
-    const firstName = user.get("firstName");
-    const lastName = user.get("lastName");
-    const hasName = Boolean(firstName && lastName);
-
-    const membershipResult = await authService.checkChoirMembership(user.id);
-    if (!membershipResult.success) {
-      throw new Error(
-        membershipResult.error || "Failed to check choir membership"
-      );
-    }
-
-    return {
-      hasName,
-      isMemberOfAnyChoir: membershipResult.isMember,
-    };
-  };
-
   const navigateBasedOnUserStatus = (userStatus: UserStatus) => {
     if (!userStatus.hasName) {
       return router.navigate("/name");
@@ -105,7 +87,7 @@ const LoginPage = () => {
 
       // Login flow
       const user = await validateAndLogin();
-      const userStatus = await getUserStatus(user);
+      const userStatus = await authService.getUserStatus(user);
 
       // Complete login
       setIsLoading(false);
@@ -126,7 +108,7 @@ const LoginPage = () => {
       if (!user) {
         throw new Error("No previous session found");
       }
-      const userStatus = await getUserStatus(user);
+      const userStatus = await authService.getUserStatus(user);
 
       // Complete login
       setIsLoading(false);

@@ -30,22 +30,35 @@ export default function LandingPage() {
     const currentUser = await authService.getCurrentUser();
     let userStatus: UserStatus;
 
-    if (currentUser) {
-      userStatus = await authService.getUserStatus(currentUser);
-      authService.navigateBasedOnUserStatus(userStatus);
+    try {
+      if (currentUser) {
+        userStatus = await authService.getUserStatus(currentUser);
+        authService.navigateBasedOnUserStatus(userStatus);
+      }
+    } catch (error: any) {
+      console.log("error", error);
+
+      if (error.message === "Invalid session token") {
+        await authService.logout();
+      }
     }
     hideLoading();
   };
 
   const handleLogin = async () => {
     showLoading();
-    const loginResponse = await authService.loginWithGoogle();
+    let loginResponse = null;
     let userStatus;
 
-    if (loginResponse.success) {
-      userStatus = await authService.getUserStatus(loginResponse.user!);
+    try {
+      loginResponse = await authService.loginWithGoogle();
+      if (loginResponse.success) {
+        userStatus = await authService.getUserStatus(loginResponse.user!);
 
-      authService.navigateBasedOnUserStatus(userStatus);
+        authService.navigateBasedOnUserStatus(userStatus);
+      }
+    } catch (error) {
+      console.log("error", error);
     }
 
     hideLoading();

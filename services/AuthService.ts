@@ -85,11 +85,8 @@ class AuthService {
   }
 
   async loginWithGoogle() {
+    // we throw errors in GoogleAuthService, so we don't need to handle them here
     const googleResponse = await googleAuthService.signIn();
-
-    if (!googleResponse.success) {
-      return { success: false, error: googleResponse.error };
-    }
 
     try {
       const { user: googleUser, idToken } = googleResponse.data!;
@@ -113,7 +110,15 @@ class AuthService {
       });
 
       return { success: true, user: loggedInUser };
-    } catch (error: any) {
+    } catch (error: Parse.Error | any) {
+      console.log("error:", error);
+
+      if (
+        error instanceof Parse.Error &&
+        error.code === Parse.Error.ACCOUNT_ALREADY_LINKED
+      ) {
+        this.logout();
+      }
       return { success: false, error: error.message };
     }
   }

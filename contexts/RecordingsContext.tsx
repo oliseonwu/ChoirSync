@@ -46,7 +46,6 @@ export function RecordingsProvider({
     date1?.toDateString() === date2?.toDateString();
 
   const fetchRecordings = async () => {
-    console.log("fetchRecordings");
     try {
       const currentUser = await authService.getCurrentUser();
       if (!currentUser) return;

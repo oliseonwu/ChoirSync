@@ -71,7 +71,7 @@ export default function TabLayout() {
               headerRight: () => (
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => router.push("/settings")}
+                  onPress={() => router.push("/(Settings)")}
                 >
                   <Image
                     source={require("@/assets/images/profile-placeholder.png")}

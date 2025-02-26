@@ -8,29 +8,39 @@ import {
 } from "@/utilities/TrueScale";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import { SettingsItem } from "@/components/SettingsItem";
 import NotificationSettingsIcon from "@/assets/images/SVG/notification-settings-icon.svg";
 import ProfileSettingsIcon from "@/assets/images/SVG/profile-settings-icon.svg";
-import PrivacySettingsIcon from "@/assets/images/SVG/Pravacy-settings-Icon.svg";
+import PrivacySettingsIcon from "@/assets/images/SVG/privacy-settings-icon.svg";
 import TermsSettingsIcon from "@/assets/images/SVG/terms-settings-icon.svg";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useWebView } from "@/contexts/WebViewContext";
+import { NowPlayingComponent } from "@/components/NowPlayingComponent";
+import { WebViewComponent } from "@/components/WebViewComponent";
 
 type SettingItem = {
-  id: string;
+  id: number;
   Icon: React.ElementType;
   title: string;
   onPress?: () => void;
 };
 
+const privacyIconMemo = memo(PrivacySettingsIcon);
+const termsIconMemo = memo(TermsSettingsIcon);
+const notificationIconMemo = memo(NotificationSettingsIcon);
+const profileIconMemo = memo(ProfileSettingsIcon);
+
 export default function SettingsScreen() {
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { opacity, showLoading, hideLoading } = useLoading();
+  const { showLoading, hideLoading } = useLoading();
+  const [webViewTitle, setWebViewTitle] = useState("");
+  const [webViewUrl, setWebViewUrl] = useState("");
   const { resetCurrentTrack } = useCurrentTrack();
   const { resetRecordings } = useRecordings();
+  const { showWebView } = useWebView();
 
   const performLogout = async () => {
     try {
@@ -68,47 +78,56 @@ export default function SettingsScreen() {
   const settingsData = useMemo<SettingItem[]>(
     () => [
       {
-        id: "1",
-        Icon: ProfileSettingsIcon,
+        id: 1,
+        Icon: profileIconMemo,
         title: "Profile",
         onPress: () => {},
       },
       {
-        id: "2",
-        Icon: NotificationSettingsIcon,
+        id: 2,
+        Icon: notificationIconMemo,
         title: "Notifications",
         onPress: () => {},
       },
       {
-        id: "3",
-        Icon: PrivacySettingsIcon,
+        id: 3,
+        Icon: privacyIconMemo,
         title: "Privacy",
-        onPress: () => {},
+        onPress: () => {
+          setWebViewTitle("Privacy Policy");
+          setWebViewUrl(
+            "https://oliseonwu.github.io/choirsync.github.io/privacy.html"
+          );
+          showWebView();
+        },
       },
       {
-        id: "4",
-        Icon: TermsSettingsIcon,
+        id: 4,
+        Icon: termsIconMemo,
         title: "Terms and Conditions",
-        onPress: () => {},
+        onPress: () => {
+          setWebViewTitle("Terms and Conditions");
+          setWebViewUrl(
+            "https://oliseonwu.github.io/choirsync.github.io/terms.html"
+          );
+          showWebView();
+        },
       },
     ],
     []
   );
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: SettingItem;
-    index: number;
-  }) => (
-    <SettingsItem
-      Icon={item.Icon}
-      title={item.title}
-      onPress={item.onPress}
-      isLast={index === settingsData.length - 1}
-      isFirst={index === 0}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: SettingItem; index: number }) => (
+      <SettingsItem
+        Icon={item.Icon}
+        title={item.title}
+        onPress={item.onPress}
+        isLast={item.id === settingsData.length}
+        isFirst={item.id === 1}
+      />
+    ),
+    []
   );
 
   return (
@@ -117,12 +136,15 @@ export default function SettingsScreen() {
         data={settingsData}
         renderItem={renderItem}
         estimatedItemSize={65}
-        keyExtractor={(item) => item.id}
+        scrollEnabled={false}
+        keyExtractor={(item) => item.id.toString()}
       />
 
       <TouchableOpacity style={[styles.logoutButton]} onPress={handleLogout}>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
+
+      <WebViewComponent title={webViewTitle} url={webViewUrl} />
     </View>
   );
 }
@@ -145,7 +167,7 @@ const styles = StyleSheet.create({
     // marginTop: "auto",
     marginBottom: verticalScale(61),
     alignItems: "center",
-    borderWidth: moderateScale(0.5),
+    borderWidth: verticalScale(1.0),
     borderColor: "#EBEBEB",
     borderLeftWidth: 0,
     borderRightWidth: 0,
@@ -153,6 +175,6 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: moderateScale(16),
     fontFamily: "Inter-Medium",
-    color: "#FF3B30",
+    color: "#C15141",
   },
 });

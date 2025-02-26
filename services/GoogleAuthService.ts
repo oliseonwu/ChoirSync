@@ -55,11 +55,11 @@ class GoogleAuthService {
     if (isErrorWithCode(error)) {
       switch (error.code) {
         case statusCodes.IN_PROGRESS:
-          return { success: false, error: "Sign in already in progress" };
+          throw { success: false, error: "Sign in already in progress" };
         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-          return { success: false, error: "Play services not available" };
+          throw { success: false, error: "Play services not available" };
         default:
-          return { success: false, error: "Sign in failed" };
+          throw { success: false, error: "Sign in failed" };
       }
     }
     return { success: false, error: "Unknown error occurred" };
