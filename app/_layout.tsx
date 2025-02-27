@@ -252,6 +252,20 @@ function RootLayoutNav() {
                     }}
                   />
                   <Stack.Screen
+                    name="(authenticated)/(Settings)/profile"
+                    options={{
+                      headerShown: true,
+                      animation: "fade",
+                      headerTitle: "Account profile",
+                      headerTitleAlign: "center",
+                      headerTitleStyle: styles.headerTitle,
+                      headerShadowVisible: false,
+
+                      headerBackTitleVisible: false,
+                      headerLeft: () => <BackButtonComponent />,
+                    }}
+                  />
+                  <Stack.Screen
                     name="(authenticated)/recordings"
                     options={{
                       headerShown: true,

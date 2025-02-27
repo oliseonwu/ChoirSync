@@ -81,7 +81,7 @@ export default function SettingsScreen() {
         id: 1,
         Icon: profileIconMemo,
         title: "Profile",
-        onPress: () => {},
+        onPress: () => router.push("/(Settings)/profile"),
       },
       {
         id: 2,
