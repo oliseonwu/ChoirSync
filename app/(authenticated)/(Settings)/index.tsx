@@ -37,7 +37,9 @@ const profileIconMemo = memo(ProfileSettingsIcon);
 export default function SettingsScreen() {
   const { showLoading, hideLoading } = useLoading();
   const [webViewTitle, setWebViewTitle] = useState("");
-  const [webViewUrl, setWebViewUrl] = useState("");
+  const [webViewUrl, setWebViewUrl] = useState(
+    "https://oliseonwu.github.io/choirsync.github.io/privacy.html"
+  );
   const { resetCurrentTrack } = useCurrentTrack();
   const { resetRecordings } = useRecordings();
   const { showWebView } = useWebView();

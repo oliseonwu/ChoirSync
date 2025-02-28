@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { googleAuthService } from "./GoogleAuthService";
 import Parse from "./Parse";
 import { GoogleUser } from "@/types/user.types";
+import { ErrorCode } from "@/types/errors";
 
 interface SignUpData {
   email: string;
@@ -179,6 +180,46 @@ class AuthService {
       ? router.navigate("/(tabs)")
       : router.navigate("/chooseYourPath");
   };
+  // ... existing code ...
+
+  async updateUserField(field: string, value: any) {
+    try {
+      const currentUser = await this.getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          error: ErrorCode.NOT_LOGGED_IN,
+        };
+      }
+
+      typeof value === "string" ? (value = value.trim()) : value;
+      currentUser.set(field, value);
+      await currentUser.save();
+
+      return {
+        success: true,
+        user: currentUser,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  async verifyAuth() {
+    const currentUser = await this.getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        error: "User not logged in",
+      };
+    }
+    return { success: true };
+  }
+
+  // ... existing code ...
 }
 
 export const authService = new AuthService();

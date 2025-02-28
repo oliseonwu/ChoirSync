@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
 import { authService } from "@/services/AuthService";
 import {
   getWindowSize,
@@ -19,14 +20,17 @@ const { height, width } = getWindowSize();
 export default function Profile() {
   const [user, setUser] = useState<Parse.User | null>(null);
 
-  useEffect(() => {
-    loadUserData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [])
+  );
 
   const loadUserData = async () => {
     const currentUser = await authService.getCurrentUser();
     if (currentUser) {
-      setUser(currentUser);
+      const userCopy = currentUser.clone();
+      setUser(userCopy);
     }
   };
 

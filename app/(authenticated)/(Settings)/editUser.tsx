@@ -39,6 +39,7 @@ const EditUserPage = () => {
   }, [name]);
 
   const updateName = async () => {
+    let result;
     if (!isFormValid) {
       Alert.alert("Error", "Please enter a " + params.type);
       return;
@@ -46,29 +47,15 @@ const EditUserPage = () => {
 
     setIsLoading(true);
 
-    try {
-      const currentUser = await Parse.User.currentAsync();
+    result = await authService.updateUserField(params.type, name);
 
-      if (!currentUser) {
-        Alert.alert("Error", "You are not logged in");
-        router.back();
-        return;
-      }
-
-      const trimmedName = name.trim();
-      const currentName = currentUser.get(params.type);
-
-      if (trimmedName !== currentName) {
-        currentUser.set(params.type, trimmedName);
-        await currentUser.save();
-      }
-
-      setIsLoading(false);
-      router.back();
-    } catch (error: any) {
-      setIsLoading(false);
-      Alert.alert("Error", error.message || "Failed to update name");
+    if (!result.success) {
+      router.dismissAll();
+      Alert.alert("Error", result.error);
+      return;
     }
+
+    router.back();
   };
 
   return (
