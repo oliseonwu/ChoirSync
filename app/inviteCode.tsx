@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { styles } from "@/shared/css/signinLoginCss";
+import { globalStyles } from "@/shared/css/GlobalCss";
 import { router, useLocalSearchParams } from "expo-router";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -87,23 +87,23 @@ const InviteCodePage = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
         style={[
-          styles.MainContainer,
+          globalStyles.MainContainer,
           { paddingTop: verticalScale(headerHeight) },
         ]}
       >
         <StatusBar style="dark" />
 
-        <View style={styles.TopContainer}>
-          <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
+        <View style={globalStyles.TopContainer}>
+          <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
             Enter Invite Code
           </Text>
 
-          <Text style={styles.regularText}>
+          <Text style={globalStyles.regularText}>
             Enter the invite code you received from the group creator.
           </Text>
 
           <TextInput
-            style={[styles.Input, { marginTop: verticalScale(32) }]}
+            style={[globalStyles.Input, { marginTop: verticalScale(32) }]}
             placeholder="Enter Invite Code"
             value={inviteCode}
             onChangeText={setInviteCode}
@@ -118,8 +118,8 @@ const InviteCodePage = () => {
           isLoading={isLoading}
           onPress={handleValidateCode}
           buttonText="Join Group"
-          style={[styles.Btn, styles.BtnBlack]}
-          textStyle={[styles.btnText, { color: "#ffff" }]}
+          style={[globalStyles.Btn, globalStyles.BtnBlack]}
+          textStyle={[globalStyles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
           disabled={!inviteCode.trim()}
         />

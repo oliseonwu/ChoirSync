@@ -12,6 +12,8 @@ import Parse from "@/services/Parse";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { Image } from "expo-image";
 import RightArrow from "@/assets/images/SVG/right-arrow3.svg";
+import MenuItemOne from "@/components/MenuItemOne";
+import { router } from "expo-router";
 
 const { height, width } = getWindowSize();
 export default function Profile() {
@@ -30,8 +32,10 @@ export default function Profile() {
 
   return (
     <View style={[globalStyles.container]}>
+      <View style={styles.flexContainer}></View>
       <View style={styles.profileSection}>
         <TouchableOpacity
+          activeOpacity={0.7}
           style={[styles.imageContainer, styles.profileBorderRadius]}
           onPress={() => {
             console.log("profile image pressed");
@@ -51,9 +55,48 @@ export default function Profile() {
       </View>
 
       <View style={styles.infoSection}>
-        <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+        <MenuItemOne
+          label="First Name"
+          value={user?.get("firstName") || "N/A"}
+          onPress={() => {
+            router.push({
+              pathname: "/(authenticated)/(Settings)/editUser",
+              params: {
+                type: "firstName", // or "lastName"
+                title: "Edit First Name",
+                description: "Please enter your new first name below",
+              },
+            });
+          }}
+        />
+        <MenuItemOne
+          label="Last Name"
+          value={user?.get("lastName") || "N/A"}
+          onPress={() => {
+            router.push({
+              pathname: "/(authenticated)/(Settings)/editUser",
+              params: {
+                type: "lastName", // or "lastName"
+                title: "Edit Last Name",
+                description: "Please enter your new last name below",
+              },
+            });
+          }}
+        />
+        <MenuItemOne
+          label="Email"
+          value={user?.get("email") || "N/A"}
+          onPress={() => {
+            console.log("email pressed");
+          }}
+          borderBottomWidth={moderateScale(0.5)}
+          disabled={true}
+        />
+        {/*<View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
           <Text style={styles.label}>First Name</Text>
-          <Text style={styles.value}>{user?.get("firstName") || "N/A"}</Text>
+          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
+            {user?.get("firstName") || "N/A"}
+          </Text>
           <RightArrow
             fill={"#A3A2A2"}
             height={moderateScale(21)}
@@ -63,7 +106,9 @@ export default function Profile() {
 
         <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
           <Text style={styles.label}>Last Name</Text>
-          <Text style={styles.value}>{user?.get("lastName") || "N/A"}</Text>
+          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
+            {user?.get("lastName") || "N/A"}
+          </Text>
           <RightArrow
             fill={"#A3A2A2"}
             height={moderateScale(21)}
@@ -73,13 +118,15 @@ export default function Profile() {
 
         <View style={[styles.infoRow]}>
           <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>{user?.get("email") || "N/A"}</Text>
+          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
+            {user?.get("email") || "N/A"}
+          </Text>
           <RightArrow
             fill={"#A3A2A2"}
             height={moderateScale(21)}
             width={moderateScale(21)}
           />
-        </View>
+        </View> */}
       </View>
       <TouchableOpacity style={[styles.logoutButton]}>
         <Text style={styles.logoutText}>Delete Account</Text>
@@ -89,23 +136,33 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  flexContainer: {
+    // flex: 1,
+    flexBasis: (height * 1) / 100, // 1% of height for the container before the flex is applied
+    flexGrow: 0.6, // Take up 0.6 portion of any available space
+    flexShrink: 0.6, // Shrink to 0.6 portion of any available space
+    // backgroundColor: "red",
+  },
   profileSection: {
     alignItems: "center",
+    flexGrow: 1.3,
+    flexShrink: 1.3,
     // flex: 0.52,
     // marginBottom: "15%",
-    marginBottom: (height * 7) / 100,
+    // marginBottom: (height * 7) / 100,
     // marginBottom: "2%",
 
     // marginBottom: "15%",
     // backgroundColor: "red",
     // justifyContent: "center",
   },
+
   imageContainer: {
     position: "relative",
     aspectRatio: 1,
     width: horizontalScale(97),
     // marginTop: "11%",
-    marginTop: (height * 5) / 100,
+    // marginTop: (height * 5) / 100,
   },
   profileBorderRadius: {
     borderRadius: moderateScale(48.5), // picture size/2
@@ -133,7 +190,7 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     paddingHorizontal: horizontalScale(24),
-    flex: 1,
+    flex: 8.1,
     // backgroundColor: "blue",
   },
   infoRow: {
@@ -146,12 +203,13 @@ const styles = StyleSheet.create({
     borderColor: "#E6E9E8",
   },
   label: {
+    flex: 1,
     fontFamily: "Inter-Medium",
     fontSize: moderateScale(16),
     color: "#3E3C48",
   },
   value: {
-    flex: 1,
+    // flex: 1,
 
     fontFamily: "Inter-Medium",
     fontSize: moderateScale(16),
@@ -159,6 +217,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     marginRight: horizontalScale(5),
     // backgroundColor: "red",
+    width: (width * 46) / 100,
   },
   separator: {
     height: 1,

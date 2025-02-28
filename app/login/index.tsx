@@ -15,7 +15,7 @@ import {
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { styles } from "@/shared/css/signinLoginCss";
+import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
 import LoadingButton from "@/components/LoadingButton";
@@ -123,17 +123,17 @@ const LoginPage = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
         style={[
-          styles.MainContainer,
+          globalStyles.container,
           { paddingTop: verticalScale(headerHeight) },
         ]}
       >
         <StatusBar style="dark" />
 
-        <View style={styles.TopContainer}>
-          <Text style={styles.H1}>Login</Text>
+        <View style={globalStyles.TopContainer}>
+          <Text style={globalStyles.H1}>Login</Text>
 
           <TextInput
-            style={styles.Input}
+            style={globalStyles.Input}
             placeholder="Enter Email"
             placeholderTextColor="#C9C8CA"
             value={email}
@@ -147,7 +147,7 @@ const LoginPage = () => {
 
           <TextInput
             secureTextEntry={true}
-            style={[styles.Input, { marginTop: verticalScale(19.28) }]}
+            style={[globalStyles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Enter Password"
             placeholderTextColor="#C9C8CA"
             value={password}
@@ -162,8 +162,8 @@ const LoginPage = () => {
           disabled={!isFormValid}
           loadingText="Logging in..."
           buttonText="Login"
-          style={[styles.Btn, styles.BtnBlack]}
-          textStyle={[styles.btnText, { color: "#ffff" }]}
+          style={[globalStyles.Btn, globalStyles.BtnBlack]}
+          textStyle={[globalStyles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
         />
       </View>

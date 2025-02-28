@@ -20,7 +20,7 @@ import {
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { styles } from "@/shared/css/signinLoginCss";
+import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
 import Parse from "@/services/Parse";
@@ -92,24 +92,27 @@ const NamePage = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
         style={[
-          styles.MainContainer,
+          globalStyles.MainContainer,
           { paddingTop: verticalScale(headerHeight) },
         ]}
       >
         <StatusBar style="dark" />
 
-        <View style={styles.TopContainer}>
-          <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
+        <View style={globalStyles.TopContainer}>
+          <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
             Tell us about yourself
           </Text>
           <Text
-            style={[styles.regularText, { paddingBottom: verticalScale(34) }]}
+            style={[
+              globalStyles.regularText,
+              { paddingBottom: verticalScale(34) },
+            ]}
           >
             Please enter your legal name below
           </Text>
 
           <TextInput
-            style={styles.Input}
+            style={globalStyles.Input}
             placeholder="First Name"
             placeholderTextColor="#C9C8CA"
             value={firstName}
@@ -119,7 +122,7 @@ const NamePage = () => {
           />
 
           <TextInput
-            style={[styles.Input, { marginTop: verticalScale(19.28) }]}
+            style={[globalStyles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Last Name"
             placeholderTextColor="#C9C8CA"
             value={lastName}
@@ -135,8 +138,8 @@ const NamePage = () => {
           disabled={!isFormValid}
           loadingText="Saving..."
           buttonText="Next"
-          style={[styles.Btn, styles.BtnBlack]}
-          textStyle={[styles.btnText, { color: "#ffff" }]}
+          style={[globalStyles.Btn, globalStyles.BtnBlack]}
+          textStyle={[globalStyles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
         />
       </View>

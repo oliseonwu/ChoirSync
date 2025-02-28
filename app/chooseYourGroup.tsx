@@ -18,7 +18,7 @@ import {
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { styles } from "@/shared/css/signinLoginCss";
+import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import Parse from "@/services/Parse";
 
@@ -91,14 +91,14 @@ const ChooseYourGroup = () => {
   return (
     <View
       style={[
-        styles.MainContainer,
+        globalStyles.MainContainer,
         { paddingTop: verticalScale(headerHeight) },
       ]}
     >
       <StatusBar style="dark" />
 
-      <View style={styles.TopContainer}>
-        <Text style={[styles.H1, { marginBottom: verticalScale(32) }]}>
+      <View style={globalStyles.TopContainer}>
+        <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
           Choose your Group
         </Text>
 

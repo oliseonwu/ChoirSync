@@ -266,6 +266,18 @@ function RootLayoutNav() {
                     }}
                   />
                   <Stack.Screen
+                    name="(authenticated)/(Settings)/editUser"
+                    options={{
+                      animation: "none",
+                      headerTransparent: true,
+                      headerTitle: "",
+                      headerBackTitleVisible: false,
+                      headerLeft: () => (
+                        <BackButtonComponent style={styles2.BackButton} />
+                      ),
+                    }}
+                  />
+                  <Stack.Screen
                     name="(authenticated)/recordings"
                     options={{
                       headerShown: true,

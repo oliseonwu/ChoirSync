@@ -11,7 +11,7 @@ import React, { useState, useMemo } from "react";
 import { verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { styles } from "@/shared/css/signinLoginCss";
+import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
 import LoadingButton from "@/components/LoadingButton";
@@ -67,17 +67,17 @@ const SignUpPage = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
         style={[
-          styles.MainContainer,
+          globalStyles.MainContainer,
           { paddingTop: verticalScale(headerHeight) },
         ]}
       >
         <StatusBar style="dark" />
 
-        <View style={styles.TopContainer}>
-          <Text style={styles.H1}>SignUp</Text>
+        <View style={globalStyles.TopContainer}>
+          <Text style={globalStyles.H1}>SignUp</Text>
 
           <TextInput
-            style={styles.Input}
+            style={globalStyles.Input}
             placeholder="Enter Email"
             placeholderTextColor="#C9C8CA"
             value={email}
@@ -89,7 +89,7 @@ const SignUpPage = () => {
 
           <TextInput
             secureTextEntry={true}
-            style={[styles.Input, { marginTop: verticalScale(19.28) }]}
+            style={[globalStyles.Input, { marginTop: verticalScale(19.28) }]}
             placeholder="Enter Password"
             placeholderTextColor="#C9C8CA"
             value={password}
@@ -104,8 +104,8 @@ const SignUpPage = () => {
           disabled={!isFormValid}
           loadingText="Signing up..."
           buttonText="Sign Up"
-          style={[styles.Btn, styles.BtnBlack]}
-          textStyle={[styles.btnText, { color: "#ffff" }]}
+          style={[globalStyles.Btn, globalStyles.BtnBlack]}
+          textStyle={[globalStyles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
         />
       </View>
