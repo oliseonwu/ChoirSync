@@ -1,0 +1,15 @@
+cloud/
+├── main.js              # Main entry point
+├── functions/           # Cloud functions organized by domain
+│   ├── auth.js         # Authentication related functions
+│   ├── groups.js       # Choir group related functions
+│   ├── invites.js      # Invite code related functions
+│   └── users.js        # User management functions
+├── triggers/           # Cloud triggers
+│   ├── beforeSave/
+│   └── afterSave/
+├── utils/             # Shared utilities
+│   ├── errors.js
+│   └── helpers.js
+└── config/            # Configuration files
+    └── constants.js

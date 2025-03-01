@@ -17,7 +17,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { router, useLocalSearchParams } from "expo-router";
-import { authService } from "@/services/AuthService";
+import { userManagementService } from "@/services/UserManagementService";
 import Parse from "@/services/Parse";
 import LoadingButton from "@/components/LoadingButton";
 import { useLoadingState } from "@/hooks/useLoadingState";
@@ -47,7 +47,7 @@ const EditUserPage = () => {
 
     setIsLoading(true);
 
-    result = await authService.updateUserField(params.type, name);
+    result = await userManagementService.updateUserField(params.type, name);
 
     if (!result.success) {
       router.dismissAll();

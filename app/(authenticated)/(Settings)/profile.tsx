@@ -151,14 +151,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexGrow: 1.3,
     flexShrink: 1.3,
-    // flex: 0.52,
-    // marginBottom: "15%",
-    // marginBottom: (height * 7) / 100,
-    // marginBottom: "2%",
-
-    // marginBottom: "15%",
-    // backgroundColor: "red",
-    // justifyContent: "center",
   },
 
   imageContainer: {
