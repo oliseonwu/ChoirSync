@@ -15,10 +15,11 @@ import { authService, UserStatus } from "@/services/AuthService";
 import Parse from "../services/Parse";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useUser } from "@/contexts/UserContext";
 
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();
-
+  const { updateCurrentUserData } = useUser();
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
@@ -33,6 +34,12 @@ export default function LandingPage() {
     try {
       if (currentUser) {
         userStatus = await authService.getUserStatus(currentUser);
+        updateCurrentUserData(
+          currentUser.get("firstName"),
+          currentUser.get("lastName"),
+          currentUser.get("email"),
+          currentUser.get("profileUrl")
+        );
         authService.navigateBasedOnUserStatus(userStatus);
       }
     } catch (error: any) {
@@ -54,6 +61,12 @@ export default function LandingPage() {
       loginResponse = await authService.loginWithGoogle();
       if (loginResponse.success) {
         userStatus = await authService.getUserStatus(loginResponse.user!);
+        updateCurrentUserData(
+          loginResponse.user!.get("firstName"),
+          loginResponse.user!.get("lastName"),
+          loginResponse.user!.get("email"),
+          loginResponse.user!.get("profileUrl")
+        );
 
         authService.navigateBasedOnUserStatus(userStatus);
       }

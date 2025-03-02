@@ -1,67 +1,29 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
-import { authService } from "@/services/AuthService";
+
 import {
   getWindowSize,
   horizontalScale,
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
-import Camera from "@/assets/images/SVG/camera.svg";
-import Parse from "@/services/Parse";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import { Image } from "expo-image";
-import RightArrow from "@/assets/images/SVG/right-arrow3.svg";
+
 import MenuItemOne from "@/components/MenuItemOne";
 import { router } from "expo-router";
 
+import { useUser } from "@/contexts/UserContext";
+
 const { height, width } = getWindowSize();
 export default function Profile() {
-  const [user, setUser] = useState<Parse.User | null>(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadUserData();
-    }, [])
-  );
-
-  const loadUserData = async () => {
-    const currentUser = await authService.getCurrentUser();
-    if (currentUser) {
-      const userCopy = currentUser.clone();
-      setUser(userCopy);
-    }
-  };
+  const { getCurrentUserData } = useUser();
+  const currentUserData = getCurrentUserData();
 
   return (
-    <View style={[globalStyles.container]}>
-      <View style={styles.flexContainer}></View>
-      <View style={styles.profileSection}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={[styles.imageContainer, styles.profileBorderRadius]}
-          onPress={() => {
-            console.log("profile image pressed");
-          }}
-        >
-          <Image
-            source={require("@/assets/images/profile-placeholder-large.png")}
-            style={[styles.profileImage, styles.profileBorderRadius]}
-            contentFit="contain"
-          />
-
-          <View style={[styles.cameraOverlay, styles.profileBorderRadius]}>
-            <Camera width={moderateScale(31)} height={moderateScale(31)} />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.cameraLabel}>Change photo</Text>
-      </View>
-
+    <View style={[globalStyles.container, { paddingTop: height * 0.05 }]}>
       <View style={styles.infoSection}>
         <MenuItemOne
           label="First Name"
-          value={user?.get("firstName") || "N/A"}
+          value={currentUserData?.firstName || "N/A"}
           onPress={() => {
             router.push({
               pathname: "/(authenticated)/(Settings)/editUser",
@@ -75,7 +37,7 @@ export default function Profile() {
         />
         <MenuItemOne
           label="Last Name"
-          value={user?.get("lastName") || "N/A"}
+          value={currentUserData?.lastName || "N/A"}
           onPress={() => {
             router.push({
               pathname: "/(authenticated)/(Settings)/editUser",
@@ -87,51 +49,18 @@ export default function Profile() {
             });
           }}
         />
+        <View style={styles.separator} />
         <MenuItemOne
           label="Email"
-          value={user?.get("email") || "N/A"}
+          value={currentUserData?.email || "N/A"}
           onPress={() => {
             console.log("email pressed");
           }}
           borderBottomWidth={moderateScale(0.5)}
           disabled={true}
         />
-        {/*<View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-          <Text style={styles.label}>First Name</Text>
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
-            {user?.get("firstName") || "N/A"}
-          </Text>
-          <RightArrow
-            fill={"#A3A2A2"}
-            height={moderateScale(21)}
-            width={moderateScale(21)}
-          />
-        </View>
-
-        <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-          <Text style={styles.label}>Last Name</Text>
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
-            {user?.get("lastName") || "N/A"}
-          </Text>
-          <RightArrow
-            fill={"#A3A2A2"}
-            height={moderateScale(21)}
-            width={moderateScale(21)}
-          />
-        </View>
-
-        <View style={[styles.infoRow]}>
-          <Text style={styles.label}>Email</Text>
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.value}>
-            {user?.get("email") || "N/A"}
-          </Text>
-          <RightArrow
-            fill={"#A3A2A2"}
-            height={moderateScale(21)}
-            width={moderateScale(21)}
-          />
-        </View> */}
       </View>
+      <View style={{ flex: 1 }} />
       <TouchableOpacity style={[styles.logoutButton]}>
         <Text style={styles.logoutText}>Delete Account</Text>
       </TouchableOpacity>
@@ -140,13 +69,6 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  flexContainer: {
-    // flex: 1,
-    flexBasis: (height * 1) / 100, // 1% of height for the container before the flex is applied
-    flexGrow: 0.6, // Take up 0.6 portion of any available space
-    flexShrink: 0.6, // Shrink to 0.6 portion of any available space
-    // backgroundColor: "red",
-  },
   profileSection: {
     alignItems: "center",
     flexGrow: 1.3,
@@ -157,8 +79,6 @@ const styles = StyleSheet.create({
     position: "relative",
     aspectRatio: 1,
     width: horizontalScale(97),
-    // marginTop: "11%",
-    // marginTop: (height * 5) / 100,
   },
   profileBorderRadius: {
     borderRadius: moderateScale(48.5), // picture size/2
@@ -186,8 +106,6 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     paddingHorizontal: horizontalScale(24),
-    flex: 8.1,
-    // backgroundColor: "blue",
   },
   infoRow: {
     flexDirection: "row",
@@ -205,8 +123,6 @@ const styles = StyleSheet.create({
     color: "#3E3C48",
   },
   value: {
-    // flex: 1,
-
     fontFamily: "Inter-Medium",
     fontSize: moderateScale(16),
     color: "#A3A2A2",
@@ -216,14 +132,15 @@ const styles = StyleSheet.create({
     width: (width * 46) / 100,
   },
   separator: {
-    height: 1,
-    backgroundColor: "#E5E5E5",
+    height: height * 0.04,
+    borderTopWidth: verticalScale(0.5),
+    borderColor: "#F7F7F7",
+    // backgroundColor: "#E5E5E5",
   },
   logoutButton: {
     padding: moderateScale(16),
     borderRadius: moderateScale(12),
-    // marginTop: "auto",
-    // marginBottom: verticalScale(61),
+    justifyContent: "flex-end",
     marginBottom: (height * 6.4) / 100,
     alignItems: "center",
     borderWidth: verticalScale(1.0),

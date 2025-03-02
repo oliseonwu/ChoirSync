@@ -97,6 +97,9 @@ class AuthService {
       if (!currentUser) {
         userToLogin.set("username", googleUser.email);
         userToLogin.set("email", googleUser.email);
+        userToLogin.set("firstName", googleUser.givenName);
+        userToLogin.set("lastName", googleUser.familyName);
+        userToLogin.set("profileUrl", googleUser.photo);
       }
 
       // linkWith will:

@@ -21,7 +21,8 @@ import { userManagementService } from "@/services/UserManagementService";
 import Parse from "@/services/Parse";
 import LoadingButton from "@/components/LoadingButton";
 import { useLoadingState } from "@/hooks/useLoadingState";
-
+import { useUser } from "@/contexts/UserContext";
+import { authService } from "@/services/AuthService";
 type EditUserParams = {
   type: "firstName" | "lastName";
   title: string;
@@ -33,13 +34,14 @@ const EditUserPage = () => {
   const params = useLocalSearchParams<EditUserParams>();
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useLoadingState(false);
-
+  const { updateCurrentUserData } = useUser();
   const isFormValid = useMemo(() => {
-    return name.length >= 1;
+    return name.trim().length >= 1;
   }, [name]);
 
   const updateName = async () => {
     let result;
+    let currentUser;
     if (!isFormValid) {
       Alert.alert("Error", "Please enter a " + params.type);
       return;
@@ -48,12 +50,22 @@ const EditUserPage = () => {
     setIsLoading(true);
 
     result = await userManagementService.updateUserField(params.type, name);
+    currentUser = await authService.getCurrentUser();
 
-    if (!result.success) {
+    if (!result.success && !currentUser) {
       router.dismissAll();
       Alert.alert("Error", result.error);
       return;
     }
+
+    updateCurrentUserData(
+      currentUser?.get("firstName"),
+      currentUser?.get("lastName"),
+      currentUser?.get("email"),
+      currentUser?.get("profileUrl")
+    );
+
+    setIsLoading(false);
 
     router.back();
   };

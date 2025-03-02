@@ -23,6 +23,8 @@ import { RecordingsProvider } from "@/contexts/RecordingsContext";
 import { NowPlayingProvider } from "@/contexts/NowPlayingContext";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { WebViewProvider } from "@/contexts/WebViewContext";
+import { UserProvider } from "@/contexts/UserContext";
+import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -104,197 +106,154 @@ function RootLayoutNav() {
   return (
     <PaperProvider>
       <LoadingProvider>
-        <WebViewProvider>
-          <RecordingsProvider>
-            <CurrentTrackProvider>
-              <NowPlayingProvider>
-                <NowPlayingComponent />
-                <Stack>
-                  {/* Public routes */}
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="signUp/index"
-                    options={({ route }: { route: LoginScreenParams }) => ({
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent
-                          isLoading={route.params?.isLoading === "true"}
-                          style={styles2.BackButton}
-                        />
-                      ),
-                    })}
-                  />
+        <UserProvider>
+          <WebViewProvider>
+            <RecordingsProvider>
+              <CurrentTrackProvider>
+                <NowPlayingProvider>
+                  <NowPlayingComponent />
+                  <Stack>
+                    {/* Public routes */}
+                    <Stack.Screen
+                      name="index"
+                      options={{ headerShown: false }}
+                    />
 
-                  <Stack.Screen
-                    name="signUp/signUpOptions"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
-                  <Stack.Screen
-                    name="login/loginOptions"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
+                    <Stack.Screen
+                      name="name"
+                      options={{
+                        animation: "none",
+                        headerTransparent: true,
+                        headerTitle: "",
+                        headerBackTitleVisible: false,
+                        headerLeft: () => (
+                          <BackButtonComponent style={styles2.BackButton} />
+                        ),
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="login/index"
-                    options={({ route }: { route: LoginScreenParams }) => ({
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent
-                          isLoading={route.params?.isLoading === "true"}
-                          style={styles2.BackButton}
-                        />
-                      ),
-                    })}
-                  />
+                    <Stack.Screen
+                      name="chooseYourPath"
+                      options={{
+                        animation: "none",
+                        headerTransparent: true,
+                        headerTitle: "",
+                        headerBackTitleVisible: false,
+                        headerLeft: () => (
+                          <BackButtonComponent style={styles2.BackButton} />
+                        ),
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="name"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
+                    <Stack.Screen
+                      name="chooseYourGroup"
+                      options={{
+                        animation: "none",
+                        headerTransparent: true,
+                        headerTitle: "",
+                        headerBackTitleVisible: false,
+                        headerLeft: () => (
+                          <BackButtonComponent style={styles2.BackButton} />
+                        ),
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="chooseYourPath"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
+                    <Stack.Screen
+                      name="inviteCode"
+                      options={{
+                        animation: "none",
+                        headerTransparent: true,
+                        headerBackTitleVisible: false,
+                        headerLeft: () => (
+                          <BackButtonComponent style={styles2.BackButton} />
+                        ),
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="chooseYourGroup"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
+                    {/* Authenticated routes */}
+                    <Stack.Screen
+                      name="(authenticated)/(tabs)"
+                      options={{
+                        headerShown: false,
+                        animation: "none",
+                      }}
+                    />
+                    <Stack.Screen
+                      name="(authenticated)/(Settings)/index"
+                      options={{
+                        headerShown: true,
+                        animation: "fade",
+                        headerTitle: "Settings",
+                        headerTitleAlign: "center",
+                        headerTitleStyle: styles.headerTitle,
+                        headerShadowVisible: false,
 
-                  <Stack.Screen
-                    name="inviteCode"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
+                        headerBackTitleVisible: false,
+                        headerLeft: () => <BackButtonComponent />,
 
-                  {/* Authenticated routes */}
-                  <Stack.Screen
-                    name="(authenticated)/(tabs)"
-                    options={{
-                      headerShown: false,
-                      animation: "none",
-                    }}
-                  />
-                  <Stack.Screen
-                    name="(authenticated)/(Settings)/index"
-                    options={{
-                      headerShown: true,
-                      animation: "fade",
-                      headerTitle: "Settings",
-                      headerTitleAlign: "center",
-                      headerTitleStyle: styles.headerTitle,
-                      headerShadowVisible: false,
-
-                      headerBackTitleVisible: false,
-                      headerLeft: () => <BackButtonComponent />,
-
-                      headerRight: () => (
-                        <TouchableOpacity activeOpacity={0.7} disabled>
-                          <Image
-                            source={require("@/assets/images/profile-placeholder.png")}
-                            style={styles.profilePic}
+                        headerRight: () => (
+                          <HeaderProfileImage
+                            disabled={true}
+                            onPress={() => null}
+                            marginRight={0}
+                            marginLeft={0}
                           />
-                        </TouchableOpacity>
-                      ),
-                    }}
-                  />
-                  <Stack.Screen
-                    name="(authenticated)/(Settings)/profile"
-                    options={{
-                      headerShown: true,
-                      animation: "fade",
-                      headerTitle: "Account profile",
-                      headerTitleAlign: "center",
-                      headerTitleStyle: styles.headerTitle,
-                      headerShadowVisible: false,
+                        ),
+                      }}
+                    />
+                    <Stack.Screen
+                      name="(authenticated)/(Settings)/profile"
+                      options={{
+                        headerShown: true,
+                        animation: "fade",
+                        headerTitle: "Account profile",
+                        headerTitleAlign: "center",
+                        headerTitleStyle: styles.headerTitle,
+                        headerShadowVisible: false,
 
-                      headerBackTitleVisible: false,
-                      headerLeft: () => <BackButtonComponent />,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="(authenticated)/(Settings)/editUser"
-                    options={{
-                      animation: "none",
-                      headerTransparent: true,
-                      headerTitle: "",
-                      headerBackTitleVisible: false,
-                      headerLeft: () => (
-                        <BackButtonComponent style={styles2.BackButton} />
-                      ),
-                    }}
-                  />
-                  <Stack.Screen
-                    name="(authenticated)/recordings"
-                    options={{
-                      headerShown: true,
-                      animation: "fade",
-                      headerTitle: "This Week's Recordings",
-                      headerTitleAlign: "center",
-                      headerTitleStyle: styles.smallHeaderTitle,
-                      headerShadowVisible: false,
-                      headerBackTitleVisible: false,
-                      headerLeft: () => <BackButtonComponent />,
-                    }}
-                  />
-                </Stack>
-              </NowPlayingProvider>
-            </CurrentTrackProvider>
-          </RecordingsProvider>
-        </WebViewProvider>
+                        headerBackTitleVisible: false,
+                        headerLeft: () => <BackButtonComponent />,
+                        headerRight: () => (
+                          <HeaderProfileImage
+                            disabled={true}
+                            onPress={() => null}
+                            marginRight={0}
+                            marginLeft={0}
+                          />
+                        ),
+                      }}
+                    />
+                    <Stack.Screen
+                      name="(authenticated)/(Settings)/editUser"
+                      options={{
+                        animation: "none",
+                        headerTransparent: true,
+                        headerTitle: "",
+                        headerBackTitleVisible: false,
+                        headerLeft: () => (
+                          <BackButtonComponent style={styles2.BackButton} />
+                        ),
+                      }}
+                    />
+                    <Stack.Screen
+                      name="(authenticated)/recordings"
+                      options={{
+                        headerShown: true,
+                        animation: "fade",
+                        headerTitle: "This Week's Recordings",
+                        headerTitleAlign: "center",
+                        headerTitleStyle: styles.smallHeaderTitle,
+                        headerShadowVisible: false,
+                        headerBackTitleVisible: false,
+                        headerLeft: () => <BackButtonComponent />,
+                      }}
+                    />
+                  </Stack>
+                </NowPlayingProvider>
+              </CurrentTrackProvider>
+            </RecordingsProvider>
+          </WebViewProvider>
+        </UserProvider>
       </LoadingProvider>
     </PaperProvider>
   );

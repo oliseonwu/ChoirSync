@@ -23,6 +23,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
+import { useUser } from "@/contexts/UserContext";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -31,10 +32,13 @@ export default function HomeScreen() {
   const headingContainerHeight =
     headerAndStatusBarHeight - Constants.statusBarHeight;
   const bottomOffset = tabBarHeight + getWindowSize().height * 0.075;
+  const { getCurrentUserData } = useUser();
+  const userData = getCurrentUserData();
 
   useEffect(() => {
     showPlayer();
   }, []);
+
   return (
     <View style={[styles.Container]}>
       <StatusBar style="dark" />

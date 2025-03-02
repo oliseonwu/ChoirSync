@@ -39,11 +39,13 @@ const MenuItemOne: React.FC<MenuItemOneProps> = ({
       <Text ellipsizeMode="tail" numberOfLines={1} style={[styles.value]}>
         {value}
       </Text>
-      <RightArrow
-        fill={disabled ? "#E6E9E8" : "#A3A2A2"}
-        height={moderateScale(21)}
-        width={moderateScale(21)}
-      />
+      {!disabled && (
+        <RightArrow
+          fill={disabled ? "#E6E9E8" : "#A3A2A2"}
+          height={moderateScale(21)}
+          width={moderateScale(21)}
+        />
+      )}
     </TouchableOpacity>
   );
 };
@@ -57,7 +59,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderTopWidth: moderateScale(0.5),
-    borderColor: "#E6E9E8",
+    borderColor: "#F7F7F7",
+
+    paddingHorizontal: horizontalScale(10),
+    // backgroundColor: "red",
   },
   label: {
     flex: 1,

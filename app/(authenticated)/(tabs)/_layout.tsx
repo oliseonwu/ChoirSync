@@ -6,13 +6,18 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { authService } from "@/services/AuthService";
 import { StackActions } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { moderateScale, verticalScale } from "@/utilities/TrueScale";
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from "@/utilities/TrueScale";
 import HomeIcon from "@/assets/images/SVG/house-chimney.svg";
 import CatalogIcon from "@/assets/images/SVG/folder-music.svg";
 import { styles } from "@/shared/css/headingCss";
 import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { PaperProvider } from "react-native-paper";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
+import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 
 export default function TabLayout() {
   const navigation = useNavigation();
@@ -69,15 +74,10 @@ export default function TabLayout() {
 
               headerTitleStyle: styles.headerTitle,
               headerRight: () => (
-                <TouchableOpacity
-                  activeOpacity={0.7}
+                <HeaderProfileImage
                   onPress={() => router.push("/(Settings)")}
-                >
-                  <Image
-                    source={require("@/assets/images/profile-placeholder.png")}
-                    style={styles2.profilePic}
-                  />
-                </TouchableOpacity>
+                  marginRight={horizontalScale(20)}
+                />
               ),
               headerShadowVisible: false,
             }}
