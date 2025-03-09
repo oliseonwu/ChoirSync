@@ -24,6 +24,8 @@ import { router } from "expo-router";
 import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
 import { useUser } from "@/contexts/UserContext";
+import { inviteCodeService } from "@/services/InviteCodeService";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -34,10 +36,25 @@ export default function HomeScreen() {
   const bottomOffset = tabBarHeight + getWindowSize().height * 0.075;
   const { getCurrentUserData } = useUser();
   const userData = getCurrentUserData();
+  const { expoPushToken, notification } = usePushNotifications();
+
+  const data = JSON.stringify(notification, undefined, 2);
+
+  console.log("data", data);
+  console.log("expoPushToken", expoPushToken);
 
   useEffect(() => {
     showPlayer();
   }, []);
+
+  // const storePushToken = async () => {
+  //   try {
+  //     const response = await inviteCodeService.storePushToken();
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <View style={[styles.Container]}>

@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
-import { useNavigation, router } from "expo-router";
 import {
   horizontalScale,
   moderateScale,
@@ -12,7 +11,6 @@ import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import { googleAuthService } from "@/services/GoogleAuthService";
 import { authService, UserStatus } from "@/services/AuthService";
-import Parse from "../services/Parse";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
@@ -20,6 +18,7 @@ import { useUser } from "@/contexts/UserContext";
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();
   const { updateCurrentUserData } = useUser();
+
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();

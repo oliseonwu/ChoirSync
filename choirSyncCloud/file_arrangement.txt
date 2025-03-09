@@ -4,12 +4,14 @@ cloud/
 │   ├── auth.js         # Authentication related functions
 │   ├── groups.js       # Choir group related functions
 │   ├── invites.js      # Invite code related functions
-│   └── users.js        # User management functions
+│   ├── users.js        # User management functions
+│   └── notifications.js # Push notification related functions
 ├── triggers/           # Cloud triggers
 │   ├── beforeSave/
 │   └── afterSave/
 ├── utils/             # Shared utilities
 │   ├── errors.js
-│   └── helpers.js
+│   ├── helpers.js
+│   └── notifications.js # Notification helper utilities
 └── config/            # Configuration files
     └── constants.js

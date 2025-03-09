@@ -236,6 +236,27 @@ function RootLayoutNav() {
                       }}
                     />
                     <Stack.Screen
+                      name="(authenticated)/(Settings)/notifications"
+                      options={{
+                        headerShown: true,
+                        animation: "fade",
+                        headerTitle: "Notifications",
+                        headerTitleAlign: "center",
+                        headerTitleStyle: styles.headerTitle,
+                        headerShadowVisible: false,
+                        headerBackTitleVisible: false,
+                        headerLeft: () => <BackButtonComponent />,
+                        headerRight: () => (
+                          <HeaderProfileImage
+                            disabled={true}
+                            onPress={() => null}
+                            marginRight={0}
+                            marginLeft={0}
+                          />
+                        ),
+                      }}
+                    />
+                    <Stack.Screen
                       name="(authenticated)/recordings"
                       options={{
                         headerShown: true,

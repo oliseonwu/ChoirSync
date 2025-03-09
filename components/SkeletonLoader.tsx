@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     position: "relative",
     overflow: "hidden",
+    backgroundColor: "#fff",
   },
   listItem: {
     flexDirection: "row",

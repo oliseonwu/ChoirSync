@@ -12,17 +12,25 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.olise.ChoirSync"
+      "bundleIdentifier": "com.olise.ChoirSync",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.olise.ChoirSync"
+      "package": "com.olise.ChoirSync",
+      "googleServicesFile": "./google-services.json"
+
     },
     "web": {
       "bundler": "metro",
@@ -36,12 +44,6 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.37343657987-sfm8lmtea9a2f5rqjuecdp5s69d5b3e1"
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let set your profile picture."
-        }
       ]
     ],
     "experiments": {
@@ -54,4 +56,3 @@
     }
   }
 }
-

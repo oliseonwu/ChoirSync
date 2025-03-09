@@ -36,7 +36,22 @@ async function addUserToChoirGroup(request) {
     throw new Error(`Failed to add user to choir group: ${error.message}`);
   }
 }
+async function getAllMembersOfGroup(groupId) {
+  try {
+    const ChoirMembers = Parse.Object.extend("ChoirMembers");
+    const query = new Parse.Query(ChoirMembers);
+    query.equalTo("choir_groups_id", pointer(groupId));
+    query.include("user_id");
+
+    const members = await query.find({ useMasterKey: true });
+
+    return members;
+  } catch (error) {
+    throw new Error(`Failed to get all members of group: ${error.message}`);
+  }
+}
 
 module.exports = {
   addUserToChoirGroup,
+  getAllMembersOfGroup,
 };

@@ -89,7 +89,7 @@ export default function SettingsScreen() {
         id: 2,
         Icon: notificationIconMemo,
         title: "Notifications",
-        onPress: () => {},
+        onPress: () => router.push("/(Settings)/notifications"),
       },
       {
         id: 3,
