@@ -60,6 +60,56 @@ const getUser = async (userId) => {
     throw new Error(`Failed to get user: ${error.message}`);
   }
 };
+/**
+ * Fetches multiple users by their IDs
+ * @param {string[]} userIds - Array of user IDs to fetch
+ * @returns {Promise<Parse.User[]>} Array of Parse User objects
+ */
+async function fetchUsersByIds(userIds) {
+  try {
+    const query = new Parse.Query(Parse.User);
+    query.containedIn("objectId", userIds);
+
+    const users = await query.find({ useMasterKey: true });
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates multiple users with the same field values
+ * @param {string[]} userIds - Array of user IDs to update
+ * @param {Object} fieldsAndValuesObject - Object containing fields and values to update
+ * @returns {Promise<Object>} Result of the batch update
+ */
+async function updateMultipleUsers(userIds, fieldsAndValuesObject) {
+  try {
+    const users = await fetchUsersByIds(userIds);
+
+    // Update all users with the same field values
+    const userUpdates = users.map((user) => {
+      Object.entries(fieldsAndValuesObject).forEach(([key, value]) => {
+        user.set(key, value);
+      });
+      return user;
+    });
+
+    // Execute batch update with master key
+    await Parse.Object.saveAll(userUpdates, { useMasterKey: true });
+
+    return {
+      success: true,
+      message: `Successfully updated ${userUpdates.length} users`,
+    };
+  } catch (error) {
+    console.error("Error updating users:", error);
+    throw error;
+  }
+}
+
 const getUserByExpoPushToken = async (expoPushToken) => {
   const user = await new Parse.Query(Parse.User).get(expoPushToken, {
     useMasterKey: true,
@@ -75,4 +125,6 @@ module.exports = {
   updateUserFields,
   getUser,
   getUserByExpoPushToken,
+  fetchUsersByIds,
+  updateMultipleUsers,
 };

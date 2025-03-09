@@ -9,8 +9,7 @@
 
 const { Expo } = require("expo-server-sdk");
 const { getAllMembersOfGroup } = require("./groups");
-const { getUser, updateUserField } = require("./users");
-const { request } = require("undici");
+const { getUser, updateMultipleUsers } = require("./users");
 const { NotificationErrors } = require("../utils/notificationErrors");
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
@@ -113,10 +112,10 @@ async function sendGroupNotification(request) {
         handlePushTicketsResult.failedTicketsCount +
         handlePushReceiptResult.failedReceiptsCount +
         " Users",
-      FailedTickets: handlePushTicketsResult.failedTicketsCount,
-      ResolvedTickets: handlePushTicketsResult.resolvedTicketsCount,
-      FailedReceipts: handlePushReceiptResult.failedReceiptsCount,
-      ResolvedReceipts: handlePushReceiptResult.resolvedReceiptsCount,
+      FailedTickets: handlePushTicketsResult.failedTicketsCount + "",
+      ResolvedTickets: handlePushTicketsResult.resolvedTicketsCount + "",
+      FailedReceipts: handlePushReceiptResult.failedReceiptsCount + "",
+      ResolvedReceipts: handlePushReceiptResult.resolvedReceiptsCount + "",
     };
   } catch (error) {
     throw new Error(`Failed to send group notification: ${error.message}`);
@@ -174,81 +173,71 @@ function filterTickets(tickets) {
 }
 
 /**
- * Addresses errors in each ticket.
+ * Handles push ticket errors
  * @param {Array<object>} errorTickets - The tickets to handle
- * @param {Array<object>} tokenToUserMap - The map of push tokens to user IDs
+ * @param {object} tokenToUserMap - The map of push tokens to user IDs
  * @returns {Promise<object>} The result object containing:
- *   - status: "success" | "error"
- *   - successfullTicketsCount: number
  *   - failedTicketsCount: number
  *   - resolvedTicketsCount: number
+ *
  */
 async function handlePushTicketsErrors(errorTickets, tokenToUserMap) {
-  let currentTicket;
-  let isTicketResolved;
   const result = {
-    status: "success",
-    successfullTicketsCount: 0,
     failedTicketsCount: 0,
     resolvedTicketsCount: 0,
   };
+  let currentToken;
+  const userIds = [];
+  let didResetPushTokens = false;
 
-  for (let i = 0; i < errorTickets.length; i++) {
-    currentTicket = errorTickets[i];
-
-    if (currentTicket.status === "ok") {
-      result.successfullTicketsCount++;
-      continue;
-    }
-
+  errorTickets.forEach((ticket) => {
     result.failedTicketsCount++;
 
-    isTicketResolved = await tryToResolveTicketError(
-      currentTicket,
-      tokenToUserMap
-    );
-    result.resolvedTicketsCount += isTicketResolved ? 1 : 0;
+    switch (ticket.details?.error) {
+      case NotificationErrors.DeviceNotRegistered:
+        // ticket will always contain the push token if we get a DeviceNotRegistered error.
+        currentToken = ticket.details.expoPushToken;
+
+        if (currentToken) {
+          userIds.push(tokenToUserMap[currentToken]);
+        }
+        break;
+      default:
+        logError(
+          `Failed to resolve a push ticket error`,
+          ticket.details.error,
+          ticket.message
+        );
+    }
+  });
+
+  didResetPushTokens = await resetPushTokens(userIds);
+
+  if (didResetPushTokens) {
+    result.resolvedTicketsCount = userIds.length;
   }
 
   return result;
 }
 
 /**
- * Attempts to resolve a push ticket error
- * @param {object} currentTicket - The current ticket
- * @param {object} tokenToUserMap - The map of push tokens to user IDs
- * @returns {Promise<boolean>} Whether the ticket was resolved
+ * Resets the push tokens for the passed in userIds
+ * @param {Array<string>} userIds - The userIds to update
+ * @returns {Promise<boolean>} Whether the tickets were resolved
  */
-async function tryToResolveTicketError(currentTicket, tokenToUserMap) {
-  let resolved = true;
-  let userId;
+async function resetPushTokens(userIds) {
+  if (userIds.length > 0) {
+    try {
+      await updateMultipleUsers(userIds, {
+        expo_push_token: "",
+      });
 
-  try {
-    switch (currentTicket.details.error) {
-      case NotificationErrors.DeviceNotRegistered:
-        // ticket will always contain the push token if we get a DeviceNotRegistered error.
-        userId = tokenToUserMap[currentTicket.details.expoPushToken];
-        await updateUserField(userId, "expo_push_token", "");
-        break;
-      default:
-        logError(
-          `Failed to resolve a push ticket error`,
-          currentTicket.details.error,
-          currentTicket.message
-        );
-        resolved = false;
+      return true;
+    } catch (error) {
+      console.error("Failed to reset users push tokens:", error);
+      return false;
     }
-  } catch (error) {
-    // I used this logErrorList because it handles the case where the error is not an array
-    // and its more convenient to use it here.
-    logErrorList(
-      error,
-      `Error occurred while trying to resolve push ticket error`
-    );
-    resolved = false;
   }
-
-  return resolved;
 }
 
 /**
@@ -284,71 +273,52 @@ async function getReceiptsFromTickets(tickets) {
   return receiptChunk;
 }
 
-async function testExpoReceipts() {
-  try {
-    const { statusCode, body } = await request(
-      "https://exp.host/--/api/v2/push/getReceipts",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ids: [
-            "01956f44-0dbf-70d3-ac2b-8f2305c8621a",
-            "01956f5c-b1e9-78b6-a58e-aaf3485c56c9",
-          ],
-        }),
-      }
-    );
-
-    console.log("Status:", statusCode);
-    const result = await body.json();
-    console.log("Response:", result);
-    return result;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-}
-
 /**
- * Addresses errors in each receipt.
- * @param {Array<object>} receipts - The receipts to handle
- * @param {Array<object>} tokenToUserMap - The map of push tokens to user IDs
- * @returns {Promise<object>} The result object containing:
- * - status: "success" | "error"
- * - successfullReceiptsCount: number
- * - failedReceiptsCount: number
- * - resolvedReceiptsCount: number
- **/
-
-async function handlePushReceiptErrors(receipts, tokenToUserMap) {
-  let currentReceipt;
-  let isReceiptResolved;
+ * Handles errors in receipt objects and resets invalid push tokens
+ * @param {Object} receiptObject - Object containing receipt details
+ * @param {Object} tokenToUserMap - Map of push tokens to user IDs
+ * @returns {Promise<Object>} Results of receipt processing
+ */
+async function handlePushReceiptErrors(receiptObject, tokenToUserMap) {
   const result = {
-    status: "success",
     successfullReceiptsCount: 0,
     failedReceiptsCount: 0,
     resolvedReceiptsCount: 0,
   };
 
+  let currentToken;
+  const userIds = [];
+
   // for...of: Use with arrays (gets values)
   // for...in: Use with objects (gets keys)
-  for (let receiptId in receipts) {
-    currentReceipt = receipts[receiptId];
-
-    if (currentReceipt.status === "ok") {
+  Object.entries(receiptObject).forEach(([receiptId, receipt]) => {
+    if (receipt.status === "ok") {
       result.successfullReceiptsCount++;
-      continue;
+      return;
     }
+
     result.failedReceiptsCount++;
 
-    isReceiptResolved = await tryToResolveTicketError(
-      currentReceipt,
-      tokenToUserMap
-    );
-    result.resolvedReceiptsCount += isReceiptResolved ? 1 : 0;
+    switch (receipt.details?.error) {
+      case NotificationErrors.DeviceNotRegistered:
+        currentToken = receipt.details.expoPushToken;
+        if (currentToken) {
+          userIds.push(tokenToUserMap[currentToken]);
+        }
+        break;
+      default:
+        logError(
+          "Failed to resolve a push receipt error",
+          receipt.details?.error,
+          receipt.message
+        );
+    }
+  });
+
+  const didResetPushTokens = await resetPushTokens(userIds);
+
+  if (didResetPushTokens) {
+    result.resolvedReceiptsCount = userIds.length;
   }
 
   return result;
@@ -393,45 +363,11 @@ async function checkTicketId(request) {
   return receipt;
 }
 
-async function testJsonPlaceholder() {
-  try {
-    const response = await fetch(
-      "https://jsonplaceholder.typicode.com/todos/1",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("Test response:", data);
-
-    return data;
-  } catch (error) {
-    console.error("Test failed:", error);
-    return false;
-  }
-}
-
-// You can call it like this:
-// await testJsonPlaceholder();
-
-// A way to log a Notification Errors and a way to
-// remover a push token from a user.
-
 module.exports = {
   storePushToken,
   sendGroupNotification,
   checkTicketId,
   handlePushTicketsErrors,
-  testJsonPlaceholder,
-  testExpoReceipts,
 };
 
 /*

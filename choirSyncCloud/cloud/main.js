@@ -47,6 +47,15 @@ Parse.Cloud.define("test", (request) => {
   return "yess";
 });
 
-Parse.Cloud.define("test2", async (request) => {});
+Parse.Cloud.define("test2", async (request) => {
+  const result = await userFunctions.updateMultipleUsers(
+    ["3NMtgWnykU", "nuB55AfEYH"],
+    {
+      expo_push_token: "test token",
+    }
+  );
+
+  return result;
+});
 
 Parse.Cloud.define("test3", async (request) => {});
