@@ -284,41 +284,6 @@ async function getReceiptsFromTickets(tickets) {
   return receiptChunk;
 }
 
-/**
- * Gets push notification receipts for the given receipt IDs
- * @param {string[]} receiptIds - Array of receipt IDs to fetch
- * @returns {Promise<Object>} Object mapping receipt IDs to receipt objects
- */
-async function getPushNotificationReceiptsAsync(receiptIds) {
-  try {
-    const { statusCode, body } = await request(
-      "https://exp.host/--/api/v2/push/getReceipts",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ids: [
-            "01956f44-0dbf-70d3-ac2b-8f2305c8621a",
-            "01956f5c-b1e9-78b6-a58e-aaf3485c56c9",
-          ],
-        }),
-      }
-    );
-
-    if (statusCode !== 200) {
-      throw new Error(`HTTP error! status: ${statusCode}`);
-    }
-
-    const result = await body.json();
-    return result.data || {};
-  } catch (error) {
-    console.error("Error fetching push notification receipts:", error);
-    throw error;
-  }
-}
-
 async function testExpoReceipts() {
   try {
     const { statusCode, body } = await request(
@@ -465,7 +430,6 @@ module.exports = {
   sendGroupNotification,
   checkTicketId,
   handlePushTicketsErrors,
-  getPushNotificationReceiptsAsync,
   testJsonPlaceholder,
   testExpoReceipts,
 };
