@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { Platform } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
+import { notificationService } from "../services/NotificationService";
+import Parse from "../services/Parse";
 
 export interface PushNotificationState {
   notification: Notifications.Notification; // Return the notification its self
@@ -76,6 +78,30 @@ export const usePushNotifications = (): PushNotificationState => {
         finalStatus = status;
       }
 
+      if (finalStatus === "denied") {
+        Alert.alert(
+          "Enable Notifications",
+          "Push notifications are disabled. Would you like to enable them in settings?",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Settings",
+              onPress: () => {
+                if (Platform.OS === "ios") {
+                  Linking.openURL("app-settings:");
+                } else {
+                  Linking.openSettings();
+                }
+              },
+            },
+          ]
+        );
+        return;
+      }
+
       //  Check if permissions are granted
       if (finalStatus !== "granted") {
         alert("Failed to get push notification permissions token");
@@ -87,6 +113,11 @@ export const usePushNotifications = (): PushNotificationState => {
       // using Expo's push notifications service
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig?.extra?.eas?.projectId,
+      });
+
+      // save the push token to the DB
+      await notificationService.storePushToken({
+        token: token.data,
       });
 
       if (Platform.OS === "android") {

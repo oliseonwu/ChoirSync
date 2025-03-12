@@ -8,34 +8,13 @@
  */
 
 const { Expo } = require("expo-server-sdk");
-const { getAllMembersOfGroup } = require("./groups");
-const { getUser, updateMultipleUsers } = require("./users");
+const { getGroupMembersPushTokens } = require("./groups");
+const { deletePushTokens } = require("./token");
 const { NotificationErrors } = require("../utils/notificationErrors");
+const { sleep } = require("../utils/helpers");
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
 });
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-// Store push token for a user
-async function storePushToken(request) {
-  const { token } = request.params;
-  const requestUserObject = request.user; // Get the user who called the function
-
-  if (requestUserObject.get("expo_push_token") === token) {
-    return { success: true, message: "Token already exists" };
-  }
-
-  try {
-    const user = await getUser(requestUserObject.id);
-
-    user.set("expo_push_token", token);
-    await user.save(null, { useMasterKey: true });
-
-    return { success: true, message: "Token stored successfully" };
-  } catch (error) {
-    throw new Error(`Failed to store push token: ${error.message}`);
-  }
-}
 
 // Send notification to a choir group
 /**
@@ -44,7 +23,6 @@ async function storePushToken(request) {
  * @returns
  */
 
-// { "groupId":"2DDTYeG6X6", "title":"New Recordings", "message": "Check it out!" }
 async function sendGroupNotification(request) {
   const { groupId, title, message } = request.params;
   const data = {};
@@ -55,28 +33,28 @@ async function sendGroupNotification(request) {
   let handlePushReceiptResult;
 
   // We empty this variables later in the code.
-  let membersWithPushTokens;
+  let membersPushTokens;
 
   if (!groupId || !title || !message) {
     throw new Error("Group ID, title, and message are required");
   }
 
   try {
-    // OPTIMIZE: Get members with push tokens only.
-    membersWithPushTokens = await getAllMembersOfGroup(groupId);
-    membersWithPushTokens = membersWithPushTokens.filter((member) => {
-      const pushToken = member.get("user_id").get("expo_push_token");
+    // Get push tokens of members.
+    membersPushTokens = await getGroupMembersPushTokens(groupId);
+    membersPushTokens = membersPushTokens.filter((pushTokenObject) => {
+      const pushToken = pushTokenObject.get("push_token");
       return Expo.isExpoPushToken(pushToken);
     });
 
     // Create a map of push tokens to user IDs map
-    membersWithPushTokens.forEach((member) => {
-      const pushToken = member.get("user_id").get("expo_push_token");
-      tokenToUserMap[pushToken] = member.get("user_id").id;
+    membersPushTokens.forEach((pushTokenObject) => {
+      const pushToken = pushTokenObject.get("push_token");
+      tokenToUserMap[pushToken] = pushTokenObject.get("user").id;
     });
 
     // clear the membersWithPushTokens array
-    membersWithPushTokens = undefined;
+    membersPushTokens = undefined;
 
     // Send notifications
     tickets = await notificationSender(Object.keys(tokenToUserMap), {
@@ -86,11 +64,12 @@ async function sendGroupNotification(request) {
     });
 
     // filter tickets
-    let { okTickets, errorTickets } = filterTickets(tickets);
+    let { ok: okTickets, error: errorTickets } =
+      filterTicketsOrReceipts(tickets);
 
-    handlePushTicketsResult = await handlePushTicketsErrors(
+    handlePushTicketsResult = await handlePushTicketsandReceiptsErrors(
       errorTickets,
-      tokenToUserMap
+      "ticket"
     );
 
     // clear the errorTickets array
@@ -101,21 +80,24 @@ async function sendGroupNotification(request) {
     await sleep(30000);
     receipts = await getReceiptsFromTickets(okTickets);
 
-    handlePushReceiptResult = await handlePushReceiptErrors(
-      receipts,
-      tokenToUserMap
+    let { ok: okReceipts, error: errorReceipts } =
+      filterTicketsOrReceipts(receipts);
+
+    handlePushReceiptResult = await handlePushTicketsandReceiptsErrors(
+      errorReceipts,
+      "receipt"
     );
 
     return {
-      SentTo: handlePushReceiptResult.successfullReceiptsCount + " Users",
+      SentTo: okReceipts.length + " Users",
       DidNotSendTo:
-        handlePushTicketsResult.failedTicketsCount +
-        handlePushReceiptResult.failedReceiptsCount +
+        handlePushTicketsResult.failedCount +
+        handlePushReceiptResult.failedCount +
         " Users",
-      FailedTickets: handlePushTicketsResult.failedTicketsCount + "",
-      ResolvedTickets: handlePushTicketsResult.resolvedTicketsCount + "",
-      FailedReceipts: handlePushReceiptResult.failedReceiptsCount + "",
-      ResolvedReceipts: handlePushReceiptResult.resolvedReceiptsCount + "",
+      FailedTickets: handlePushTicketsResult.failedCount + "",
+      ResolvedTickets: handlePushTicketsResult.resolvedCount + "",
+      FailedReceipts: handlePushReceiptResult.failedCount + "",
+      ResolvedReceipts: handlePushReceiptResult.resolvedCount + "",
     };
   } catch (error) {
     throw new Error(`Failed to send group notification: ${error.message}`);
@@ -150,6 +132,7 @@ async function notificationSender(tokens, message) {
     } catch (error) {
       // if there was an error with a chunk of requests,
       // expo will return an array of errors.
+      // We can keep of the chucks that failed and retry to send them.
       logErrorList(error, "Error sending notification chunk");
     }
   }
@@ -157,41 +140,48 @@ async function notificationSender(tokens, message) {
   return tickets;
 }
 
-function filterTickets(tickets) {
-  let okTickets = [];
-  let errorTickets = [];
+/**
+ * Filters tickets or receipts
+ * @param {Array<object>} ticketsOrReceipts - List of tickets or receipts to filter
+ * @returns {object} The result object containing:
+ *   - ok: Array<object> - List of tickets or receipts with status "ok"
+ *   - error: Array<object> - List of tickets or receipts with status "error"
+ */
+function filterTicketsOrReceipts(ticketsOrReceipts) {
+  let ok = [];
+  let error = [];
 
-  for (let ticket of tickets) {
-    if (ticket.status === "ok") {
-      okTickets.push(ticket);
+  for (let ticketOrReceipt of ticketsOrReceipts) {
+    if (ticketOrReceipt.status === "ok") {
+      ok.push(ticketOrReceipt);
     } else {
-      errorTickets.push(ticket);
+      error.push(ticketOrReceipt);
     }
   }
 
-  return { okTickets, errorTickets };
+  return { ok, error };
 }
 
 /**
- * Handles push ticket errors
- * @param {Array<object>} errorTickets - The tickets to handle
- * @param {object} tokenToUserMap - The map of push tokens to user IDs
+ * Handles push ticket errors and receipts errors
+ * @param {Array<object>} errorList - List of tickets or receipts to handle
+ * @param {string} type - The type of error to handle. Either "ticket" or "receipt"
  * @returns {Promise<object>} The result object containing:
- *   - failedTicketsCount: number
- *   - resolvedTicketsCount: number
+ *   - failedCount: number
+ *   - resolvedCount: number
  *
  */
-async function handlePushTicketsErrors(errorTickets, tokenToUserMap) {
+async function handlePushTicketsandReceiptsErrors(errorList, type) {
   const result = {
-    failedTicketsCount: 0,
-    resolvedTicketsCount: 0,
+    failedCount: 0,
+    resolvedCount: 0,
   };
   let currentToken;
-  const userIds = [];
+  const tokenList = [];
   let didResetPushTokens = false;
 
-  errorTickets.forEach((ticket) => {
-    result.failedTicketsCount++;
+  errorList.forEach((ticket) => {
+    result.failedCount++;
 
     switch (ticket.details?.error) {
       case NotificationErrors.DeviceNotRegistered:
@@ -199,45 +189,25 @@ async function handlePushTicketsErrors(errorTickets, tokenToUserMap) {
         currentToken = ticket.details.expoPushToken;
 
         if (currentToken) {
-          userIds.push(tokenToUserMap[currentToken]);
+          tokenList.push(currentToken);
         }
         break;
       default:
         logError(
-          `Failed to resolve a push ticket error`,
+          `Failed to resolve a push ${type} error`,
           ticket.details.error,
           ticket.message
         );
     }
   });
 
-  didResetPushTokens = await resetPushTokens(userIds);
+  didResetPushTokens = await deletePushTokens(tokenList);
 
   if (didResetPushTokens) {
-    result.resolvedTicketsCount = userIds.length;
+    result.resolvedCount = tokenList.length;
   }
 
   return result;
-}
-
-/**
- * Resets the push tokens for the passed in userIds
- * @param {Array<string>} userIds - The userIds to update
- * @returns {Promise<boolean>} Whether the tickets were resolved
- */
-async function resetPushTokens(userIds) {
-  if (userIds.length > 0) {
-    try {
-      await updateMultipleUsers(userIds, {
-        expo_push_token: "",
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Failed to reset users push tokens:", error);
-      return false;
-    }
-  }
 }
 
 /**
@@ -250,78 +220,29 @@ async function getReceiptsFromTickets(tickets) {
   let receiptIds = [];
   let receipts = [];
   let receiptChunk;
-  let temp;
 
   receiptIds = tickets.map((ticket) => ticket.id);
   receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
-  console.log("receiptIdChunks", receiptIdChunks);
 
   for (let chunk of receiptIdChunks) {
-    // get receipts for each chunk
-    console.log("chunk", chunk);
+    try {
+      receiptChunk = await expo.getPushNotificationReceiptsAsync(chunk);
 
-    receiptChunk = await expo.getPushNotificationReceiptsAsync(chunk);
-
-    // we use for...in to iterate over the receiptChunk object
-    // because the receiptChunk is an object containing multiple
-    // receipts.
-    for (let receiptId in receiptChunk) {
-      receipts.push(receiptChunk[receiptId]);
+      // we use for...in to iterate over the receiptChunk object
+      // because the receiptChunk is an object containing multiple
+      // receipts.
+      for (let receiptId in receiptChunk) {
+        receipts.push(receiptChunk[receiptId]);
+      }
+    } catch (error) {
+      // if there is an error with a chunk of requests,
+      // expo will return an array of errors.
+      // We can keep of the chucks that failed and retry to send them.
+      logErrorList(error, "Error getting receipts from tickets");
     }
   }
 
-  return receiptChunk;
-}
-
-/**
- * Handles errors in receipt objects and resets invalid push tokens
- * @param {Object} receiptObject - Object containing receipt details
- * @param {Object} tokenToUserMap - Map of push tokens to user IDs
- * @returns {Promise<Object>} Results of receipt processing
- */
-async function handlePushReceiptErrors(receiptObject, tokenToUserMap) {
-  const result = {
-    successfullReceiptsCount: 0,
-    failedReceiptsCount: 0,
-    resolvedReceiptsCount: 0,
-  };
-
-  let currentToken;
-  const userIds = [];
-
-  // for...of: Use with arrays (gets values)
-  // for...in: Use with objects (gets keys)
-  Object.entries(receiptObject).forEach(([receiptId, receipt]) => {
-    if (receipt.status === "ok") {
-      result.successfullReceiptsCount++;
-      return;
-    }
-
-    result.failedReceiptsCount++;
-
-    switch (receipt.details?.error) {
-      case NotificationErrors.DeviceNotRegistered:
-        currentToken = receipt.details.expoPushToken;
-        if (currentToken) {
-          userIds.push(tokenToUserMap[currentToken]);
-        }
-        break;
-      default:
-        logError(
-          "Failed to resolve a push receipt error",
-          receipt.details?.error,
-          receipt.message
-        );
-    }
-  });
-
-  const didResetPushTokens = await resetPushTokens(userIds);
-
-  if (didResetPushTokens) {
-    result.resolvedReceiptsCount = userIds.length;
-  }
-
-  return result;
+  return receipts;
 }
 
 /**
@@ -354,20 +275,10 @@ function logErrorList(error, errorHeading) {
   }
 }
 
-async function checkTicketId(request) {
-  const { ticketId } = request.params;
-  // return ticketId;
-  const receiptId = expo.chunkPushNotificationReceiptIds([ticketId]);
-  // return receiptId;
-  const receipt = await expo.getPushNotificationReceiptsAsync(receiptId[0]);
-  return receipt;
-}
-
 module.exports = {
-  storePushToken,
   sendGroupNotification,
-  checkTicketId,
-  handlePushTicketsErrors,
+  handlePushTicketsandReceiptsErrors,
+  notificationSender,
 };
 
 /*

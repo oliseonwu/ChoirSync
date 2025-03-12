@@ -11,6 +11,7 @@
  */
 
 const { pointer } = require("../utils/helpers");
+const { getUsersPushTokenObjects, deletePushTokens } = require("./token");
 
 async function addUserToChoirGroup(request) {
   const { groupId, userId } = request.params;
@@ -51,7 +52,34 @@ async function getAllMembersOfGroup(groupId) {
   }
 }
 
+// ... existing code ...
+
+/**
+ * Gets all push tokens for all members of a group
+ * @param {string} groupId - The ID of the group
+ * @returns {Promise<Array<{
+ * user: Pointer,
+ * push_token: string,
+ * installation_id: string
+ * }>>} Array of push tokens
+ *
+ */
+async function getGroupMembersPushTokens(groupId) {
+  try {
+    const members = await getAllMembersOfGroup(groupId);
+    const userIds = members.map((member) => member.get("user_id").id);
+
+    // Get push tokenObjects for these users
+    const pushTokensObjects = await getUsersPushTokenObjects(userIds);
+
+    return pushTokensObjects;
+  } catch (error) {
+    throw new Error(`Failed to get members with push tokens: ${error.message}`);
+  }
+}
+
 module.exports = {
   addUserToChoirGroup,
   getAllMembersOfGroup,
+  getGroupMembersPushTokens,
 };

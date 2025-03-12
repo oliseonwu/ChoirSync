@@ -4,6 +4,7 @@ import {
   ScrollView,
   Text,
   View,
+  Linking,
 } from "react-native";
 import {
   moderateScale,
@@ -47,15 +48,6 @@ export default function HomeScreen() {
     showPlayer();
   }, []);
 
-  // const storePushToken = async () => {
-  //   try {
-  //     const response = await inviteCodeService.storePushToken();
-  //     console.log(response);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   return (
     <View style={[styles.Container]}>
       <StatusBar style="dark" />
@@ -92,6 +84,9 @@ export default function HomeScreen() {
             disabled={true}
             title="New Songs"
             icon={require("@/assets/images/music-icon-2.png")}
+            // onPress={() => {
+            //   Linking.openURL("app-settings:");
+            // }}
           />
 
           <ThisWeekCard

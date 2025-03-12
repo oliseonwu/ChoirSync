@@ -12,7 +12,9 @@ const inviteFunctions = require("./functions/invites");
 const groupFunctions = require("./functions/groups");
 const notificationFunctions = require("./functions/notifications");
 const userFunctions = require("./functions/users");
-
+const tokenFunctions = require("./functions/token");
+const helpers = require("./utils/helpers");
+const { Expo } = require("expo-server-sdk");
 // Register invite functions
 Parse.Cloud.define(
   "regenerateInviteCode",
@@ -25,7 +27,7 @@ Parse.Cloud.define("fetchInviteCode", inviteFunctions.fetchInviteCode);
 Parse.Cloud.define("addUserToChoirGroup", groupFunctions.addUserToChoirGroup);
 
 // Register notification functions
-Parse.Cloud.define("storePushToken", notificationFunctions.storePushToken, {
+Parse.Cloud.define("storePushToken", tokenFunctions.storePushToken, {
   fields: {
     token: {
       type: String,
@@ -36,26 +38,45 @@ Parse.Cloud.define("storePushToken", notificationFunctions.storePushToken, {
   },
   requireUser: true,
 });
+//{ "groupId":"2DDTYeG6X6", "title":"New Recordings", "message": "Check it out!" }
 Parse.Cloud.define(
   "sendGroupNotification",
-  notificationFunctions.sendGroupNotification
+  notificationFunctions.sendGroupNotification,
+  {
+    fields: {
+      groupId: {
+        type: String,
+        required: true,
+      },
+      title: {
+        type: String,
+        required: true,
+      },
+      message: {
+        type: String,
+        required: true,
+      },
+    },
+  }
 );
 
-Parse.Cloud.define("checkTicketId", notificationFunctions.checkTicketId);
-
-Parse.Cloud.define("test", (request) => {
-  return "yess";
-});
-
-Parse.Cloud.define("test2", async (request) => {
-  const result = await userFunctions.updateMultipleUsers(
-    ["3NMtgWnykU", "nuB55AfEYH"],
-    {
-      expo_push_token: "test token",
-    }
+Parse.Cloud.define("test", async (request) => {
+  const { userId, installationId, pushToken } = request.params;
+  const result = await tokenFunctions.savePushToken(
+    userId,
+    installationId,
+    pushToken
   );
 
   return result;
+});
+
+Parse.Cloud.define("test2", async (request) => {
+  const pushTokens = await groupFunctions.getGroupMembersPushTokens(
+    "2DDTYeG6X6"
+  );
+
+  return pushTokens;
 });
 
 Parse.Cloud.define("test3", async (request) => {});
