@@ -7,6 +7,7 @@ import * as Notifications from "expo-notifications";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 import { notificationService } from "@/services/NotificationService";
 import { EventRegister } from "react-native-event-listeners";
+import { authService } from "@/services/AuthService";
 type AppStateContextType = {
   appStateSV: SharedValue<AppStateStatus>;
 };
@@ -36,7 +37,7 @@ export const AppStateProvider = ({
     nextAppState: AppStateStatus,
     currentAppState: AppStateStatus
   ) => {
-    // appStateSV.value !== "active" && nextAppState === "active" &&
+    const isAuthenticated = await authService.verifyAuth();
     let authorized = true;
     const storedNotificationSetting = await AsyncStorageService.getItem(
       AsyncStorageKeys.NOTIFICATION_STATUS
@@ -53,6 +54,7 @@ export const AppStateProvider = ({
     // we dont want to sync if the stored notification setting is
     // thesame as the system notification setting
     if (
+      isAuthenticated &&
       storedNotificationSetting === null &&
       currentAppState !== "background" &&
       nextAppState !== "active" &&

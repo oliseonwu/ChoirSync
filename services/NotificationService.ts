@@ -76,6 +76,11 @@ class NotificationService {
         projectId: Constants.expoConfig?.extra?.eas?.projectId,
       });
       await this.storePushNotificationToken(token.data);
+
+      // reset the dialog flag
+      await AsyncStorageService.removeItem(
+        AsyncStorageKeys.HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG
+      );
     } else {
       // delete the push token from the DB\
       if (previousPushToken) {

@@ -4,6 +4,9 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert, Linking, Platform } from "react-native";
 import { notificationService } from "../services/NotificationService";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 
 export interface PushNotificationState {
   notification: Notifications.Notification; // Return the notification its self
@@ -59,16 +62,31 @@ export const usePushNotifications = (): PushNotificationState => {
     }),
   });
 
-  const displayCustomAlert = (
+  const displayCustomAlert = async (
     title: string,
     message: string,
     actionText: string,
     actionHandler: () => void
   ) => {
+    const hasSeenNotificationPermissionsDialog =
+      await AsyncStorageService.getItem(
+        AsyncStorageKeys.HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG
+      );
+    if (hasSeenNotificationPermissionsDialog) {
+      return;
+    }
+
     Alert.alert(title, message, [
       {
         text: "Cancel",
         style: "cancel",
+        onPress: async () => {
+          // stop showing the dialog
+          await AsyncStorageService.setItem(
+            AsyncStorageKeys.HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG,
+            "true"
+          );
+        },
       },
       {
         text: actionText,

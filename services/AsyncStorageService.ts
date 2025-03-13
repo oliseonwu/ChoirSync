@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export enum AsyncStorageKeys {
   NOTIFICATION_STATUS = "NOTIFICATION_STATUS",
   PUSH_TOKEN = "PUSH_TOKEN",
+  HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG = "HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG",
 }
 
 class AsyncStorageService {
