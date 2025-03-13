@@ -24,9 +24,6 @@ import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
 import { useUser } from "@/contexts/UserContext";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import AsyncStorageService, {
-  AsyncStorageKeys,
-} from "@/services/AsyncStorageService";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();

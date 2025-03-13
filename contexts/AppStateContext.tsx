@@ -15,6 +15,15 @@ const AppStateContext = createContext<AppStateContextType | undefined>(
   undefined
 );
 
+// OPTIMIZATION TIP:
+// Lets not keep notification logic in the AppStateContext.
+// Instead place it in the usePushNotifications hook
+// then we can use the AppStateContext to emit events
+// to the usePushNotifications hook to sync the
+// notification permissions. This way also makes keeping
+// track of the stored notification permissions in AsyncStorage
+// not needed because the usePushNotifications hook will keep
+// track of the notification permissions in the DB using a Ref.
 export const AppStateProvider = ({
   children,
 }: {
@@ -55,6 +64,13 @@ export const AppStateProvider = ({
     return authorized;
   };
 
+  /**
+   * Syncs the notification permissions in the system settings
+   * with the stored notification permissions in the app(AsyncStorage)
+   * and the DB.
+   * @param nextAppState - The next app state
+   * @returns The system notification setting
+   */
   async function syncNotificationPermissions(nextAppState: AppStateStatus) {
     const { status: systemNotificationSetting } =
       await Notifications.getPermissionsAsync();

@@ -15,9 +15,6 @@ import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
 import "expo-splash-screen"; // helps resolve splash screen error on ios
-import AsyncStorageService, {
-  AsyncStorageKeys,
-} from "@/services/AsyncStorageService";
 
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();

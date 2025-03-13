@@ -4,10 +4,6 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert, Linking, Platform } from "react-native";
 import { notificationService } from "../services/NotificationService";
-import Parse from "../services/Parse";
-import AsyncStorageService, {
-  AsyncStorageKeys,
-} from "@/services/AsyncStorageService";
 
 export interface PushNotificationState {
   notification: Notifications.Notification; // Return the notification its self

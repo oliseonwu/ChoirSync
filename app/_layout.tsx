@@ -37,12 +37,6 @@ export {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-type LoginScreenParams = {
-  params?: {
-    isLoading?: string;
-  };
-};
-
 export default function RootLayout() {
   const [fontLoaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
