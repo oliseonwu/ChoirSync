@@ -15,6 +15,13 @@
         "simulator": true
       }
     },
+    "development-IOS-physical": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      }
+    },
     "preview": {
       "distribution": "internal"
     },

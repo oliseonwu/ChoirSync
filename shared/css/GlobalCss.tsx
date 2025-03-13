@@ -5,7 +5,18 @@ import {
 } from "@/utilities/TrueScale";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const globalStyles = StyleSheet.create({
+  profilePic: {
+    width: moderateScale(39),
+    height: moderateScale(39),
+    borderRadius: moderateScale(19.5),
+    // marginRight: moderateScale(20),
+    marginBottom: verticalScale(0.5),
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   MainContainer: {
     backgroundColor: "#F9F7F7",
     flex: 1,

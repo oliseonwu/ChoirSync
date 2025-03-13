@@ -1,154 +1,95 @@
-const INVITE_CODE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-const MIN_REMAINING_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
+/**
+ * Main entry point for Parse Cloud Code
+ *
+ * Purpose:
+ * - Register all cloud functions, triggers, and jobs
+ * - Import and organize all function modules
+ * - No actual function implementations should be here
+ * - Keep this file as clean and organized as possible
+ */
 
-function generateInviteCode() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
+const inviteFunctions = require("./functions/invites");
+const groupFunctions = require("./functions/groups");
+const notificationFunctions = require("./functions/notifications");
+const userFunctions = require("./functions/users");
+const tokenFunctions = require("./functions/token");
+const helpers = require("./utils/helpers");
+const { Expo } = require("expo-server-sdk");
+// Register invite functions
+Parse.Cloud.define(
+  "regenerateInviteCode",
+  inviteFunctions.regenerateInviteCode
+);
+Parse.Cloud.define("validateInviteCode", inviteFunctions.validateInviteCode);
+Parse.Cloud.define("fetchInviteCode", inviteFunctions.fetchInviteCode);
 
-function pointer(id, className = "ChoirGroups") {
-  return {
-    __type: "Pointer",
-    className,
-    objectId: id,
-  };
-}
+// Register group functions
+Parse.Cloud.define("addUserToChoirGroup", groupFunctions.addUserToChoirGroup);
 
-Parse.Cloud.define("regenerateInviteCode", async (request) => {
-  const { groupId } = request.params;
+// Register notification functions
 
-  if (!groupId) {
-    throw new Error("Group ID is required");
+//{ "groupId":"2DDTYeG6X6", "title":"New Recordings", "message": "Check it out!" }
+Parse.Cloud.define(
+  "sendGroupNotification",
+  notificationFunctions.sendGroupNotification,
+  {
+    fields: {
+      groupId: {
+        type: String,
+        required: true,
+      },
+      title: {
+        type: String,
+        required: true,
+      },
+      message: {
+        type: String,
+        required: true,
+      },
+    },
   }
+);
 
-  const groupPointer = pointer(groupId);
-  const query = new Parse.Query("InviteCode");
-  query.equalTo("choir_groups_id", groupPointer);
-
-  try {
-    const code = generateInviteCode();
-    const currentTime = new Date();
-    let inviteCode = await query.first({ useMasterKey: true });
-
-    if (inviteCode) {
-      inviteCode.set("code", code);
-    } else {
-      const InviteCode = Parse.Object.extend("InviteCode");
-      inviteCode = new InviteCode();
-      inviteCode.set("choir_groups_id", groupPointer);
-      inviteCode.set("code", code);
-    }
-
-    await inviteCode.save(null, { useMasterKey: true });
-
-    return {
-      success: true,
-      code: code,
-      expiresAt: new Date(currentTime.getTime() + INVITE_CODE_EXPIRY),
-    };
-  } catch (error) {
-    throw new Error(`Failed to regenerate invite code: ${error.message}`);
-  }
+// Register token functions
+Parse.Cloud.define("storePushToken", tokenFunctions.storePushToken, {
+  fields: {
+    token: {
+      type: String,
+      required: true,
+      options: (val) => Expo.isExpoPushToken(val),
+      error: "Cloud function error: Invalid Expo push token",
+    },
+  },
+  requireUser: true,
+});
+Parse.Cloud.define("deletePushToken", tokenFunctions.deletePushToken, {
+  fields: {
+    token: {
+      type: String,
+      required: true,
+      options: (val) => Expo.isExpoPushToken(val),
+      error: "Cloud function error: Invalid Expo push token",
+    },
+  },
+  requireUser: true,
 });
 
-Parse.Cloud.define("validateInviteCode", async (request) => {
-  const { code, groupId } = request.params;
+Parse.Cloud.define("test", async (request) => {
+  const { userId, installationId, pushToken } = request.params;
+  const result = await tokenFunctions.savePushToken(
+    userId,
+    installationId,
+    pushToken
+  );
 
-  if (!code || !groupId) {
-    throw new Error("Code and Group ID are required");
-  }
-
-  const query = new Parse.Query("InviteCode");
-  query.equalTo("choir_groups_id", pointer(groupId));
-  query.equalTo("code", code.toUpperCase());
-
-  try {
-    const inviteCode = await query.first({ useMasterKey: true });
-
-    if (!inviteCode) {
-      return {
-        success: false,
-        error: "Invalid invite code",
-      };
-    }
-
-    const updatedAt = inviteCode.updatedAt;
-    const currentTime = new Date();
-    const timeDiff = currentTime - updatedAt;
-
-    if (timeDiff > INVITE_CODE_EXPIRY) {
-      return {
-        success: false,
-        error: "Invite code has expired",
-      };
-    }
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    throw new Error(`Failed to validate invite code: ${error.message}`);
-  }
+  return result;
 });
 
-Parse.Cloud.define("fetchInviteCode", async (request) => {
-  const { groupId } = request.params;
+Parse.Cloud.define("test2", async (request) => {
+  const pushTokens =
+    await groupFunctions.getGroupMembersPushTokens("2DDTYeG6X6");
 
-  if (!groupId) {
-    throw new Error("Group ID is required");
-  }
-
-  const query = new Parse.Query("InviteCode");
-  query.equalTo("choir_groups_id", pointer(groupId));
-
-  try {
-    const inviteCode = await query.first({ useMasterKey: true });
-
-    if (!inviteCode) {
-      // No code exists, generate new one
-      return Parse.Cloud.run("regenerateInviteCode", { groupId });
-    }
-
-    const currentTime = new Date();
-    const createdAt = inviteCode.createdAt;
-    const timeDiff = currentTime - createdAt;
-    const timeRemaining = INVITE_CODE_EXPIRY - timeDiff;
-
-    // Generate new code if expired or less than 1 hour remaining
-    if (timeDiff > INVITE_CODE_EXPIRY || timeRemaining < MIN_REMAINING_TIME) {
-      return Parse.Cloud.run("regenerateInviteCode", { groupId });
-    }
-
-    return {
-      success: true,
-      code: inviteCode.get("code"),
-      expiresAt: new Date(createdAt.getTime() + INVITE_CODE_EXPIRY),
-    };
-  } catch (error) {
-    throw new Error(`Failed to fetch invite code: ${error.message}`);
-  }
+  return pushTokens;
 });
 
-Parse.Cloud.define("addUserToChoirGroup", async (request) => {
-  const { groupId, userId } = request.params;
-
-  if (!groupId || !userId) {
-    throw new Error("Group ID and User ID are required");
-  }
-
-  try {
-    const ChoirMembers = Parse.Object.extend("ChoirMembers");
-    const choirMember = new ChoirMembers();
-
-    choirMember.set("user_id", pointer(userId, "_User"));
-    choirMember.set("choir_groups_id", pointer(groupId));
-    choirMember.set("role", "member"); // Default role for new members
-
-    await choirMember.save(null, { useMasterKey: true });
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    throw new Error(`Failed to add user to choir group: ${error.message}`);
-  }
-});
+Parse.Cloud.define("test3", async (request) => {});

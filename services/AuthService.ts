@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { googleAuthService } from "./GoogleAuthService";
 import Parse from "./Parse";
 import { GoogleUser } from "@/types/user.types";
+import { ErrorCode } from "@/types/errors";
 
 interface SignUpData {
   email: string;
@@ -15,7 +16,7 @@ interface LoginData {
   password: string;
 }
 
-interface UserStatus {
+export interface UserStatus {
   hasName: boolean;
   isMemberOfAnyChoir: boolean;
 }
@@ -85,10 +86,11 @@ class AuthService {
   }
 
   async loginWithGoogle() {
+    // we throw errors in GoogleAuthService, so we don't need to handle them here
     const googleResponse = await googleAuthService.signIn();
 
     if (!googleResponse.success) {
-      return { success: false, error: googleResponse.error };
+      throw new Error("Google sign in failed: " + googleResponse.error);
     }
 
     try {
@@ -99,6 +101,9 @@ class AuthService {
       if (!currentUser) {
         userToLogin.set("username", googleUser.email);
         userToLogin.set("email", googleUser.email);
+        userToLogin.set("firstName", googleUser.givenName);
+        userToLogin.set("lastName", googleUser.familyName);
+        userToLogin.set("profileUrl", googleUser.photo);
       }
 
       // linkWith will:
@@ -113,7 +118,15 @@ class AuthService {
       });
 
       return { success: true, user: loggedInUser };
-    } catch (error: any) {
+    } catch (error: Parse.Error | any) {
+      console.log("error:", error);
+
+      if (
+        error instanceof Parse.Error &&
+        error.code === Parse.Error.ACCOUNT_ALREADY_LINKED
+      ) {
+        this.logout();
+      }
       return { success: false, error: error.message };
     }
   }
@@ -174,6 +187,17 @@ class AuthService {
       ? router.navigate("/(tabs)")
       : router.navigate("/chooseYourPath");
   };
+
+  async verifyAuth() {
+    const currentUser = await this.getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        error: "User not logged in",
+      };
+    }
+    return { success: true };
+  }
 }
 
 export const authService = new AuthService();

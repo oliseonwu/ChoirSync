@@ -43,10 +43,6 @@ expo-env.d.ts
 
 .env
 
-# Parse
+
 choirSyncCloud/.parse.project
 choirSyncCloud/.parse.local
-choirSyncCloud/node_modules
-
-# Google
-google-services.json

@@ -4,6 +4,7 @@ import {
   ScrollView,
   Text,
   View,
+  Linking,
 } from "react-native";
 import {
   moderateScale,
@@ -16,13 +17,13 @@ import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import Animated from "react-native-reanimated";
+import { useEffect } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
+import { useUser } from "@/contexts/UserContext";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -31,13 +32,21 @@ export default function HomeScreen() {
   const headingContainerHeight =
     headerAndStatusBarHeight - Constants.statusBarHeight;
   const bottomOffset = tabBarHeight + getWindowSize().height * 0.075;
+  const { getCurrentUserData } = useUser();
+  const userData = getCurrentUserData();
+  const { expoPushToken, notification } = usePushNotifications();
+
+  const data = JSON.stringify(notification, undefined, 2);
+
+  // console.log("data", data);
+  // console.log("expoPushToken", expoPushToken);
 
   useEffect(() => {
     showPlayer();
   }, []);
+
   return (
     <View style={[styles.Container]}>
-      <StatusBar style="dark" />
       {/* <CustomHeaderComponent>
         <View style={styles.headerContainer}>
           <View style={styles.invisibleBox}></View>
@@ -71,6 +80,9 @@ export default function HomeScreen() {
             disabled={true}
             title="New Songs"
             icon={require("@/assets/images/music-icon-2.png")}
+            // onPress={() => {
+            //   Linking.openURL("app-settings:");
+            // }}
           />
 
           <ThisWeekCard

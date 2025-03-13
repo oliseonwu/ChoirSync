@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
-import { useNavigation, router } from "expo-router";
 import {
   horizontalScale,
   moderateScale,
@@ -11,49 +10,76 @@ import {
 import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import { googleAuthService } from "@/services/GoogleAuthService";
-import { authService } from "@/services/AuthService";
-import Parse from "../services/Parse";
+import { authService, UserStatus } from "@/services/AuthService";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useUser } from "@/contexts/UserContext";
+import "expo-splash-screen"; // helps resolve splash screen error on ios
 
 export default function LandingPage() {
-  const navigation = useNavigation();
   const { showLoading, hideLoading } = useLoading();
+  const { updateCurrentUserData } = useUser();
 
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
+
     attemptToLogin();
   }, []);
 
   const attemptToLogin = async () => {
-    console.log("attempting to login");
     showLoading();
     const currentUser = await authService.getCurrentUser();
-    if (currentUser) {
-      const userStatus = await authService.getUserStatus(currentUser);
-      authService.navigateBasedOnUserStatus(userStatus);
+    let userStatus: UserStatus;
+
+    try {
+      if (currentUser) {
+        userStatus = await authService.getUserStatus(currentUser);
+        updateCurrentUserData(
+          currentUser.get("firstName"),
+          currentUser.get("lastName"),
+          currentUser.get("email"),
+          currentUser.get("profileUrl")
+        );
+        authService.navigateBasedOnUserStatus(userStatus);
+      }
+    } catch (error: any) {
+      console.log("error attempting to login", error);
+
+      if (error.message === "Invalid session token") {
+        await authService.logout();
+      }
     }
     hideLoading();
   };
 
   const handleLogin = async () => {
     showLoading();
-    const loginResponse = await authService.loginWithGoogle();
+    let loginResponse = null;
     let userStatus;
 
-    if (loginResponse.success) {
-      userStatus = await authService.getUserStatus(loginResponse.user!);
+    try {
+      loginResponse = await authService.loginWithGoogle();
+      if (loginResponse.success) {
+        userStatus = await authService.getUserStatus(loginResponse.user!);
+        updateCurrentUserData(
+          loginResponse.user!.get("firstName"),
+          loginResponse.user!.get("lastName"),
+          loginResponse.user!.get("email"),
+          loginResponse.user!.get("profileUrl")
+        );
 
-      authService.navigateBasedOnUserStatus(userStatus);
+        authService.navigateBasedOnUserStatus(userStatus);
+      }
+    } catch (error: any) {
+      console.log("error", error.message);
     }
+
     hideLoading();
   };
 
   return (
     <View style={styles.MainContainer}>
-      <StatusBar style="light" />
-
       <View style={styles.TopContainer}>
         <Image
           style={styles.LandingPageImage}
@@ -64,7 +90,6 @@ export default function LandingPage() {
           transition={0}
         />
       </View>
-
       <View style={styles.BottomContainer}>
         <Text style={styles.Heading1}>
           {"Organise and share\nchoir recording."}
