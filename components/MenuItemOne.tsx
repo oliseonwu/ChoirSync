@@ -12,14 +12,14 @@ const { width } = getWindowSize();
 
 interface MenuItemOneProps {
   label: string;
-  value: string;
+  value?: string;
   disabled?: boolean;
   borderBottomWidth?: number;
   onPress?: () => void;
 }
 
 const MenuItemOne: React.FC<MenuItemOneProps> = ({
-  label,
+  label = "",
   value,
   disabled = false,
   borderBottomWidth = 0,

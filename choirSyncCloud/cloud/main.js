@@ -27,17 +27,7 @@ Parse.Cloud.define("fetchInviteCode", inviteFunctions.fetchInviteCode);
 Parse.Cloud.define("addUserToChoirGroup", groupFunctions.addUserToChoirGroup);
 
 // Register notification functions
-Parse.Cloud.define("storePushToken", tokenFunctions.storePushToken, {
-  fields: {
-    token: {
-      type: String,
-      required: true,
-      options: (val) => Expo.isExpoPushToken(val),
-      error: "Cloud function error: Invalid Expo push token",
-    },
-  },
-  requireUser: true,
-});
+
 //{ "groupId":"2DDTYeG6X6", "title":"New Recordings", "message": "Check it out!" }
 Parse.Cloud.define(
   "sendGroupNotification",
@@ -60,6 +50,30 @@ Parse.Cloud.define(
   }
 );
 
+// Register token functions
+Parse.Cloud.define("storePushToken", tokenFunctions.storePushToken, {
+  fields: {
+    token: {
+      type: String,
+      required: true,
+      options: (val) => Expo.isExpoPushToken(val),
+      error: "Cloud function error: Invalid Expo push token",
+    },
+  },
+  requireUser: true,
+});
+Parse.Cloud.define("deletePushToken", tokenFunctions.deletePushToken, {
+  fields: {
+    token: {
+      type: String,
+      required: true,
+      options: (val) => Expo.isExpoPushToken(val),
+      error: "Cloud function error: Invalid Expo push token",
+    },
+  },
+  requireUser: true,
+});
+
 Parse.Cloud.define("test", async (request) => {
   const { userId, installationId, pushToken } = request.params;
   const result = await tokenFunctions.savePushToken(
@@ -72,9 +86,8 @@ Parse.Cloud.define("test", async (request) => {
 });
 
 Parse.Cloud.define("test2", async (request) => {
-  const pushTokens = await groupFunctions.getGroupMembersPushTokens(
-    "2DDTYeG6X6"
-  );
+  const pushTokens =
+    await groupFunctions.getGroupMembersPushTokens("2DDTYeG6X6");
 
   return pushTokens;
 });

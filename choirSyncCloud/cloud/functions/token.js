@@ -11,13 +11,12 @@ const { pointer } = require("../utils/helpers");
  */
 async function storePushToken(request) {
   const { token } = request.params;
-  const installationId = request.installationId;
   const requestUserObject = request.user; // Get the user who called the function
   const userId = requestUserObject.id;
   let result;
 
   try {
-    result = await savePushToken(userId, installationId, token);
+    result = await savePushToken(userId, token);
     if (!result.success) {
       throw new Error(result.message);
     }
@@ -31,20 +30,43 @@ async function storePushToken(request) {
   return result;
 }
 
+/**
+ * Deletes a push token for a user
+ * @param {string} userId - The user id
+ * @param {string} installationId - The installation id
+ * @returns {Promise<object>} The result object containing:
+ *   - success: boolean
+ *   - message: string
+ */
+async function deletePushToken(request) {
+  const userId = request.user.id;
+  const token = request.params.token;
+  try {
+    const pushTokenObject = await fetchPushTokenObject(userId, token);
+    await pushTokenObject.destroy();
+    return { success: true, message: "Token deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting push token: ", error);
+    return {
+      success: false,
+      message: "Cloud error: Failed to delete token.",
+    };
+  }
+}
 // FUNCTIONS
 
 /**
  * Fetches a push token for a user
  * @param {string} userId - The user id
- * @param {string} installationId - The installation id
+ * @param {string} token - The push token
  * @returns {Promise<object>} The result object containing:
  *   - The push token object
  *   - null if the push token does not exist
  */
-async function fetchPushTokenObject(userId, installationId) {
+async function fetchPushTokenObject(userId, token) {
   try {
     const query = new Parse.Query("PushTokens");
-    query.equalTo("installation_id", installationId);
+    query.equalTo("push_token", token);
     query.equalTo("user", pointer(userId, "_User"));
 
     const tokenObject = await query.first({ useMasterKey: true });
@@ -64,33 +86,22 @@ const fetchPushTokenObjects = async (tokenList) => {
 /**
  * Saves a push token for a user
  * @param {string} userId - The user id
- * @param {string} installationId - The installation id
  * @param {string} pushToken - The push token
  * @returns {Promise<object>} The result object containing:
  *   - success: boolean
  *   - message: string
  */
-async function savePushToken(userId, installationId, pushToken) {
+async function savePushToken(userId, pushToken) {
   try {
-    const existingTokenObject = await fetchPushTokenObject(
-      userId,
-      installationId
-    );
+    const existingTokenObject = await fetchPushTokenObject(userId, pushToken);
     let tokenObject;
 
-    if (!existingTokenObject) {
-      tokenObject = new Parse.Object("PushTokens");
-      tokenObject.set("user", pointer(userId, "_User"));
-      tokenObject.set("installation_id", installationId);
-    } else {
-      // if the token already exists, we check if
-      // it is the same as the one we are trying to save
-      if (existingTokenObject.get("push_token") === pushToken) {
-        return { success: true, message: "Token already exists" };
-      }
-      tokenObject = existingTokenObject;
+    if (existingTokenObject) {
+      return { success: true, message: "Token already exists" };
     }
 
+    tokenObject = new Parse.Object("PushTokens");
+    tokenObject.set("user", pointer(userId, "_User"));
     tokenObject.set("push_token", pushToken);
     await tokenObject.save(null, { useMasterKey: true });
 
@@ -149,4 +160,5 @@ module.exports = {
   deletePushTokens,
   fetchPushTokenObjects,
   getUsersPushTokenObjects,
+  deletePushToken,
 };

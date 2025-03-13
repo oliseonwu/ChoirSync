@@ -21,6 +21,10 @@ import { useLoading } from "@/contexts/LoadingContext";
 import { useWebView } from "@/contexts/WebViewContext";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { WebViewComponent } from "@/components/WebViewComponent";
+import { notificationService } from "@/services/NotificationService";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 
 type SettingItem = {
   id: number;
@@ -45,8 +49,15 @@ export default function SettingsScreen() {
   const { showWebView } = useWebView();
 
   const performLogout = async () => {
+    const pushToken = await AsyncStorageService.getItem(
+      AsyncStorageKeys.PUSH_TOKEN
+    );
+
     try {
       showLoading();
+      await AsyncStorageService.clear();
+      await notificationService.deletePushNotificationToken(pushToken || ""); // delete the push token from the DB
+
       const result = await authService.logout();
 
       if (result.success) {

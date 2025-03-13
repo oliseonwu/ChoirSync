@@ -18,6 +18,7 @@ import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { PaperProvider } from "react-native-paper";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
+import { StatusBar } from "expo-status-bar";
 
 export default function TabLayout() {
   const navigation = useNavigation();

@@ -5,6 +5,9 @@ import Constants from "expo-constants";
 import { Alert, Linking, Platform } from "react-native";
 import { notificationService } from "../services/NotificationService";
 import Parse from "../services/Parse";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 
 export interface PushNotificationState {
   notification: Notifications.Notification; // Return the notification its self
@@ -60,82 +63,86 @@ export const usePushNotifications = (): PushNotificationState => {
     }),
   });
 
+  const displayCustomAlert = (
+    title: string,
+    message: string,
+    actionText: string,
+    actionHandler: () => void
+  ) => {
+    Alert.alert(title, message, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: actionText,
+        onPress: actionHandler,
+      },
+    ]);
+  };
+
   // setup permissions
   // get token for push notifications
   async function registerForPushNotifications() {
     let token;
-    if (Device.isDevice) {
+
+    if (!Device.isDevice) {
       // check if physicaldevice
+      console.log("Error: Please use a physical device");
+      return;
+    }
 
-      //  Get permissions status
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
+    //  Get permissions status
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
 
-      let finalStatus = existingStatus; // this could change
+    let finalStatus = existingStatus; // this could change
 
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus === "denied") {
-        Alert.alert(
+    switch (finalStatus) {
+      case "denied":
+        displayCustomAlert(
           "Enable Notifications",
           "Push notifications are disabled. Would you like to enable them in settings?",
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-            {
-              text: "Settings",
-              onPress: () => {
-                if (Platform.OS === "ios") {
-                  Linking.openURL("app-settings:");
-                } else {
-                  Linking.openSettings();
-                }
-              },
-            },
-          ]
+          "Settings",
+          notificationService.openNotificationSystemSettings
         );
         return;
-      }
-
-      //  Check if permissions are granted
-      if (finalStatus !== "granted") {
-        alert("Failed to get push notification permissions token");
-        return;
-      }
-
-      // Returns an Expo token that can be used
-      // to send a push notification to the device
-      // using Expo's push notifications service
-      token = await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig?.extra?.eas?.projectId,
-      });
-
-      // save the push token to the DB
-      await notificationService.storePushToken({
-        token: token.data,
-      });
-
-      if (Platform.OS === "android") {
-        // use to mute certain notification channels
-        Notifications.setNotificationChannelAsync("default", {
-          name: "default",
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: "#FF231F7C",
-        });
-
-        return token;
-      }
-
-      setExpoPushToken(token);
-    } else {
-      console.log("Error: Please use a physical device");
+      case "undetermined":
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+        break;
+      default:
+        break;
     }
+
+    //  Check if permissions are granted
+    if (finalStatus !== "granted") {
+      alert("Failed to get push notification permissions token");
+      return;
+    }
+
+    // Returns an Expo token that can be used
+    // to send a push notification to the device
+    // using Expo's push notifications service
+    token = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig?.extra?.eas?.projectId,
+    });
+
+    await notificationService.updateNotificationSettings(finalStatus);
+
+    if (Platform.OS === "android") {
+      // use to mute certain notification channels
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+
+      return token;
+    }
+
+    setExpoPushToken(token);
   }
 
   return {

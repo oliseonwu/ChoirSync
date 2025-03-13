@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import {
@@ -15,6 +15,9 @@ import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
 import "expo-splash-screen"; // helps resolve splash screen error on ios
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();
@@ -23,6 +26,7 @@ export default function LandingPage() {
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
+
     attemptToLogin();
   }, []);
 
@@ -43,7 +47,7 @@ export default function LandingPage() {
         authService.navigateBasedOnUserStatus(userStatus);
       }
     } catch (error: any) {
-      console.log("error", error);
+      console.log("error attempting to login", error);
 
       if (error.message === "Invalid session token") {
         await authService.logout();
@@ -79,8 +83,6 @@ export default function LandingPage() {
 
   return (
     <View style={styles.MainContainer}>
-      <StatusBar style="light" />
-
       <View style={styles.TopContainer}>
         <Image
           style={styles.LandingPageImage}
@@ -91,7 +93,6 @@ export default function LandingPage() {
           transition={0}
         />
       </View>
-
       <View style={styles.BottomContainer}>
         <Text style={styles.Heading1}>
           {"Organise and share\nchoir recording."}

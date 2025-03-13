@@ -17,16 +17,16 @@ import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import Animated from "react-native-reanimated";
+import { useEffect } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
 import { useUser } from "@/contexts/UserContext";
-import { inviteCodeService } from "@/services/InviteCodeService";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
@@ -41,8 +41,8 @@ export default function HomeScreen() {
 
   const data = JSON.stringify(notification, undefined, 2);
 
-  console.log("data", data);
-  console.log("expoPushToken", expoPushToken);
+  // console.log("data", data);
+  // console.log("expoPushToken", expoPushToken);
 
   useEffect(() => {
     showPlayer();
@@ -50,7 +50,6 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.Container]}>
-      <StatusBar style="dark" />
       {/* <CustomHeaderComponent>
         <View style={styles.headerContainer}>
           <View style={styles.invisibleBox}></View>
