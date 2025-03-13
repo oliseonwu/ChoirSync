@@ -44,7 +44,6 @@ export function NotificationMenuItem({
           data.nextAppState === "active" &&
           data.previousAppState !== "active"
         ) {
-          console.log("appStateChange", data);
           isNotificationEnabledSV.value =
             data.notificationSetting === "granted";
         }

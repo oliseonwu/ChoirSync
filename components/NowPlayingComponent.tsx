@@ -113,7 +113,7 @@ export function NowPlayingComponent() {
             play={currentTrackState === "playing" && ytVideoId !== undefined}
             webViewStyle={styles.videoPlayer}
             onError={(e) => {
-              console.log("Error:", e);
+              console.log("Playback error:", e);
               console.log("ytVideoId:", ytVideoId);
             }}
           />

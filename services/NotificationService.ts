@@ -75,6 +75,7 @@ class NotificationService {
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig?.extra?.eas?.projectId,
       });
+
       await this.storePushNotificationToken(token.data);
 
       // reset the dialog flag

@@ -26,7 +26,7 @@ export const usePushNotifications = (): PushNotificationState => {
   const responseListener = useRef<Notifications.Subscription>();
 
   useEffect(() => {
-    // SETUP PERMISSIONS AND GET TOKEN
+    // // SETUP PERMISSIONS AND GET TOKEN
     registerForPushNotifications().then((token) => {
       setExpoPushToken(token);
     });

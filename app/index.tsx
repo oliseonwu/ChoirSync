@@ -71,8 +71,8 @@ export default function LandingPage() {
 
         authService.navigateBasedOnUserStatus(userStatus);
       }
-    } catch (error) {
-      console.log("error", error);
+    } catch (error: any) {
+      console.log("error", error.message);
     }
 
     hideLoading();

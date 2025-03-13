@@ -37,8 +37,8 @@ export const AppStateProvider = ({
     nextAppState: AppStateStatus,
     currentAppState: AppStateStatus
   ) => {
-    const isAuthenticated = await authService.verifyAuth();
-    let authorized = true;
+    const isAuthenticated = (await authService.verifyAuth()).success;
+    let authorized = false;
     const storedNotificationSetting = await AsyncStorageService.getItem(
       AsyncStorageKeys.NOTIFICATION_STATUS
     );
@@ -53,14 +53,17 @@ export const AppStateProvider = ({
 
     // we dont want to sync if the stored notification setting is
     // thesame as the system notification setting
+
+    if (!isAuthenticated) {
+      return authorized;
+    }
+
     if (
-      isAuthenticated &&
-      storedNotificationSetting === null &&
-      currentAppState !== "background" &&
-      nextAppState !== "active" &&
-      systemNotificationSetting === storedNotificationSetting
+      currentAppState === "background" &&
+      nextAppState === "active" &&
+      systemNotificationSetting !== storedNotificationSetting
     ) {
-      authorized = false;
+      authorized = true;
     }
 
     return authorized;

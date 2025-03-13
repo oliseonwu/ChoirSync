@@ -89,6 +89,10 @@ class AuthService {
     // we throw errors in GoogleAuthService, so we don't need to handle them here
     const googleResponse = await googleAuthService.signIn();
 
+    if (!googleResponse.success) {
+      throw new Error("Google sign in failed: " + googleResponse.error);
+    }
+
     try {
       const { user: googleUser, idToken } = googleResponse.data!;
       const currentUser = await this.getCurrentUser();
@@ -194,8 +198,6 @@ class AuthService {
     }
     return { success: true };
   }
-
-  // ... existing code ...
 }
 
 export const authService = new AuthService();
