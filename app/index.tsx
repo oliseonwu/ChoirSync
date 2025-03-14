@@ -14,7 +14,6 @@ import { authService, UserStatus } from "@/services/AuthService";
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
-import "expo-splash-screen"; // helps resolve splash screen error on ios
 
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();
@@ -23,7 +22,6 @@ export default function LandingPage() {
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
-
     attemptToLogin();
   }, []);
 

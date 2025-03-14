@@ -5,15 +5,18 @@ import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
-import BackButton from "@/assets/images/SVG/back-Button.svg";
 import { StyleSheet, TouchableOpacity, Image } from "react-native";
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
+// import {
+//   getTrackingPermissionsAsync,
+//   PermissionStatus,
+//   requestTrackingPermissionsAsync,
+// } from "expo-tracking-transparency";
 import BackButtonComponent from "@/components/BackButtonComponent";
-import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { CurrentTrackProvider } from "@/contexts/CurrentTrackContext";
 import NowPlayingComponent from "@/components/NowPlayingComponent";
 import { Asset } from "expo-asset";
@@ -25,9 +28,8 @@ import { LoadingProvider } from "@/contexts/LoadingContext";
 import { WebViewProvider } from "@/contexts/WebViewContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
-import { StatusBar } from "expo-status-bar";
-// import { useAppState } from "@/hooks/useAppState";
 import { AppStateProvider } from "@/contexts/AppStateContext";
+import mobileAds from "react-native-google-mobile-ads";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -35,7 +37,7 @@ export {
 } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontLoaded, error] = useFonts({
@@ -79,6 +81,7 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
+        // Prevent the splash screen from auto-hiding before asset loading is complete.
         SplashScreen.preventAutoHideAsync();
         await preloadLocalImgAssets();
       } catch (error) {
@@ -90,6 +93,7 @@ export default function RootLayout() {
     }
 
     prepare();
+    initializeAds();
   }, []);
 
   if (!fontLoaded || !isReady) {
@@ -97,6 +101,18 @@ export default function RootLayout() {
   }
 
   return <RootLayoutNav />;
+}
+
+function initializeAds() {
+  mobileAds()
+    .initialize()
+    .then((adapterStatuses) => {
+      // Initialization complete!
+      console.log("Initialization complete!", adapterStatuses);
+    })
+    .catch((error) => {
+      console.log("Initialization failed", error);
+    });
 }
 
 function RootLayoutNav() {
@@ -123,7 +139,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -136,7 +152,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -149,7 +165,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -161,7 +177,7 @@ function RootLayoutNav() {
                         options={{
                           animation: "none",
                           headerTransparent: true,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -185,8 +201,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
 
                           headerRight: () => (
@@ -208,8 +223,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                           headerRight: () => (
                             <HeaderProfileImage
@@ -227,7 +241,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -242,7 +256,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                           headerRight: () => (
                             <HeaderProfileImage
@@ -263,7 +277,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.smallHeaderTitle,
                           headerShadowVisible: false,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                         }}
                       />

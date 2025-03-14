@@ -20,6 +20,7 @@ import { router } from "expo-router";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { FlashList } from "@shopify/flash-list";
 import { SongItem } from "@/components/SongItem";
+import AdComponent from "@/components/AdComponent";
 
 enum ItemType {
   DATE_AND_SONG = "DateAndSong",
@@ -116,6 +117,7 @@ export default function CatalogueScreen() {
 
   return (
     <View style={styles.container}>
+      <AdComponent />
       <FlashList
         contentContainerStyle={styles.flashListContent}
         data={recordings}
