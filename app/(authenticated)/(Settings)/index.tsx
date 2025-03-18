@@ -94,13 +94,13 @@ export default function SettingsScreen() {
         id: 1,
         Icon: profileIconMemo,
         title: "Account profile",
-        onPress: () => router.push("/(Settings)/profile"),
+        onPress: () => router.push("/(authenticated)/(Settings)/profile"),
       },
       {
         id: 2,
         Icon: notificationIconMemo,
         title: "Notifications",
-        onPress: () => router.push("/(Settings)/notifications"),
+        onPress: () => router.push("/(authenticated)/(Settings)/notifications"),
       },
       {
         id: 3,

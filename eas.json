@@ -6,7 +6,11 @@
   "build": {
     "development-APK": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/Users/olisemeduaonwuatogwu/Library/Android/sdk",
+        "ANDROID_NDK_HOME": "/Users/olisemeduaonwuatogwu/Library/Android/sdk/ndk"
+      }
     },
     "development-IOS": {
       "developmentClient": true,

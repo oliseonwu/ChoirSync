@@ -89,7 +89,6 @@ class NotificationService {
       }
     }
 
-    console.log("systemNotificationSetting", systemNotificationSetting);
     // save the notification status to AsyncStorage
     await AsyncStorageService.setItem(
       AsyncStorageKeys.NOTIFICATION_STATUS,

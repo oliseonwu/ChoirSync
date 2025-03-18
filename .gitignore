@@ -50,3 +50,4 @@ choirSyncCloud/node_modules
 
 # Google
 google-services.json
+*.apk

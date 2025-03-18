@@ -60,6 +60,7 @@ export const SkeletonLoader = ({ width }: { width: number }) => {
 
 const styles = StyleSheet.create({
   skeletonContainer: {
+    flex: 1,
     position: "relative",
     overflow: "hidden",
     backgroundColor: "#fff",

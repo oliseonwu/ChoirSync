@@ -76,7 +76,7 @@ export default function TabLayout() {
               headerTitleStyle: styles.headerTitle,
               headerRight: () => (
                 <HeaderProfileImage
-                  onPress={() => router.push("/(Settings)")}
+                  onPress={() => router.push("/(authenticated)/(Settings)")}
                   marginRight={horizontalScale(20)}
                 />
               ),

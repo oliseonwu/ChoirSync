@@ -3,17 +3,20 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-native-reanimated";
-import BackButton from "@/assets/images/SVG/back-Button.svg";
 import { StyleSheet, TouchableOpacity, Image } from "react-native";
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
+import {
+  getTrackingPermissionsAsync,
+  PermissionStatus,
+  requestTrackingPermissionsAsync,
+} from "expo-tracking-transparency";
 import BackButtonComponent from "@/components/BackButtonComponent";
-import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { CurrentTrackProvider } from "@/contexts/CurrentTrackContext";
 import NowPlayingComponent from "@/components/NowPlayingComponent";
 import { Asset } from "expo-asset";
@@ -25,9 +28,12 @@ import { LoadingProvider } from "@/contexts/LoadingContext";
 import { WebViewProvider } from "@/contexts/WebViewContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
-import { StatusBar } from "expo-status-bar";
-// import { useAppState } from "@/hooks/useAppState";
 import { AppStateProvider } from "@/contexts/AppStateContext";
+
+import mobileAds, {
+  AdsConsent,
+  AdsConsentDebugGeography,
+} from "react-native-google-mobile-ads";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -35,7 +41,7 @@ export {
 } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontLoaded, error] = useFonts({
@@ -53,6 +59,7 @@ export default function RootLayout() {
   });
 
   const [isReady, setIsReady] = useState(false);
+  const hasTriedToInitializeAds = useRef(false);
 
   const preloadLocalImgAssets = async () => {
     try {
@@ -79,6 +86,7 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
+        // Prevent the splash screen from auto-hiding before asset loading is complete.
         SplashScreen.preventAutoHideAsync();
         await preloadLocalImgAssets();
       } catch (error) {
@@ -90,13 +98,74 @@ export default function RootLayout() {
     }
 
     prepare();
+    // NOTE: This is the full consent flow which includes UMP(User Messaging Platform)
+    // and initialize ads.
+    // AdsConsent.reset();
+    runFullAdsConsentFlow();
+
+    // NOTE: We attempt to load ads using UMP consent obtained in the previous session.
+    // Its a way to skip the UMP flow if the user has already given consent.
+    initializeAds();
   }, []);
+
+  async function runFullAdsConsentFlow() {
+    try {
+      await umpFlow();
+      await initializeAds();
+    } catch (error) {
+      console.error(`Error running full ads consent flow: ${error}`);
+    }
+  }
+  /**
+   * This function request consent to show both personalized and non-personalized ads
+   * for users in the EU area. UMP(User Messaging Platform).
+   */
+  async function umpFlow() {
+    await AdsConsent.gatherConsent();
+  }
+
+  async function initializeAds() {
+    const { canRequestAds, status } = await AdsConsent.getConsentInfo();
+
+    // Note: If user has not completed the UMP flow previously
+    // canRequestAds will be false.
+    if (!canRequestAds || hasTriedToInitializeAds.current) return;
+
+    hasTriedToInitializeAds.current = true;
+
+    // Ask IOS users for if they want to opt in to personalized ads
+    // AdMob uses the outcome of this to determine
+    // if it should show personalized ads or not ON IOS
+
+    // NOTE: if an IOS user says no to personalized ads,
+    // Google AdMob will still show non-personalized ads to the user.
+    await getTrackingPermissionsForPersonalizedAdsOnIOS();
+
+    mobileAds()
+      .initialize()
+      .then((adapterStatuses) => {
+        // Initialization complete!
+        console.log("Ads initialization complete!", adapterStatuses);
+      })
+      .catch((error) => {
+        console.log("Ads initialization failed", error);
+      });
+  }
+
+  async function getTrackingPermissionsForPersonalizedAdsOnIOS() {
+    const { status } = await getTrackingPermissionsAsync();
+
+    if (status === PermissionStatus.UNDETERMINED) {
+      await requestTrackingPermissionsAsync();
+    }
+    return status;
+  }
 
   if (!fontLoaded || !isReady) {
     return null;
+  } else {
+    return <RootLayoutNav />;
   }
-
-  return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
@@ -123,7 +192,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -136,7 +205,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -149,7 +218,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -161,7 +230,7 @@ function RootLayoutNav() {
                         options={{
                           animation: "none",
                           headerTransparent: true,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -185,8 +254,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
 
                           headerRight: () => (
@@ -208,8 +276,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                           headerRight: () => (
                             <HeaderProfileImage
@@ -227,7 +294,7 @@ function RootLayoutNav() {
                           animation: "none",
                           headerTransparent: true,
                           headerTitle: "",
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => (
                             <BackButtonComponent style={styles2.BackButton} />
                           ),
@@ -242,7 +309,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.headerTitle,
                           headerShadowVisible: false,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                           headerRight: () => (
                             <HeaderProfileImage
@@ -263,7 +330,7 @@ function RootLayoutNav() {
                           headerTitleAlign: "center",
                           headerTitleStyle: styles.smallHeaderTitle,
                           headerShadowVisible: false,
-                          headerBackTitleVisible: false,
+                          headerBackButtonDisplayMode: "minimal",
                           headerLeft: () => <BackButtonComponent />,
                         }}
                       />
