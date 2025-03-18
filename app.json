@@ -7,11 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "exp+choirsync",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    
     "platforms": [
       "ios",
       "android"
@@ -21,12 +17,15 @@
       "bundleIdentifier": "com.olise.ChoirSync",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "icon": {
+        "light": "./assets/images/icon-light-ios.png"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon-android.png",
+        "backgroundColor": "#FCF5F3"
       },
       "package": "com.olise.ChoirSync",
       "googleServicesFile": "./google-services.json"
@@ -39,6 +38,15 @@
     "plugins": [
       "expo-router",
       [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFf",
+          "image": "./assets/images/splash-icon-light.png",
+          
+          "imageWidth": 200
+        }
+      ],
+      [
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.37343657987-sfm8lmtea9a2f5rqjuecdp5s69d5b3e1"
@@ -49,6 +57,9 @@
         {
           "ios": {
             "useFrameworks": "static"
+          },
+          "android": {
+            "extraProguardRules": "-keep class com.google.android.gms.internal.consent_sdk.** { *; }\n-keep class com.android.installreferrer.api.** { *; }\n-keep class com.google.android.gms.common.** { *; }"
           }
         }
       ],
@@ -57,7 +68,8 @@
         {
           "androidAppId": "ca-app-pub-1967837539947027~5511847988",
           "iosAppId": "ca-app-pub-1967837539947027~8876377921",
-          "userTrackingUsageDescription": "Do you want to opt in to personalized ads?",
+          "userTrackingUsageDescription": "Allow this app to collect app-related data that can be used for tracking you or your device.",
+          "delayAppMeasurementInit": true,
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
             "4fzdc2evr5.skadnetwork",

@@ -3,7 +3,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-native-reanimated";
 import { StyleSheet, TouchableOpacity, Image } from "react-native";
 import {
@@ -11,11 +11,11 @@ import {
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
-// import {
-//   getTrackingPermissionsAsync,
-//   PermissionStatus,
-//   requestTrackingPermissionsAsync,
-// } from "expo-tracking-transparency";
+import {
+  getTrackingPermissionsAsync,
+  PermissionStatus,
+  requestTrackingPermissionsAsync,
+} from "expo-tracking-transparency";
 import BackButtonComponent from "@/components/BackButtonComponent";
 import { CurrentTrackProvider } from "@/contexts/CurrentTrackContext";
 import NowPlayingComponent from "@/components/NowPlayingComponent";
@@ -29,7 +29,11 @@ import { WebViewProvider } from "@/contexts/WebViewContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { AppStateProvider } from "@/contexts/AppStateContext";
-import mobileAds from "react-native-google-mobile-ads";
+
+import mobileAds, {
+  AdsConsent,
+  AdsConsentDebugGeography,
+} from "react-native-google-mobile-ads";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,6 +59,7 @@ export default function RootLayout() {
   });
 
   const [isReady, setIsReady] = useState(false);
+  const hasTriedToInitializeAds = useRef(false);
 
   const preloadLocalImgAssets = async () => {
     try {
@@ -93,26 +98,74 @@ export default function RootLayout() {
     }
 
     prepare();
+    // NOTE: This is the full consent flow which includes UMP(User Messaging Platform)
+    // and initialize ads.
+    // AdsConsent.reset();
+    runFullAdsConsentFlow();
+
+    // NOTE: We attempt to load ads using UMP consent obtained in the previous session.
+    // Its a way to skip the UMP flow if the user has already given consent.
     initializeAds();
   }, []);
 
-  if (!fontLoaded || !isReady) {
-    return null;
+  async function runFullAdsConsentFlow() {
+    try {
+      await umpFlow();
+      await initializeAds();
+    } catch (error) {
+      console.error(`Error running full ads consent flow: ${error}`);
+    }
+  }
+  /**
+   * This function request consent to show both personalized and non-personalized ads
+   * for users in the EU area. UMP(User Messaging Platform).
+   */
+  async function umpFlow() {
+    await AdsConsent.gatherConsent();
   }
 
-  return <RootLayoutNav />;
-}
+  async function initializeAds() {
+    const { canRequestAds, status } = await AdsConsent.getConsentInfo();
 
-function initializeAds() {
-  mobileAds()
-    .initialize()
-    .then((adapterStatuses) => {
-      // Initialization complete!
-      console.log("Initialization complete!", adapterStatuses);
-    })
-    .catch((error) => {
-      console.log("Initialization failed", error);
-    });
+    // Note: If user has not completed the UMP flow previously
+    // canRequestAds will be false.
+    if (!canRequestAds || hasTriedToInitializeAds.current) return;
+
+    hasTriedToInitializeAds.current = true;
+
+    // Ask IOS users for if they want to opt in to personalized ads
+    // AdMob uses the outcome of this to determine
+    // if it should show personalized ads or not ON IOS
+
+    // NOTE: if an IOS user says no to personalized ads,
+    // Google AdMob will still show non-personalized ads to the user.
+    await getTrackingPermissionsForPersonalizedAdsOnIOS();
+
+    mobileAds()
+      .initialize()
+      .then((adapterStatuses) => {
+        // Initialization complete!
+        console.log("Ads initialization complete!", adapterStatuses);
+      })
+      .catch((error) => {
+        console.log("Ads initialization failed", error);
+      });
+  }
+
+  async function getTrackingPermissionsForPersonalizedAdsOnIOS() {
+    const { status } = await getTrackingPermissionsAsync();
+
+    if (status === PermissionStatus.UNDETERMINED) {
+      await requestTrackingPermissionsAsync();
+    }
+    return status;
+  }
+
+  if (!fontLoaded || !isReady) {
+    return null;
+  } else {
+    return <RootLayoutNav />;
+  }
 }
 
 function RootLayoutNav() {

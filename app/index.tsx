@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
+  getWindowSize,
 } from "@/utilities/TrueScale";
 import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
@@ -18,7 +19,11 @@ import { useUser } from "@/contexts/UserContext";
 export default function LandingPage() {
   const { showLoading, hideLoading } = useLoading();
   const { updateCurrentUserData } = useUser();
-
+  const [statusBarStyle, setStatusBarStyle] = useState<"dark" | "light">(
+    "light"
+  );
+  const windowHeight = getWindowSize().height;
+  console.log("windowHeight", windowHeight);
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
@@ -39,6 +44,7 @@ export default function LandingPage() {
           currentUser.get("email"),
           currentUser.get("profileUrl")
         );
+        setStatusBarStyle("dark");
         authService.navigateBasedOnUserStatus(userStatus);
       }
     } catch (error: any) {
@@ -47,6 +53,7 @@ export default function LandingPage() {
       if (error.message === "Invalid session token") {
         await authService.logout();
       }
+      hideLoading();
     }
     hideLoading();
   };
@@ -66,6 +73,7 @@ export default function LandingPage() {
           loginResponse.user!.get("email"),
           loginResponse.user!.get("profileUrl")
         );
+        setStatusBarStyle("dark");
 
         authService.navigateBasedOnUserStatus(userStatus);
       }
@@ -78,6 +86,7 @@ export default function LandingPage() {
 
   return (
     <View style={styles.MainContainer}>
+      <StatusBar style={statusBarStyle} />
       <View style={styles.TopContainer}>
         <Image
           style={styles.LandingPageImage}
@@ -116,13 +125,14 @@ export default function LandingPage() {
             </Text>
           </TouchableOpacity>
         </View> */}
+        {/* <View style={styles.flexContainer}></View> */}
         <TouchableOpacity
           style={styles.googleBtnContainer}
           onPress={handleLogin}
         >
           <SignInWithGoogleBtn
             width={horizontalScale(230)}
-            height={verticalScale(55)}
+            // height={verticalScale(55)}
           />
         </TouchableOpacity>
       </View>
@@ -138,7 +148,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   TopContainer: {
-    flex: 7,
+    flexBasis: "59.6%",
+    flexShrink: 1, // If the screen is small, the image will shrink
   },
 
   LandingPageImage: {
@@ -146,21 +157,22 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   BottomContainer: {
-    flex: 5,
-    justifyContent: "center",
+    paddingTop: "11%",
     marginHorizontal: horizontalScale(21),
-    // paddingBottom: verticalScale(10),
   },
   Heading1: {
     fontFamily: "Inter-Medium",
     fontSize: moderateScale(32),
     color: "#313234",
-    marginBottom: "5%",
+    marginBottom: "4%",
   },
   Heading2: {
     fontFamily: "Inter-Regular",
     fontSize: moderateScale(16),
     color: "#525355",
+  },
+  flexContainer: {
+    flex: 1,
   },
   BtnRowContainer: {
     flexDirection: "row",
@@ -193,8 +205,8 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(16),
   },
   googleBtnContainer: {
-    marginTop: "11%",
-    marginBottom: "1%",
+    marginTop: "14%",
+    marginBottom: "18%",
     alignItems: "center",
   },
 });

@@ -46,4 +46,14 @@ const getWindowSize = () => ({ width: width, height: height });
 
 // moderateScale = {font-size, borderRadius}
 // (anything with no hight or width)
-export { horizontalScale, verticalScale, moderateScale, getWindowSize };
+
+const isSmallHeightDevice = () => {
+  return height < 700;
+};
+export {
+  horizontalScale,
+  verticalScale,
+  moderateScale,
+  getWindowSize,
+  isSmallHeightDevice,
+};
