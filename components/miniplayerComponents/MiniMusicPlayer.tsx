@@ -1,5 +1,10 @@
-import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
-import { Text } from "@/components/Themed";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Platform,
+  Text,
+} from "react-native";
 import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
 
 import { Portal } from "react-native-paper";

@@ -27,6 +27,21 @@ class UserManagementService {
       };
     }
   }
+
+  async deleteCurrentUser() {
+    try {
+      await Parse.Cloud.run("deleteCurrentUser");
+      return {
+        success: true,
+        message: "User deleted successfully",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
 }
 
 export const userManagementService = new UserManagementService();

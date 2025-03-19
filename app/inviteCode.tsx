@@ -69,7 +69,7 @@ const InviteCodePage = () => {
         );
 
         if (addUserResult.success) {
-          router.navigate("/(tabs)");
+          router.navigate("/(authenticated)/(tabs)");
         } else {
           Alert.alert("Error", "Failed to join the group");
         }

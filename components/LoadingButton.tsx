@@ -8,7 +8,6 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
-import { styles } from "@/shared/css/signinLoginCss";
 
 type LoadingButtonProps = {
   isLoading: boolean;

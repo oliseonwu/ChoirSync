@@ -1,5 +1,4 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "@/components/Themed";
+import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import React, { memo } from "react";
 import {
   moderateScale,

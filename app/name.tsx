@@ -10,6 +10,7 @@ import {
   Keyboard,
   Alert,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import React, { useState, useMemo } from "react";
 import {
@@ -19,7 +20,6 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { StatusBar } from "expo-status-bar";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import { authService } from "@/services/AuthService";
@@ -96,8 +96,6 @@ const NamePage = () => {
           { paddingTop: verticalScale(headerHeight) },
         ]}
       >
-        <StatusBar style="dark" />
-
         <View style={globalStyles.TopContainer}>
           <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
             Tell us about yourself

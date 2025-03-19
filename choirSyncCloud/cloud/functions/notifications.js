@@ -8,10 +8,13 @@
  */
 
 const { Expo } = require("expo-server-sdk");
-const { getGroupMembersPushTokens } = require("./groups");
+const {
+  getGroupMembersPushTokens,
+  getIdsOfGroupsWithRecentRecordings,
+} = require("./groups");
 const { deletePushTokens } = require("./token");
 const { NotificationErrors } = require("../utils/notificationErrors");
-const { sleep } = require("../utils/helpers");
+const { sleep, isPacificTimeDay } = require("../utils/helpers");
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
 });
@@ -87,6 +90,18 @@ async function sendGroupNotification(request) {
       errorReceipts,
       "receipt"
     );
+
+    console.log({
+      SentTo: okReceipts.length + " Users",
+      DidNotSendTo:
+        handlePushTicketsResult.failedCount +
+        handlePushReceiptResult.failedCount +
+        " Users",
+      FailedTickets: handlePushTicketsResult.failedCount + "",
+      ResolvedTickets: handlePushTicketsResult.resolvedCount + "",
+      FailedReceipts: handlePushReceiptResult.failedCount + "",
+      ResolvedReceipts: handlePushReceiptResult.resolvedCount + "",
+    });
 
     return {
       SentTo: okReceipts.length + " Users",
@@ -274,6 +289,66 @@ function logErrorList(error, errorHeading) {
     logError(errorHeading, err.code, err.message);
   }
 }
+
+/**
+ * Cloud job to notify group members about recent recordings
+ * Runs every Thursday and Friday at 5:00 PM
+ */
+Parse.Cloud.job("notifyRecentRecordings", async () => {
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setUTCHours(0, 0, 0, 0);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  // Check for Thursday (4) or Friday (5) in Pacific Time
+  if (!isPacificTimeDay([4, 5])) {
+    console.log(
+      "notifyRecentRecordings Job completed: Not the right day to run this job (Pacific Time)"
+    );
+    return {
+      success: true,
+      message: "Not the right day to run this job",
+    };
+  }
+
+  try {
+    const uniqueGroups = await getIdsOfGroupsWithRecentRecordings(oneWeekAgo);
+
+    if (uniqueGroups.length === 0) {
+      console.log(
+        "notifyRecentRecordings Job completed: No groups with recent recordings"
+      );
+      return {
+        success: true,
+        message: "No groups with recent recordings",
+      };
+    }
+
+    for (const groupId of uniqueGroups) {
+      const requestObject = {
+        params: {
+          groupId,
+          title: "Lets Practice!",
+          message: "Check out the recent recordings.",
+        },
+      };
+      sendGroupNotification(requestObject);
+      await sleep(10000);
+      // ... rest of notification logic
+    }
+
+    console.log("notifyRecentRecordings Job completed!");
+    return {
+      success: true,
+      message: "notifyRecentRecordings Job completed!",
+    };
+  } catch (error) {
+    console.error("notifyRecentRecordings Job failed:", error);
+    return {
+      success: false,
+      message: "notifyRecentRecordings Job failed",
+    };
+  }
+});
 
 module.exports = {
   sendGroupNotification,
