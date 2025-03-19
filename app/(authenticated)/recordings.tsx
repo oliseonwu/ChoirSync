@@ -13,23 +13,12 @@ import {
 } from "@/utilities/TrueScale";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { Recording } from "@/types/music.types";
 import SongItem from "@/components/SongItem";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
-import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-  useForeground,
-} from "react-native-google-mobile-ads";
+
 import AdComponent from "@/components/AdComponent";
 
 export default function RecordingsScreen() {
@@ -81,7 +70,7 @@ export default function RecordingsScreen() {
   const renderItem = useCallback(
     ({ item, index }: { item: Recording; index: number }) => (
       <SongItem
-        index={index}
+        index={index + 1}
         recording={item}
         currentSongDetailsSV={currentSongDetailsSV}
         changeCurrentTrack={changeCurrentTrack}

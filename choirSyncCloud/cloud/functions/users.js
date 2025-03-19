@@ -1,3 +1,27 @@
+// ROUTES
+
+/**
+ * Deletes the currently logged in user
+ * @returns {Promise<Object>} Result of deletion
+ */
+const deleteCurrentUser = async (request) => {
+  if (!request.user) {
+    throw new Error("Must be logged in to delete account");
+  }
+
+  try {
+    await request.user.destroy({ useMasterKey: true });
+    return {
+      success: true,
+      message: "User account deleted successfully",
+    };
+  } catch (error) {
+    throw new Error(`Failed to delete user: ${error.message}`);
+  }
+};
+
+// FUNCTIONS
+
 const updateUserField = async (userId, field, value) => {
   try {
     // Get user
@@ -120,6 +144,25 @@ const getUserByExpoPushToken = async (expoPushToken) => {
   return user;
 };
 
+//TRIGGER FUNCTIONS
+/**
+ * Trigger to clean up user data before deletion
+ * Automatically removes associated choir member records
+ */
+Parse.Cloud.beforeDelete(Parse.User, async (request) => {
+  const user = request.object;
+
+  const ChoirMembers = Parse.Object.extend("ChoirMembers");
+  const query = new Parse.Query(ChoirMembers);
+  query.equalTo("user_id", user.toPointer());
+
+  const memberRecord = await query.find({ useMasterKey: true });
+
+  if (memberRecord.length > 0) {
+    await Parse.Object.destroyAll(memberRecord, { useMasterKey: true });
+  }
+});
+
 module.exports = {
   updateUserField,
   updateUserFields,
@@ -127,4 +170,5 @@ module.exports = {
   getUserByExpoPushToken,
   fetchUsersByIds,
   updateMultipleUsers,
+  deleteCurrentUser,
 };

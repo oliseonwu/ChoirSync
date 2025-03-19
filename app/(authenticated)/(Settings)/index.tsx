@@ -1,5 +1,4 @@
-import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
-import { Text } from "@/components/Themed";
+import { StyleSheet, View, Alert, TouchableOpacity, Text } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import {
   horizontalScale,

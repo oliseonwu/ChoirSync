@@ -1,5 +1,4 @@
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { Text } from "@/components/Themed";
+import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import React, { memo, useMemo } from "react";
 import { Portal } from "react-native-paper";
 import Constants from "expo-constants";

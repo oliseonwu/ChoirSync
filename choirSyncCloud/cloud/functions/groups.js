@@ -60,7 +60,6 @@ async function getAllMembersOfGroup(groupId) {
  * @returns {Promise<Array<{
  * user: Pointer,
  * push_token: string,
- * installation_id: string
  * }>>} Array of push tokens
  *
  */
@@ -78,8 +77,38 @@ async function getGroupMembersPushTokens(groupId) {
   }
 }
 
+/**
+ * Gets groups that have recordings within the specified time period
+ * @param {Date} sinceDate - Get recordings since this date
+ * @returns {Promise<string[]>} Array of group IDs that have recent recordings
+ */
+async function getIdsOfGroupsWithRecentRecordings(sinceDate) {
+  try {
+    const Recording = Parse.Object.extend("Recordings");
+    const recordingQuery = new Parse.Query(Recording);
+    recordingQuery.greaterThanOrEqualTo("rehearsal_date", sinceDate);
+    recordingQuery.include("choir_group_id");
+
+    const recentRecordings = await recordingQuery.find({ useMasterKey: true });
+
+    // Get unique groups using Set and mapping
+    const uniqueGroupIds = [
+      ...new Set(
+        recentRecordings.map((recording) => recording.get("choir_group_id").id)
+      ),
+    ];
+
+    return uniqueGroupIds;
+  } catch (error) {
+    throw new Error(
+      `Failed to get groups with recent recordings: ${error.message}`
+    );
+  }
+}
+
 module.exports = {
   addUserToChoirGroup,
   getAllMembersOfGroup,
   getGroupMembersPushTokens,
+  getIdsOfGroupsWithRecentRecordings,
 };

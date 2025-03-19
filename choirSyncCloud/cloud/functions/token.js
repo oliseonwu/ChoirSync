@@ -43,7 +43,7 @@ async function deletePushToken(request) {
   const token = request.params.token;
   try {
     const pushTokenObject = await fetchPushTokenObject(userId, token);
-    await pushTokenObject.destroy();
+    await pushTokenObject.destroy({ useMasterKey: true });
     return { success: true, message: "Token deleted successfully" };
   } catch (error) {
     console.error("Error deleting push token: ", error);

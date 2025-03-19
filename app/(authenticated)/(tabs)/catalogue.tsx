@@ -1,5 +1,4 @@
-import { StyleSheet, ScrollView } from "react-native";
-import { Text, View } from "@/components/Themed";
+import { StyleSheet, ScrollView, Text, View } from "react-native";
 import SongListItem from "@/components/SongListItem";
 import { verticalScale, moderateScale } from "@/utilities/TrueScale";
 import React, {

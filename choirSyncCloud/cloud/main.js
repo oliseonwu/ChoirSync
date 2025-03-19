@@ -74,22 +74,17 @@ Parse.Cloud.define("deletePushToken", tokenFunctions.deletePushToken, {
   requireUser: true,
 });
 
-Parse.Cloud.define("test", async (request) => {
-  const { userId, installationId, pushToken } = request.params;
-  const result = await tokenFunctions.savePushToken(
-    userId,
-    installationId,
-    pushToken
-  );
+// Register user functions
+Parse.Cloud.define("deleteCurrentUser", userFunctions.deleteCurrentUser, {
+  requireUser: true,
+});
 
-  return result;
+Parse.Cloud.define("test", async (request) => {
+  // const { userId, installationId, pushToken } = request.params;
 });
 
 Parse.Cloud.define("test2", async (request) => {
-  const pushTokens =
-    await groupFunctions.getGroupMembersPushTokens("2DDTYeG6X6");
-
-  return pushTokens;
+  return "Still Running";
 });
 
 Parse.Cloud.define("test3", async (request) => {});

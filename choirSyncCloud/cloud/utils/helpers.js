@@ -77,10 +77,26 @@ async function retryWithBackoff(callback, options = {}) {
   }
 }
 
+/**
+ * Checks if current time is a specific day in Pacific Time
+ * @param {number[]} validDays - Array of valid days (0-6, where 0 is Sunday)
+ * @returns {boolean} True if current Pacific day is in validDays
+ */
+function isPacificTimeDay(validDays) {
+  const pacificTime = new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles",
+    })
+  );
+  const pacificDay = pacificTime.getDay();
+  return validDays.includes(pacificDay);
+}
+
 module.exports = {
   pointer,
   sleep,
   random_between,
   returnMin,
   retryWithBackoff,
+  isPacificTimeDay,
 };

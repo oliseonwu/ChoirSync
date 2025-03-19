@@ -24,22 +24,13 @@ import Constants from "expo-constants";
 import CustomHeaderComponent from "@/components/CustomHeaderComponent";
 import { useUser } from "@/contexts/UserContext";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { StatusBar } from "expo-status-bar";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
-  const headerAndStatusBarHeight = useHeaderHeight();
-  const headingContainerHeight =
-    headerAndStatusBarHeight - Constants.statusBarHeight;
-  const bottomOffset = tabBarHeight + getWindowSize().height * 0.075;
-  const { getCurrentUserData } = useUser();
-  const userData = getCurrentUserData();
+  // We must call this to setup the push notifications on the device
   const { expoPushToken, notification } = usePushNotifications();
-
-  const data = JSON.stringify(notification, undefined, 2);
-
-  // console.log("data", data);
-  // console.log("expoPushToken", expoPushToken);
 
   useEffect(() => {
     showPlayer();
@@ -47,6 +38,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.Container]}>
+      <StatusBar style="dark" />
       {/* <CustomHeaderComponent>
         <View style={styles.headerContainer}>
           <View style={styles.invisibleBox}></View>

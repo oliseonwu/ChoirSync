@@ -184,7 +184,7 @@ class AuthService {
       return router.navigate("/name");
     }
     return userStatus.isMemberOfAnyChoir
-      ? router.navigate("/(tabs)")
+      ? router.navigate("/(authenticated)/(tabs)")
       : router.navigate("/chooseYourPath");
   };
 

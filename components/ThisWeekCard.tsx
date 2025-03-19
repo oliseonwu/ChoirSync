@@ -1,6 +1,5 @@
 import React, { memo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Text } from "@/components/Themed";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import {
   moderateScale,
   horizontalScale,

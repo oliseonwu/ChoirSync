@@ -5,88 +5,29 @@ import LandingPageImage from "../assets/images/landing-Page.png";
 import {
   horizontalScale,
   moderateScale,
-  verticalScale,
   getWindowSize,
 } from "@/utilities/TrueScale";
-import { StatusBar } from "expo-status-bar";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import { googleAuthService } from "@/services/GoogleAuthService";
-import { authService, UserStatus } from "@/services/AuthService";
-import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
-import { useLoading } from "@/contexts/LoadingContext";
-import { useUser } from "@/contexts/UserContext";
 
+import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
+
+import { useAuth } from "@/hooks/useAuth";
+import { StatusBar } from "expo-status-bar";
 export default function LandingPage() {
-  const { showLoading, hideLoading } = useLoading();
-  const { updateCurrentUserData } = useUser();
-  const [statusBarStyle, setStatusBarStyle] = useState<"dark" | "light">(
-    "light"
-  );
+  const { attemptToLogin, handleLogin } = useAuth();
   const windowHeight = getWindowSize().height;
   console.log("windowHeight", windowHeight);
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
+
     attemptToLogin();
   }, []);
 
-  const attemptToLogin = async () => {
-    showLoading();
-    const currentUser = await authService.getCurrentUser();
-    let userStatus: UserStatus;
-
-    try {
-      if (currentUser) {
-        userStatus = await authService.getUserStatus(currentUser);
-        updateCurrentUserData(
-          currentUser.get("firstName"),
-          currentUser.get("lastName"),
-          currentUser.get("email"),
-          currentUser.get("profileUrl")
-        );
-        setStatusBarStyle("dark");
-        authService.navigateBasedOnUserStatus(userStatus);
-      }
-    } catch (error: any) {
-      console.log("error attempting to login", error);
-
-      if (error.message === "Invalid session token") {
-        await authService.logout();
-      }
-      hideLoading();
-    }
-    hideLoading();
-  };
-
-  const handleLogin = async () => {
-    showLoading();
-    let loginResponse = null;
-    let userStatus;
-
-    try {
-      loginResponse = await authService.loginWithGoogle();
-      if (loginResponse.success) {
-        userStatus = await authService.getUserStatus(loginResponse.user!);
-        updateCurrentUserData(
-          loginResponse.user!.get("firstName"),
-          loginResponse.user!.get("lastName"),
-          loginResponse.user!.get("email"),
-          loginResponse.user!.get("profileUrl")
-        );
-        setStatusBarStyle("dark");
-
-        authService.navigateBasedOnUserStatus(userStatus);
-      }
-    } catch (error: any) {
-      console.log("error", error.message);
-    }
-
-    hideLoading();
-  };
-
   return (
     <View style={styles.MainContainer}>
-      <StatusBar style={statusBarStyle} />
+      <StatusBar style="light" />
       <View style={styles.TopContainer}>
         <Image
           style={styles.LandingPageImage}
@@ -105,30 +46,11 @@ export default function LandingPage() {
           {"This app is designed for choir groups, providing easy" +
             " access to rehearsal recordings for their choir members."}
         </Text>
-
-        {/* <View style={styles.BtnRowContainer}>
-          <TouchableOpacity
-            style={[styles.Btn, styles.btnHollow]}
-            onPress={handleLogin}
-          >
-            <Text style={[styles.btnText, { color: "#313234" }]}>Login</Text>
-          </TouchableOpacity>
-
-          <View style={styles.HorizontalSpaceView}></View>
-
-          <TouchableOpacity
-            style={[styles.Btn, styles.BtnBlack]}
-            onPress={() => router.navigate("/signUp/signUpOptions")}
-          >
-            <Text style={[styles.btnText, { color: "#ffff" }]}>
-              Get Started
-            </Text>
-          </TouchableOpacity>
-        </View> */}
-        {/* <View style={styles.flexContainer}></View> */}
         <TouchableOpacity
           style={styles.googleBtnContainer}
-          onPress={handleLogin}
+          onPress={() => {
+            handleLogin();
+          }}
         >
           <SignInWithGoogleBtn
             width={horizontalScale(230)}
@@ -206,7 +128,7 @@ const styles = StyleSheet.create({
   },
   googleBtnContainer: {
     marginTop: "14%",
-    marginBottom: "18%",
+    marginBottom: "16%",
     alignItems: "center",
   },
 });

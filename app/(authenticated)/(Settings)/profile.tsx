@@ -12,11 +12,22 @@ import MenuItemOne from "@/components/MenuItemOne";
 import { router } from "expo-router";
 
 import { useUser } from "@/contexts/UserContext";
-
+import { userManagementService } from "@/services/UserManagementService";
+import { useAuth } from "@/hooks/useAuth";
 const { height, width } = getWindowSize();
 export default function Profile() {
   const { getCurrentUserData } = useUser();
   const currentUserData = getCurrentUserData();
+  const { performLogout } = useAuth();
+
+  const deleteUser = async () => {
+    const result = await userManagementService.deleteCurrentUser();
+    if (result.success) {
+      performLogout();
+    } else {
+      console.log("Error", result.error);
+    }
+  };
 
   return (
     <View style={[globalStyles.container, { paddingTop: height * 0.05 }]}>
@@ -61,7 +72,12 @@ export default function Profile() {
         />
       </View>
       <View style={{ flex: 1 }} />
-      <TouchableOpacity style={[styles.logoutButton]}>
+      <TouchableOpacity
+        style={[styles.logoutButton]}
+        onPress={() => {
+          deleteUser();
+        }}
+      >
         <Text style={styles.logoutText}>Delete Account</Text>
       </TouchableOpacity>
     </View>

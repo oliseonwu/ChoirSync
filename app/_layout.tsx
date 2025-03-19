@@ -34,6 +34,7 @@ import mobileAds, {
   AdsConsent,
   AdsConsentDebugGeography,
 } from "react-native-google-mobile-ads";
+import { StatusBarProvider } from "@/contexts/StatusBarContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -171,177 +172,177 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider>
-      <AppStateProvider>
-        <LoadingProvider>
-          <UserProvider>
-            <WebViewProvider>
-              <RecordingsProvider>
-                <CurrentTrackProvider>
-                  <NowPlayingProvider>
-                    <NowPlayingComponent />
-                    <Stack>
-                      {/* Public routes */}
-                      <Stack.Screen
-                        name="index"
-                        options={{ headerShown: false }}
-                      />
+      <StatusBarProvider>
+        <AppStateProvider>
+          <LoadingProvider>
+            <UserProvider>
+              <WebViewProvider>
+                <RecordingsProvider>
+                  <CurrentTrackProvider>
+                    <NowPlayingProvider>
+                      <NowPlayingComponent />
+                      <Stack>
+                        {/* Public routes */}
+                        <Stack.Screen
+                          name="index"
+                          options={{ headerShown: false }}
+                        />
 
-                      <Stack.Screen
-                        name="name"
-                        options={{
-                          animation: "none",
-                          headerTransparent: true,
-                          headerTitle: "",
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => (
-                            <BackButtonComponent style={styles2.BackButton} />
-                          ),
-                        }}
-                      />
+                        <Stack.Screen
+                          name="name"
+                          options={{
+                            animation: "none",
+                            headerTransparent: true,
+                            headerTitle: "",
+                            headerBackButtonDisplayMode: "minimal",
+                            headerBackVisible: false,
+                          }}
+                        />
 
-                      <Stack.Screen
-                        name="chooseYourPath"
-                        options={{
-                          animation: "none",
-                          headerTransparent: true,
-                          headerTitle: "",
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => (
-                            <BackButtonComponent style={styles2.BackButton} />
-                          ),
-                        }}
-                      />
+                        <Stack.Screen
+                          name="chooseYourPath"
+                          options={{
+                            animation: "none",
+                            headerTransparent: true,
+                            headerTitle: "",
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => (
+                              <BackButtonComponent style={styles2.BackButton} />
+                            ),
+                          }}
+                        />
 
-                      <Stack.Screen
-                        name="chooseYourGroup"
-                        options={{
-                          animation: "none",
-                          headerTransparent: true,
-                          headerTitle: "",
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => (
-                            <BackButtonComponent style={styles2.BackButton} />
-                          ),
-                        }}
-                      />
+                        <Stack.Screen
+                          name="chooseYourGroup"
+                          options={{
+                            animation: "none",
+                            headerTransparent: true,
+                            headerTitle: "",
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => (
+                              <BackButtonComponent style={styles2.BackButton} />
+                            ),
+                          }}
+                        />
 
-                      <Stack.Screen
-                        name="inviteCode"
-                        options={{
-                          animation: "none",
-                          headerTransparent: true,
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => (
-                            <BackButtonComponent style={styles2.BackButton} />
-                          ),
-                        }}
-                      />
+                        <Stack.Screen
+                          name="inviteCode"
+                          options={{
+                            animation: "none",
+                            headerTransparent: true,
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => (
+                              <BackButtonComponent style={styles2.BackButton} />
+                            ),
+                          }}
+                        />
 
-                      {/* Authenticated routes */}
-                      <Stack.Screen
-                        name="(authenticated)/(tabs)"
-                        options={{
-                          headerShown: false,
-                          animation: "none",
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(authenticated)/(Settings)/index"
-                        options={{
-                          headerShown: true,
-                          animation: "fade",
-                          headerTitle: "Settings",
-                          headerTitleAlign: "center",
-                          headerTitleStyle: styles.headerTitle,
-                          headerShadowVisible: false,
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => <BackButtonComponent />,
+                        {/* Authenticated routes */}
+                        <Stack.Screen
+                          name="(authenticated)/(tabs)"
+                          options={{
+                            headerShown: false,
+                            animation: "none",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(authenticated)/(Settings)/index"
+                          options={{
+                            headerShown: true,
+                            animation: "slide_from_right",
+                            headerTitle: "Settings",
+                            headerTitleAlign: "center",
+                            headerTitleStyle: styles.headerTitle,
+                            headerShadowVisible: false,
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => <BackButtonComponent />,
 
-                          headerRight: () => (
-                            <HeaderProfileImage
-                              disabled={true}
-                              onPress={() => null}
-                              marginRight={0}
-                              marginLeft={0}
-                            />
-                          ),
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(authenticated)/(Settings)/profile"
-                        options={{
-                          headerShown: true,
-                          animation: "fade",
-                          headerTitle: "Account profile",
-                          headerTitleAlign: "center",
-                          headerTitleStyle: styles.headerTitle,
-                          headerShadowVisible: false,
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => <BackButtonComponent />,
-                          headerRight: () => (
-                            <HeaderProfileImage
-                              disabled={true}
-                              onPress={() => null}
-                              marginRight={0}
-                              marginLeft={0}
-                            />
-                          ),
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(authenticated)/(Settings)/editUser"
-                        options={{
-                          animation: "none",
-                          headerTransparent: true,
-                          headerTitle: "",
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => (
-                            <BackButtonComponent style={styles2.BackButton} />
-                          ),
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(authenticated)/(Settings)/notifications"
-                        options={{
-                          headerShown: true,
-                          animation: "fade",
-                          headerTitle: "Notifications",
-                          headerTitleAlign: "center",
-                          headerTitleStyle: styles.headerTitle,
-                          headerShadowVisible: false,
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => <BackButtonComponent />,
-                          headerRight: () => (
-                            <HeaderProfileImage
-                              disabled={true}
-                              onPress={() => null}
-                              marginRight={0}
-                              marginLeft={0}
-                            />
-                          ),
-                        }}
-                      />
-                      <Stack.Screen
-                        name="(authenticated)/recordings"
-                        options={{
-                          headerShown: true,
-                          animation: "fade",
-                          headerTitle: "This Week's Recordings",
-                          headerTitleAlign: "center",
-                          headerTitleStyle: styles.smallHeaderTitle,
-                          headerShadowVisible: false,
-                          headerBackButtonDisplayMode: "minimal",
-                          headerLeft: () => <BackButtonComponent />,
-                        }}
-                      />
-                    </Stack>
-                  </NowPlayingProvider>
-                </CurrentTrackProvider>
-              </RecordingsProvider>
-            </WebViewProvider>
-          </UserProvider>
-        </LoadingProvider>
-      </AppStateProvider>
+                            headerRight: () => (
+                              <HeaderProfileImage
+                                disabled={true}
+                                onPress={() => null}
+                                marginRight={0}
+                                marginLeft={0}
+                              />
+                            ),
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(authenticated)/(Settings)/profile"
+                          options={{
+                            headerShown: true,
+                            animation: "none",
+                            headerTitle: "Account profile",
+                            headerTitleAlign: "center",
+                            headerTitleStyle: styles.headerTitle,
+                            headerShadowVisible: false,
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => <BackButtonComponent />,
+                            headerRight: () => (
+                              <HeaderProfileImage
+                                disabled={true}
+                                onPress={() => null}
+                                marginRight={0}
+                                marginLeft={0}
+                              />
+                            ),
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(authenticated)/(Settings)/editUser"
+                          options={{
+                            animation: "none",
+                            headerTransparent: true,
+                            headerTitle: "",
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => (
+                              <BackButtonComponent style={styles2.BackButton} />
+                            ),
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(authenticated)/(Settings)/notifications"
+                          options={{
+                            headerShown: true,
+                            animation: "none",
+                            headerTitle: "Notifications",
+                            headerTitleAlign: "center",
+                            headerTitleStyle: styles.headerTitle,
+                            headerShadowVisible: false,
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => <BackButtonComponent />,
+                            headerRight: () => (
+                              <HeaderProfileImage
+                                disabled={true}
+                                onPress={() => null}
+                                marginRight={0}
+                                marginLeft={0}
+                              />
+                            ),
+                          }}
+                        />
+                        <Stack.Screen
+                          name="(authenticated)/recordings"
+                          options={{
+                            headerShown: true,
+                            animation: "slide_from_right",
+                            headerTitle: "This Week's Recordings",
+                            headerTitleAlign: "center",
+                            headerTitleStyle: styles.smallHeaderTitle,
+                            headerShadowVisible: false,
+                            headerBackButtonDisplayMode: "minimal",
+                            headerLeft: () => <BackButtonComponent />,
+                          }}
+                        />
+                      </Stack>
+                    </NowPlayingProvider>
+                  </CurrentTrackProvider>
+                </RecordingsProvider>
+              </WebViewProvider>
+            </UserProvider>
+          </LoadingProvider>
+        </AppStateProvider>
+      </StatusBarProvider>
     </PaperProvider>
   );
 }

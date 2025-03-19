@@ -8,14 +8,8 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import {
-  getWindowSize,
-  horizontalScale,
-  moderateScale,
-  verticalScale,
-} from "@/utilities/TrueScale";
+import { verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { StatusBar } from "expo-status-bar";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { router } from "expo-router";
 import LabeledCard from "@/components/LabeledCard";
@@ -32,8 +26,6 @@ const ChooseYourPath = () => {
         { paddingTop: verticalScale(headerHeight) },
       ]}
     >
-      <StatusBar style="dark" />
-
       <View style={globalStyles.TopContainer}>
         <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
           Choose Your Path
