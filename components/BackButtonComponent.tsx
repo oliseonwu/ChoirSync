@@ -20,6 +20,7 @@ const BackButtonComponent = ({
       onPress={router.back}
       disabled={isLoading}
       style={[{ opacity: isLoading ? 0.5 : 1 }, style]}
+      hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
     >
       <BackButton style={styles.backButton} />
     </TouchableOpacity>
