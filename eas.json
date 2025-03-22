@@ -10,27 +10,37 @@
       "env": {
         "ANDROID_HOME": "/Users/olisemeduaonwuatogwu/Library/Android/sdk",
         "ANDROID_NDK_HOME": "/Users/olisemeduaonwuatogwu/Library/Android/sdk/ndk"
-      }
+      },
+      "environment": "development",
+      "channel": "development"
     },
     "development-IOS": {
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
         "simulator": true
-      }
+      },
+      "environment": "development",
+      "channel": "development"
     },
     "development-IOS-physical": {
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
         "simulator": false
-      }
+      },
+      "environment": "development",
+      "channel": "development"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "environment": "preview",
+      "channel": "preview"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "environment": "production",
+      "channel": "production"
     }
   },
   "submit": {

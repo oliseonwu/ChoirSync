@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "exp+choirsync",
     "userInterfaceStyle": "automatic",
-    
     "platforms": [
       "ios",
       "android"
@@ -20,6 +19,9 @@
       },
       "icon": {
         "light": "./assets/images/icon-light-ios.png"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "android": {
@@ -28,7 +30,11 @@
         "backgroundColor": "#FCF5F3"
       },
       "package": "com.olise.ChoirSync",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID",
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +48,6 @@
         {
           "backgroundColor": "#FFf",
           "image": "./assets/images/splash-icon-light.png",
-          
           "imageWidth": 200
         }
       ],
@@ -126,6 +131,12 @@
       "eas": {
         "projectId": "2c946f2e-0cec-4c9b-8999-cf6754225145"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2c946f2e-0cec-4c9b-8999-cf6754225145"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

@@ -16,8 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { StatusBar } from "expo-status-bar";
 export default function LandingPage() {
   const { attemptToLogin, handleLogin } = useAuth();
-  const windowHeight = getWindowSize().height;
-  console.log("windowHeight", windowHeight);
+
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();

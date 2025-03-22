@@ -79,6 +79,7 @@ export function NowPlayingComponent() {
         height={verticalScale(25)}
         width={horizontalScale(22)}
         fill={"#313234"}
+        hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
       />
     ),
     []

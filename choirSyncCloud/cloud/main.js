@@ -13,8 +13,10 @@ const groupFunctions = require("./functions/groups");
 const notificationFunctions = require("./functions/notifications");
 const userFunctions = require("./functions/users");
 const tokenFunctions = require("./functions/token");
+const recordingsFunctions = require("./functions/recordings");
 const helpers = require("./utils/helpers");
 const { Expo } = require("expo-server-sdk");
+
 // Register invite functions
 Parse.Cloud.define(
   "regenerateInviteCode",
@@ -77,6 +79,40 @@ Parse.Cloud.define("deletePushToken", tokenFunctions.deletePushToken, {
 // Register user functions
 Parse.Cloud.define("deleteCurrentUser", userFunctions.deleteCurrentUser, {
   requireUser: true,
+});
+
+// Register recording functions
+Parse.Cloud.define("uploadRecordings", recordingsFunctions.uploadRecordings, {
+  fields: {
+    choirGroupId: {
+      type: String,
+      required: true,
+    },
+    rehearsalDate: {
+      type: String,
+      required: true,
+    },
+    recordingData: {
+      type: Object,
+      required: true,
+      options: (val) =>
+        Object.values(val).every(
+          (item) =>
+            typeof item.name === "string" &&
+            typeof item.url === "string" &&
+            typeof item.singerName === "string" &&
+            typeof item.rehearsalDate === "string" &&
+            typeof item.categoryId === "string"
+        ),
+      error: "Cloud function error: Invalid recording data",
+    },
+    notify: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  requireMaster: true,
 });
 
 Parse.Cloud.define("test", async (request) => {
