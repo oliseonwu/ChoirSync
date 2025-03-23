@@ -61,6 +61,41 @@ async function uploadRecordings(request) {
   }
 }
 
+/**
+ * Fetches recordings from the Recordings table
+ * @param {Object} request Request object
+ * @param {string} request.params.groupId ID of the choir group
+ * @param {number} request.params.page Page number for pagination
+ * @param {number} request.params.limit Number of recordings to fetch per page
+ * @returns {Object} Object containing success status, message, count, and recordings
+ */
+async function fetchRecordings(request) {
+  const { groupId, page, limit } = request.params;
+  const LIMIT = limit || 20;
+  const skip = (page - 1) * LIMIT;
+  const Recordings = Parse.Object.extend("Recordings");
+  const query = new Parse.Query(Recordings);
+
+  try {
+    query.equalTo("choir_group_id", pointer(groupId, "ChoirGroups"));
+    query.skip(skip);
+    query.limit(LIMIT);
+    const recordings = await query.find({ useMasterKey: true });
+    return {
+      success: true,
+      message: `Successfully fetched ${recordings.length} recordings`,
+      count: recordings.length,
+      recordings: recordings,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Failed to fetch recordings: ${error.message}`,
+    };
+  }
+}
+
 module.exports = {
   uploadRecordings,
+  fetchRecordings,
 };

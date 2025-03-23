@@ -117,6 +117,8 @@ Parse.Cloud.define("uploadRecordings", recordingsFunctions.uploadRecordings, {
 
 Parse.Cloud.define("test", async (request) => {
   // const { userId, installationId, pushToken } = request.params;
+  const recordings = await recordingsFunctions.fetchRecordings(request);
+  return recordings;
 });
 
 Parse.Cloud.define("test2", async (request) => {
