@@ -21,11 +21,16 @@ const expo = new Expo({
 
 // Send notification to a choir group
 /**
- *
- * @param {*} request
- * @returns
+ * Send a notification to a group
+ * @param {object} request - The request object
+ * @param {string} request.params.groupId - The group ID
+ * @param {string} request.params.title - The title of the notification
+ * @param {string} request.params.message - The message of the notification
+ * @returns {Promise<object>} A promise that resolves to an object containing:
+ *   - SentTo: number - The number of users that received the notification
+ *   - DidNotSendTo: number - The number of users that did not receive the notification
+ *   - FailedTickets: number - The number of tickets that failed
  */
-
 async function sendGroupNotification(request) {
   const { groupId, title, message } = request.params;
   const data = {};
@@ -346,6 +351,35 @@ Parse.Cloud.job("notifyRecentRecordings", async () => {
     return {
       success: false,
       message: "notifyRecentRecordings Job failed",
+    };
+  }
+});
+
+/**
+ * Cloud job to notify group members about recent recordings
+ * Runs every Thursday and Friday at 5:00 PM
+ */
+Parse.Cloud.job("testNotify", async () => {
+  try {
+    const requestObject = {
+      params: {
+        groupId: "2DDTYeG6X6",
+        title: "Test Notification",
+        message: "This is a test notification.",
+      },
+    };
+    sendGroupNotification(requestObject);
+
+    console.log("testNotify Job completed!");
+    return {
+      success: true,
+      message: "testNotify Job completed!",
+    };
+  } catch (error) {
+    console.error("testNotify Job failed:", error);
+    return {
+      success: false,
+      message: "testNotify Job failed",
     };
   }
 });

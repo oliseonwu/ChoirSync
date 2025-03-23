@@ -40,8 +40,8 @@ const ThisWeekCard: React.FC<ThisWeekCardProps> = ({
 
       <View style={styles.TitleContainer}>
         <Text style={styles.title}>{title}</Text>
-        {showDot && <View style={styles.dot} />}
       </View>
+      {showDot && <View style={styles.dot} />}
     </TouchableOpacity>
   );
 };
@@ -50,16 +50,19 @@ const styles = StyleSheet.create({
   container: {
     height: horizontalScale(58),
     width: horizontalScale(190),
+    padding: moderateScale(1),
     flexDirection: "row",
     backgroundColor: "#F5F5F5",
     borderRadius: moderateScale(6),
+    borderWidth: moderateScale(0.5),
+    borderColor: "#E6E9E8",
+    alignItems: "center",
   },
   iconContainer: {
     width: horizontalScale(58),
     height: "100%",
     marginRight: horizontalScale(10.67),
     // backgroundColor: "red",
-    borderRadius: moderateScale(6),
   },
   icon: {
     width: "100%",
@@ -74,18 +77,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     // backgroundColor: "blue",
   },
+  title: {
+    fontSize: moderateScale(14),
+    fontFamily: "Inter-SemiBold",
+    // width: "72%",
+    color: "#3E3C48",
+  },
   dot: {
     marginLeft: moderateScale(8.63),
     padding: moderateScale(3.24),
     backgroundColor: "#FF3B30",
     borderRadius: moderateScale(4),
     marginRight: moderateScale(8.63),
-  },
-  title: {
-    fontSize: moderateScale(14),
-    fontFamily: "Inter-SemiBold",
-    width: "70%",
-    color: "#3E3C48",
   },
 });
 

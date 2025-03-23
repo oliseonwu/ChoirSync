@@ -18,6 +18,7 @@ import { MiniPlayerProvider } from "@/contexts/MiniPlayerContext";
 import { PaperProvider } from "react-native-paper";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
+import { PlatformPressable } from "@react-navigation/elements";
 
 export default function TabLayout() {
   const navigation = useNavigation();
@@ -50,8 +51,12 @@ export default function TabLayout() {
           screenOptions={{
             tabBarActiveTintColor: "#8F8F8F",
             tabBarInactiveTintColor: "#C2C2C2",
-            // Disable the static render of the header on web
-            // to prevent a hydration error in React Navigation v6.
+            tabBarButton: (props) => (
+              <PlatformPressable
+                {...props}
+                android_ripple={{ color: "transparent" }} // Disables the ripple effect for Android
+              />
+            ),
             headerShown: false,
             tabBarLabelStyle: {
               fontFamily: "Inter-Medium",

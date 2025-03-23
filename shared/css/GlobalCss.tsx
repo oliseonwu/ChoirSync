@@ -68,4 +68,10 @@ export const globalStyles = StyleSheet.create({
     fontSize: moderateScale(16),
     fontFamily: "Inter-Regular",
   },
+  heading1: {
+    fontSize: moderateScale(20),
+    fontFamily: "Inter-Medium",
+    color: "#3E3C48",
+    marginBottom: verticalScale(26),
+  },
 });

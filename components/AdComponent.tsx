@@ -11,9 +11,30 @@ import {
 
 import { StyleSheet, View } from "react-native";
 import React from "react";
-import { verticalScale } from "@/utilities/TrueScale";
+import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 
-export default function AdComponent() {
+type AdComponentProps = {
+  paddingVertical?: number;
+  paddingHorizontal?: number;
+  borderRadius?: number;
+  borderLeftWidth?: number;
+  borderRightWidth?: number;
+  borderTopWidth?: number;
+  borderBottomWidth?: number;
+  borderColor?: string;
+  backgroundColor?: string;
+};
+
+const AdComponent: React.FC<AdComponentProps> = ({
+  paddingVertical = verticalScale(8),
+  borderRadius = 0,
+  borderLeftWidth = 0,
+  borderRightWidth = 0,
+  borderTopWidth = 0,
+  borderBottomWidth = moderateScale(0.5),
+  borderColor = "#E6E9E8",
+  backgroundColor = "#FAFAFA",
+}) => {
   // const adUnitId = __DEV__
   //   ? TestIds.ADAPTIVE_BANNER
   //   : Platform.OS === "ios"
@@ -57,12 +78,28 @@ export default function AdComponent() {
   if (!canShowAds) return null;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingVertical,
+          borderRadius,
+          borderLeftWidth,
+          borderRightWidth,
+          borderTopWidth,
+          borderBottomWidth,
+          borderColor,
+          backgroundColor,
+        },
+      ]}
+    >
       {/* <Text>{status}</Text> */}
       <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.BANNER} />
     </View>
   );
-}
+};
+
+export default AdComponent;
 
 const styles = StyleSheet.create({
   container: {
