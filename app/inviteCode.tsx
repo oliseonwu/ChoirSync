@@ -20,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import LoadingButton from "@/components/LoadingButton";
 import { inviteCodeService } from "@/services/InviteCodeService";
 import Parse from "@/services/Parse";
-
+import { useUser } from "@/contexts/UserContext";
 const InviteCodePage = () => {
   const headerHeight = useHeaderHeight();
   const { groupName, groupId } = useLocalSearchParams<{
@@ -30,7 +30,7 @@ const InviteCodePage = () => {
   const navigation = useNavigation();
   const [inviteCode, setInviteCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const userContext = useUser();
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: groupName || "",
@@ -69,6 +69,13 @@ const InviteCodePage = () => {
         );
 
         if (addUserResult.success) {
+          userContext.updateCurrentUserData(
+            currentUser.get("firstName"),
+            currentUser.get("lastName"),
+            currentUser.get("email"),
+            currentUser.get("profileUrl"),
+            groupId
+          );
           router.navigate("/(authenticated)/(tabs)");
         } else {
           Alert.alert("Error", "Failed to join the group");

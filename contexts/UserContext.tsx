@@ -6,6 +6,7 @@ type UserData = {
   lastName: string | null;
   email: string | null;
   profileImageUrl: string | null;
+  groupId: string | null;
 };
 
 type UserContextType = {
@@ -15,7 +16,8 @@ type UserContextType = {
     firstName: string,
     lastName: string,
     email: string,
-    profileImageUrl: string
+    profileImageUrl: string,
+    groupId: string
   ) => void;
 };
 
@@ -24,6 +26,7 @@ const initialUserData: UserData = {
   lastName: "",
   email: "",
   profileImageUrl: "",
+  groupId: "",
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -37,13 +40,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       firstName: string,
       lastName: string,
       email: string,
-      profileImageUrl: string
+      profileImageUrl: string,
+      groupId: string
     ) => {
       setCurrentUserData({
         firstName: firstName,
         lastName: lastName,
         email: email,
         profileImageUrl: profileImageUrl,
+        groupId: groupId,
       });
     },
     [currentUserData]

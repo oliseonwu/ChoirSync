@@ -20,6 +20,7 @@ import { useRecordings } from "@/contexts/RecordingsContext";
 import { FlashList } from "@shopify/flash-list";
 import { SongItem } from "@/components/SongItem";
 import AdComponent from "@/components/AdComponent";
+import { useAuth } from "@/hooks/useAuth";
 
 enum ItemType {
   DATE_AND_SONG = "DateAndSong",
@@ -32,12 +33,13 @@ export default function CatalogueScreen() {
   const { changeCurrentTrack, currentSongDetailsSV } = useCurrentTrack();
   const { openPlayer } = useNowPlayingContext();
   const { recordings, isLoading, fetchRecordings } = useRecordings();
-
+  const { logoutIfNotFullyAuthenticated } = useAuth();
   useEffect(() => {
-    if (recordings.length === 0) {
+    // if (recordings.length === 0) {
+    logoutIfNotFullyAuthenticated().then(() => {
       fetchRecordings();
-    }
-  }, [recordings]);
+    });
+  }, []);
 
   const renderItem = useCallback(
     ({ item, index }: { item: Recording; index: number }) => {

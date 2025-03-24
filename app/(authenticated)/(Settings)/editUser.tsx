@@ -34,7 +34,7 @@ const EditUserPage = () => {
   const params = useLocalSearchParams<EditUserParams>();
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useLoadingState(false);
-  const { updateCurrentUserData } = useUser();
+  const { updateCurrentUserData, getCurrentUserData } = useUser();
   const isFormValid = useMemo(() => {
     return name.trim().length >= 1;
   }, [name]);
@@ -62,7 +62,8 @@ const EditUserPage = () => {
       currentUser?.get("firstName"),
       currentUser?.get("lastName"),
       currentUser?.get("email"),
-      currentUser?.get("profileUrl")
+      currentUser?.get("profileUrl"),
+      getCurrentUserData().groupId || ""
     );
 
     setIsLoading(false);

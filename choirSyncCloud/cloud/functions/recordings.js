@@ -1,5 +1,8 @@
 const { pointer } = require("../utils/helpers");
 const { sendGroupNotification } = require("./notifications");
+
+// ROUTES
+
 /**
  * Uploads YouTube recording references to the Recordings table
  * @param {Object} request Request object
@@ -65,22 +68,35 @@ async function uploadRecordings(request) {
  * Fetches recordings from the Recordings table
  * @param {Object} request Request object
  * @param {string} request.params.groupId ID of the choir group
- * @param {number} request.params.page Page number for pagination
+ * @param {number} request.params.page Page number for pagination(starts at page 1)
  * @param {number} request.params.limit Number of recordings to fetch per page
- * @returns {Object} Object containing success status, message, count, and recordings
+ * @param {boolean} request.params.returnInClientFormat Whether to return the recordings in the format the client expects
+ * @returns {Object} Object containing:
+ *   - success: boolean - Whether the recordings were fetched successfully
+ *   - message: string - A message describing the result of the operation
+ *   - count: number - The number of recordings fetched
+ *   - recordings: Object[] - An array of objects containing recording details
  */
 async function fetchRecordings(request) {
-  const { groupId, page, limit } = request.params;
-  const LIMIT = limit || 20;
-  const skip = (page - 1) * LIMIT;
+  const { groupId, page, limit, returnInClientFormat } = request.params;
+
+  const skip = (page - 1) * limit;
   const Recordings = Parse.Object.extend("Recordings");
   const query = new Parse.Query(Recordings);
+  let recordings;
 
   try {
     query.equalTo("choir_group_id", pointer(groupId, "ChoirGroups"));
+    query.descending("rehearsal_date");
     query.skip(skip);
-    query.limit(LIMIT);
-    const recordings = await query.find({ useMasterKey: true });
+    query.limit(limit);
+
+    recordings = await query.find({ useMasterKey: true });
+
+    if (returnInClientFormat) {
+      recordings = toClientFormat(recordings, page);
+    }
+
     return {
       success: true,
       message: `Successfully fetched ${recordings.length} recordings`,
@@ -93,6 +109,44 @@ async function fetchRecordings(request) {
       message: `Failed to fetch recordings: ${error.message}`,
     };
   }
+}
+
+// FUNCTIONS
+
+/**
+ * Converts an array of DB recording objects to the format the client expects
+ * @param {Parse.Object[]} recordings Recording objects
+ * @param {number} page Page number for the paginated recordings. Defaults to 1. Used while determining if a recording is the first rehearsal recording
+ * @returns {Object[]} Array of objects containing:
+ *   - id: string - The recording's objectId
+ *   - name: string - The recording's name
+ *   - singerName: string - The recording's singer name
+ *   - channel: string - The recording's channel
+ *   - link: string - The recording's link
+ *   - file: Parse.File - The recording's file
+ *   - isMultiTracked: boolean - Whether the recording is multi-tracked
+ *   - rehearsalDate: Date - The recording's rehearsal date
+ *   - categoryId: string - The recording's category id
+ *   - choirGroupId: string - The recording's choir group id
+ *   - isFirstRehearsalRecording: boolean - Whether the recording is the first rehearsal recording for the rehearsal date
+ */
+function toClientFormat(recordings, page = 1) {
+  return recordings.map((recording, index) => ({
+    id: recording.id,
+    name: recording.get("name"),
+    singerName: recording.get("singer_name"),
+    channel: recording.get("channel"),
+    link: recording.get("link"),
+    file: recording.get("File"),
+    isMultiTracked: recording.get("is_multi_tracked"),
+    rehearsalDate: recording.get("rehearsal_date"),
+    categoryId: recording.get("category_id").id,
+    choirGroupId: recording.get("choir_group_id").id,
+    isFirstRehearsalRecording:
+      index === 0 ||
+      recording.get("rehearsal_date").toDateString() !==
+        recordings[index - 1].get("rehearsal_date").toDateString(),
+  }));
 }
 
 module.exports = {

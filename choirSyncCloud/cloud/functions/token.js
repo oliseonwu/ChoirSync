@@ -153,6 +153,30 @@ async function getUsersPushTokenObjects(userIds) {
   }
 }
 
+/**
+ * Deletes all push tokens for a specific user
+ * @param {Parse.User} user - The user whose push tokens should be deleted
+ * @returns {Promise<Object>} Result of the operation
+ */
+async function deleteUserPushTokens(user) {
+  try {
+    const query = new Parse.Query("PushTokens");
+    query.equalTo("user", user.toPointer());
+
+    const tokenObjects = await query.find({ useMasterKey: true });
+    if (tokenObjects.length > 0) {
+      await Parse.Object.destroyAll(tokenObjects, { useMasterKey: true });
+    }
+
+    return {
+      success: true,
+      message: `Deleted ${tokenObjects.length} push tokens`,
+    };
+  } catch (error) {
+    throw new Error(`Failed to delete user push tokens: ${error.message}`);
+  }
+}
+
 module.exports = {
   storePushToken,
   fetchPushTokenObject,
@@ -161,4 +185,5 @@ module.exports = {
   fetchPushTokenObjects,
   getUsersPushTokenObjects,
   deletePushToken,
+  deleteUserPushTokens,
 };

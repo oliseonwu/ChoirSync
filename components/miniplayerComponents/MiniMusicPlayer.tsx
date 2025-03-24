@@ -21,10 +21,7 @@ type MiniMusicPlayerProps = {
   isVisibleSV: SharedValue<boolean>;
 };
 
-export function MiniMusicPlayer({
-  bottomOffset,
-  isVisibleSV,
-}: MiniMusicPlayerProps) {
+function MiniMusicPlayer({ bottomOffset, isVisibleSV }: MiniMusicPlayerProps) {
   const miniplayerStyleSV = useAnimatedStyle(() => {
     return {
       opacity: isVisibleSV.value ? 1 : 0,

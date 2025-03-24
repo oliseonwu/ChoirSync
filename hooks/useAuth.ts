@@ -6,14 +6,21 @@ import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
 import { notificationService } from "@/services/NotificationService";
-import { authService, UserStatus } from "@/services/AuthService";
+import { authService } from "@/services/AuthService";
 import { Alert } from "react-native";
 import { useUser } from "@/contexts/UserContext";
+import Parse from "@/services/Parse";
+
+import { userManagementService } from "@/services/UserManagementService";
+
+// Handles Login, Logout, and Session Management
+
 export const useAuth = () => {
   const { showLoading, hideLoading } = useLoading();
   const { resetCurrentTrack } = useCurrentTrack();
   const { resetRecordings } = useRecordings();
-  const { updateCurrentUserData } = useUser();
+  const { updateCurrentUserData, getCurrentUserData } = useUser();
+
   const performLogout = async () => {
     const pushToken = await AsyncStorageService.getItem(
       AsyncStorageKeys.PUSH_TOKEN
@@ -26,11 +33,15 @@ export const useAuth = () => {
 
       const result = await authService.logout();
 
-      if (result.success) {
+      if (
+        result.success ||
+        result?.error === Parse.Error.INVALID_SESSION_TOKEN
+      ) {
         router.dismissAll();
         resetCurrentTrack();
         resetRecordings();
       } else {
+        console.log("Logout error", result);
         Alert.alert("Error", "Failed to logout");
       }
     } catch (error) {
@@ -42,24 +53,21 @@ export const useAuth = () => {
 
   const attemptToLogin = async () => {
     showLoading();
-    const currentUser = await authService.getCurrentUser();
-    let userStatus: UserStatus;
+    let currentUser;
 
     try {
+      // If the session is valid, get the user from the session
+      const session = await Parse.Session.current();
+      currentUser = session.get("user");
+
       if (currentUser) {
-        userStatus = await authService.getUserStatus(currentUser);
-        updateCurrentUserData(
-          currentUser.get("firstName"),
-          currentUser.get("lastName"),
-          currentUser.get("email"),
-          currentUser.get("profileUrl")
-        );
-        authService.navigateBasedOnUserStatus(userStatus);
+        onSuccessfulLogin(currentUser);
       }
     } catch (error: any) {
-      console.log("error attempting to login", error);
+      console.log("error attempting to login: ", error.message);
 
-      if (error.message === "Invalid session token") {
+      // If the session is invalid, logout the user
+      if (error.message === Parse.Error.INVALID_SESSION_TOKEN) {
         await authService.logout();
       }
       hideLoading();
@@ -70,32 +78,66 @@ export const useAuth = () => {
   const handleLogin = async () => {
     showLoading();
     let loginResponse = null;
-    let userStatus;
 
     try {
       loginResponse = await authService.loginWithGoogle();
       if (loginResponse.success) {
-        userStatus = await authService.getUserStatus(loginResponse.user!);
-        updateCurrentUserData(
-          loginResponse.user!.get("firstName"),
-          loginResponse.user!.get("lastName"),
-          loginResponse.user!.get("email"),
-          loginResponse.user!.get("profileUrl")
-        );
-
-        authService.navigateBasedOnUserStatus(userStatus);
+        onSuccessfulLogin(loginResponse.user!);
       }
     } catch (error: any) {
       console.log("error", error.message);
+      hideLoading();
+      Alert.alert("Error", "Failed to login. Please try again.");
     }
 
     hideLoading();
   };
 
+  async function onSuccessfulLogin(user: Parse.User) {
+    const groupIdsResult = await userManagementService.getUserGroupIds(user.id);
+    const groupId = groupIdsResult.groupIds?.[0] || "";
+
+    updateCurrentUserData(
+      user.get("firstName"),
+      user.get("lastName"),
+      user.get("email"),
+      user.get("profileUrl"),
+      groupId
+    );
+
+    authService.navigateBasedOnUserCredentials(user, groupId);
+  }
+
+  // Checks if the user is fully authenticated
+  // we put this function here and not in the AuthService
+  // because it uses the useUser hook
+  async function isFullyAuthenticated() {
+    try {
+      // throws an error if the session is invalid
+      const session = await Parse.Session.current();
+
+      const { groupId } = getCurrentUserData();
+
+      return session.get("user") && groupId;
+    } catch (error) {
+      console.log("error checking if user is authenticated: ", error);
+      return false;
+    }
+  }
+
+  async function logoutIfNotFullyAuthenticated() {
+    // If the user is not fully authenticated, logout the user
+    const isAuthenticated = await isFullyAuthenticated();
+    if (!isAuthenticated) {
+      await performLogout();
+    }
+  }
+
   return {
     performLogout,
     attemptToLogin,
     handleLogin,
-    // Add other auth-related functions here as needed
+    isFullyAuthenticated,
+    logoutIfNotFullyAuthenticated,
   };
 };

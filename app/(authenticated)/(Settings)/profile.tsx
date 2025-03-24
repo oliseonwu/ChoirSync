@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 
 import {
   getWindowSize,
@@ -21,12 +21,27 @@ export default function Profile() {
   const { performLogout } = useAuth();
 
   const deleteUser = async () => {
-    const result = await userManagementService.deleteCurrentUser();
-    if (result.success) {
-      performLogout();
-    } else {
-      console.log("Error", result.error);
+    try {
+      const result = await userManagementService.deleteCurrentUser();
+      if (result.success) {
+        performLogout();
+      } else {
+        console.log("Error", result.error);
+      }
+    } catch (error) {
+      console.log("Error", error);
     }
+  };
+
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: deleteUser },
+      ]
+    );
   };
 
   return (
@@ -75,7 +90,7 @@ export default function Profile() {
       <TouchableOpacity
         style={[styles.logoutButton]}
         onPress={() => {
-          deleteUser();
+          handleDeleteAccount();
         }}
       >
         <Text style={styles.logoutText}>Delete Account</Text>
