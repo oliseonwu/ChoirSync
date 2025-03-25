@@ -37,7 +37,9 @@ export default function HomeScreen() {
   useEffect(() => {
     showPlayer();
 
-    fetchRecordings();
+    if (recordings.length === 0) {
+      fetchRecordings();
+    }
   }, []);
 
   const hasThisWeekRecordings = useMemo(() => {
