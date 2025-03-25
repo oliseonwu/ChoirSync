@@ -1,26 +1,18 @@
 import { StyleSheet, ScrollView, Text, View } from "react-native";
-import SongListItem from "@/components/SongListItem";
 import { verticalScale, moderateScale } from "@/utilities/TrueScale";
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import Parse from "@/services/Parse";
-import { authService } from "@/services/AuthService";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { Recording } from "@/types/music.types";
-import { router } from "expo-router";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { FlashList } from "@shopify/flash-list";
 import { SongItem } from "@/components/SongItem";
 import AdComponent from "@/components/AdComponent";
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "react-native-paper";
 
 enum ItemType {
   DATE_AND_SONG = "DateAndSong",
@@ -31,49 +23,51 @@ export default function CatalogueScreen() {
   const rehearsalRecordCount = useRef(1);
   const { width } = useWindowDimensions();
   const { changeCurrentTrack, currentSongDetailsSV } = useCurrentTrack();
-  const { openPlayer } = useNowPlayingContext();
-  const { recordings, isLoading, fetchRecordings } = useRecordings();
+  const { recordings, isLoading, fetchRecordings, noMoreRecordings } =
+    useRecordings();
   const { logoutIfNotFullyAuthenticated } = useAuth();
   useEffect(() => {
-    // if (recordings.length === 0) {
-    logoutIfNotFullyAuthenticated().then(() => {
-      fetchRecordings();
-    });
+    if (recordings.length === 0) {
+      logoutIfNotFullyAuthenticated().then(() => {
+        fetchRecordings();
+      });
+    }
   }, []);
 
-  const renderItem = useCallback(
-    ({ item, index }: { item: Recording; index: number }) => {
-      if (item.isFirstRehearsalRecording) {
-        rehearsalRecordCount.current = 1;
-        return (
-          <>
-            <Text style={[styles.title, styles.title1]}>
-              {getHeaderText(item.rehearsalDate, rehearsalRecordCount.current)}
-            </Text>
-
-            <SongItem
-              index={1}
-              recording={item}
-              currentSongDetailsSV={currentSongDetailsSV}
-              changeCurrentTrack={changeCurrentTrack}
-            />
-          </>
-        );
-      }
-
-      rehearsalRecordCount.current++;
-
+  const renderItem = useCallback(({ item }: { item: Recording }) => {
+    if (item.isFirstRehearsalRecording) {
+      rehearsalRecordCount.current = 1;
       return (
+        <View>
+          <Text style={[styles.title, styles.title1]}>
+            {getHeaderText(item.rehearsalDate, rehearsalRecordCount.current)}
+          </Text>
+
+          <SongItem
+            index={1}
+            recording={item}
+            currentSongDetailsSV={currentSongDetailsSV}
+            changeCurrentTrack={changeCurrentTrack}
+          />
+          {ItemSeparatorComponent()}
+        </View>
+      );
+    }
+
+    rehearsalRecordCount.current++;
+
+    return (
+      <>
         <SongItem
           index={rehearsalRecordCount.current}
           recording={item}
           currentSongDetailsSV={currentSongDetailsSV}
           changeCurrentTrack={changeCurrentTrack}
         />
-      );
-    },
-    []
-  );
+        {ItemSeparatorComponent()}
+      </>
+    );
+  }, []);
 
   const ItemSeparatorComponent = useCallback(() => {
     return <View style={{ marginTop: verticalScale(44) }} />;
@@ -85,13 +79,6 @@ export default function CatalogueScreen() {
       : ItemType.SONG;
   }, []);
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <SkeletonLoader width={width} />
-      </View>
-    );
-  }
   function getHeaderText(date: Date, index: number) {
     const currentDate = new Date();
 
@@ -116,6 +103,33 @@ export default function CatalogueScreen() {
     });
   }
 
+  const onEndReached = () => {
+    if (!noMoreRecordings) {
+      fetchRecordings();
+    }
+  };
+
+  const ListFooterComponent = () => {
+    if (!isLoading) {
+      return null;
+    }
+    return (
+      <View>
+        <Button disabled loading>
+          Fetching more...
+        </Button>
+      </View>
+    );
+  };
+
+  if (isLoading && recordings.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <SkeletonLoader width={width} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <AdComponent />
@@ -124,8 +138,11 @@ export default function CatalogueScreen() {
         data={recordings}
         estimatedItemSize={moderateScale(63)}
         renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparatorComponent}
         getItemType={getItemType}
+        onEndReached={onEndReached}
+        ListFooterComponent={ListFooterComponent}
+        showsVerticalScrollIndicator={true}
+        onEndReachedThreshold={0.7} // Trigger onEndReached when user is 70% away from the bottom of the list
       />
     </View>
   );

@@ -19,10 +19,13 @@ import { PaperProvider } from "react-native-paper";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { PlatformPressable } from "@react-navigation/elements";
+import { useUser } from "@/contexts/UserContext";
 
 export default function TabLayout() {
   const navigation = useNavigation();
+  const { getCurrentUserData } = useUser();
 
+  const { groupId } = getCurrentUserData();
   useEffect(() => {
     const checkMembership = async () => {
       const currentUser = await authService.getCurrentUser();
@@ -32,11 +35,7 @@ export default function TabLayout() {
         return;
       }
 
-      const membershipResult = await authService.checkChoirMembership(
-        currentUser.id
-      );
-
-      if (!membershipResult.success || !membershipResult.isMember) {
+      if (!groupId) {
         router.replace("/chooseYourPath");
       }
     };

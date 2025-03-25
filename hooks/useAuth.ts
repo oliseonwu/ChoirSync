@@ -31,19 +31,11 @@ export const useAuth = () => {
       await AsyncStorageService.clear();
       await notificationService.deletePushNotificationToken(pushToken || "");
 
-      const result = await authService.logout();
+      await authService.logout();
 
-      if (
-        result.success ||
-        result?.error === Parse.Error.INVALID_SESSION_TOKEN
-      ) {
-        router.dismissAll();
-        resetCurrentTrack();
-        resetRecordings();
-      } else {
-        console.log("Logout error", result);
-        Alert.alert("Error", "Failed to logout");
-      }
+      router.dismissAll();
+      resetCurrentTrack();
+      resetRecordings();
     } catch (error) {
       Alert.alert("Error", "An unexpected error occurred");
     } finally {
