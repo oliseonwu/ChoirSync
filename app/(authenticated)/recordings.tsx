@@ -18,7 +18,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Recording } from "@/types/music.types";
 import SongItem from "@/components/SongItem";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
-
+import ListEmptyComponent from "@/components/ListEmptyComponent";
 import AdComponent from "@/components/AdComponent";
 
 export default function RecordingsScreen() {
@@ -45,7 +45,6 @@ export default function RecordingsScreen() {
       const rehearsalDate = new Date(recording.rehearsalDate);
       rehearsalDate.setUTCHours(0, 0, 0, 0);
       return rehearsalDate >= oneWeekAgo;
-      return true;
     });
 
     setThisWeekRecordings(tempThisWeekRecordings);
@@ -78,17 +77,6 @@ export default function RecordingsScreen() {
     ),
     []
   );
-  const listEmptyComponent = useCallback(() => {
-    return (
-      <View style={styles.noRecordingsContainer}>
-        <Text style={styles.noRecordingsText}>No recordings found</Text>
-      </View>
-    );
-  }, []);
-
-  const onLoad = useCallback((info: { elapsedTimeInMs: number }) => {
-    console.log("Flash List elapsed time: `", info.elapsedTimeInMs);
-  }, []);
 
   // This must always be the last thing to render
   if (isLoading) {
@@ -104,7 +92,12 @@ export default function RecordingsScreen() {
         data={thisWeekRecordings}
         renderItem={renderItem}
         estimatedItemSize={moderateScale(63)}
-        ListEmptyComponent={listEmptyComponent}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            text="No recordings found"
+            paddingTop={verticalScale(12)}
+          />
+        }
       />
     </View>
   );
