@@ -13,6 +13,7 @@ import SongItem from "@/components/SongItem";
 import AdComponent from "@/components/AdComponent";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "react-native-paper";
+import ListEmptyComponent from "@/components/ListEmptyComponent";
 
 enum ItemType {
   DATE_AND_SONG = "DateAndSong",
@@ -139,6 +140,12 @@ export default function CatalogueScreen() {
         ListFooterComponent={ListFooterComponent}
         showsVerticalScrollIndicator={true}
         onEndReachedThreshold={0.7} // Trigger onEndReached when user is 70% away from the bottom of the list
+        ListEmptyComponent={
+          <ListEmptyComponent
+            text="No recordings found"
+            paddingTop={verticalScale(30)}
+          />
+        }
       />
     </View>
   );

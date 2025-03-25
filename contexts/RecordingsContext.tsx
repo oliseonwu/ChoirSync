@@ -32,6 +32,7 @@ export function RecordingsProvider({
   };
 
   const fetchRecordings = async () => {
+    console.log("fetchRecordings");
     setIsLoading(true);
     try {
       const { groupId } = getCurrentUserData();
