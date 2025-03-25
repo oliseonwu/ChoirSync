@@ -1,13 +1,14 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { Recording } from "@/types/music.types";
-import Parse from "@/services/Parse";
-import { authService } from "@/services/AuthService";
+import { useUser } from "@/contexts/UserContext";
+import { recordingsService } from "@/services/RecordingsService";
 
 type RecordingsContextType = {
   recordings: Recording[];
   isLoading: boolean;
-  fetchRecordings: () => Promise<void>;
+  fetchRecordings: (refresh?: boolean) => Promise<void>;
   resetRecordings: () => void;
+  noMoreRecordings: boolean;
 };
 
 const RecordingsContext = createContext<RecordingsContextType | undefined>(
@@ -21,96 +22,44 @@ export function RecordingsProvider({
 }) {
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchLastTwoRehearsalRecordings = (
-    recordings: Parse.Object<Parse.Attributes>[]
-  ) => {
-    if (recordings.length === 0) return [];
-    const firstRehearsalDate = recordings[0].get("rehearsal_date");
-    let secondRehearsalDate: any = null;
-
-    return recordings.filter((recording) => {
-      const currentDate = recording.get("rehearsal_date");
-      if (currentDate.toDateString() === firstRehearsalDate.toDateString()) {
-        return true;
-      }
-      if (!secondRehearsalDate) {
-        secondRehearsalDate = currentDate;
-        return true;
-      }
-      return currentDate.toDateString() === secondRehearsalDate.toDateString();
-    });
+  const { getCurrentUserData } = useUser();
+  const [noMoreRecordings, setNoMoreRecordings] = useState(false);
+  const currentPageRef = useRef(1);
+  let recordingsResponse: {
+    success: boolean;
+    recordings: Recording[];
+    count: number;
   };
 
-  const isSameDate = (date1: Date | null, date2: Date | null) =>
-    date1?.toDateString() === date2?.toDateString();
-
   const fetchRecordings = async () => {
+    setIsLoading(true);
     try {
-      const currentUser = await authService.getCurrentUser();
-      if (!currentUser) return;
+      const { groupId } = getCurrentUserData();
 
-      const membershipResult = await authService.checkChoirMembership(
-        currentUser.id
+      if (!groupId) {
+        throw new Error("No group ID found");
+      }
+
+      recordingsResponse = await recordingsService.fetchRecordings(
+        groupId,
+        currentPageRef.current
       );
-      if (!membershipResult.success || !membershipResult.isMember) return;
+      currentPageRef.current++;
 
-      const choirGroupId =
-        membershipResult.choirMember?.get("choir_groups_id").id;
+      if (!recordingsResponse.success) {
+        throw new Error("Error fetching recordings");
+      }
 
-      const Recordings = Parse.Object.extend("Recordings");
-      const query = new Parse.Query(Recordings);
+      // If the response count is 0, we have reached the end of the recordings
+      if (recordingsResponse.recordings.length === 0) {
+        setNoMoreRecordings(true);
+        return;
+      }
 
-      query.equalTo("choir_group_id", {
-        __type: "Pointer",
-        className: "ChoirGroups",
-        objectId: choirGroupId,
-      });
-
-      query.include("category_id");
-      query.descending("rehearsal_date");
-      query.limit(15);
-
-      const results = await query.find();
-      const lastTwoRehearsalRecordings =
-        fetchLastTwoRehearsalRecordings(results);
-
-      let previousRehearsalDate: Date | null = null;
-      let currentRehearsalDate: Date | null = null;
-      let isFirstRehearsalRecording: boolean = false;
-
-      const processedRecordings = lastTwoRehearsalRecordings.map(
-        (recording) => {
-          currentRehearsalDate = recording.get("rehearsal_date");
-
-          if (previousRehearsalDate === null) {
-            isFirstRehearsalRecording = true;
-          } else {
-            isFirstRehearsalRecording = !isSameDate(
-              previousRehearsalDate,
-              currentRehearsalDate
-            );
-          }
-
-          previousRehearsalDate = currentRehearsalDate;
-
-          return {
-            id: recording.id,
-            name: recording.get("name"),
-            singerName: recording.get("singer_name"),
-            channel: recording.get("channel"),
-            link: recording.get("link"),
-            file: recording.get("File"),
-            isMultiTracked: recording.get("is_multi_tracked"),
-            rehearsalDate: recording.get("rehearsal_date"),
-            categoryId: recording.get("category_id")?.id,
-            choirGroupId: recording.get("choir_group_id").id,
-            isFirstRehearsalRecording: isFirstRehearsalRecording,
-          };
-        }
-      );
-
-      setRecordings(processedRecordings);
+      setRecordings([
+        ...recordings,
+        ...sanitizeNewRecordings(recordingsResponse.recordings),
+      ]);
     } catch (error) {
       console.error("Error fetching recordings:", error);
     } finally {
@@ -118,14 +67,50 @@ export function RecordingsProvider({
     }
   };
 
+  // Fixes first rehearsal flag for paginated responses.
+  // Backend logic is not full proof because sometimes
+  // paginated responses may split recordings from same
+  // rehearsal date across multiple requests.
+  const sanitizeNewRecordings = (newRecordings: Recording[]) => {
+    let lastRecord;
+
+    if (recordings.length === 0) {
+      return newRecordings;
+    }
+
+    lastRecord = recordings[recordings.length - 1];
+
+    for (let i = 0; i < newRecordings.length; i++) {
+      if (
+        lastRecord.rehearsalDate.toDateString() ===
+        newRecordings[i].rehearsalDate.toDateString()
+      ) {
+        newRecordings[i].isFirstRehearsalRecording = false;
+        newRecordings[i].index = lastRecord.index + 1 + i;
+      } else {
+        break;
+      }
+    }
+
+    return newRecordings;
+  };
+
   const resetRecordings = () => {
     setRecordings([]);
     setIsLoading(false);
+    currentPageRef.current = 1;
+    setNoMoreRecordings(false);
   };
 
   return (
     <RecordingsContext.Provider
-      value={{ recordings, isLoading, fetchRecordings, resetRecordings }}
+      value={{
+        recordings,
+        isLoading,
+        fetchRecordings,
+        resetRecordings,
+        noMoreRecordings,
+      }}
     >
       {children}
     </RecordingsContext.Provider>

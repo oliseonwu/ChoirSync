@@ -21,10 +21,7 @@ type MiniMusicPlayerProps = {
   isVisibleSV: SharedValue<boolean>;
 };
 
-export function MiniMusicPlayer({
-  bottomOffset,
-  isVisibleSV,
-}: MiniMusicPlayerProps) {
+function MiniMusicPlayer({ bottomOffset, isVisibleSV }: MiniMusicPlayerProps) {
   const miniplayerStyleSV = useAnimatedStyle(() => {
     return {
       opacity: isVisibleSV.value ? 1 : 0,
@@ -53,7 +50,10 @@ export function MiniMusicPlayer({
 }
 
 export default memo(MiniMusicPlayer, (prev, next) => {
-  return true;
+  return (
+    prev.bottomOffset === next.bottomOffset &&
+    prev.isVisibleSV === next.isVisibleSV
+  );
 });
 const styles = StyleSheet.create({
   MiniMusicPlayer: {

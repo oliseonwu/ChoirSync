@@ -1,58 +1,9 @@
 import { router } from "expo-router";
 import { googleAuthService } from "./GoogleAuthService";
 import Parse from "./Parse";
-import { GoogleUser } from "@/types/user.types";
-import { ErrorCode } from "@/types/errors";
-
-interface SignUpData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface UserStatus {
-  hasName: boolean;
-  isMemberOfAnyChoir: boolean;
-}
-
-//The AuthService class is a central manager for all
-// authentication-related operations in your app.
-//Think of it as a dedicated helper that handles
-// all the complexities of user authentication,
-// including signup, login, logout, and error handling.
+import { pointer } from "@/utilities/Helpers";
 
 class AuthService {
-  async signUp({ email, password, firstName, lastName }: SignUpData) {
-    try {
-      // Create a new Parse User
-      const user = new Parse.User();
-      user.set("username", email); // Using email as username
-      user.set("email", email);
-      user.set("password", password);
-      user.set("firstName", firstName);
-      user.set("lastName", lastName);
-
-      // Sign up the user
-      const signedUpUser = await user.signUp();
-
-      return {
-        success: true,
-        user: signedUpUser,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
   async getCurrentUser() {
     return Parse.User.currentAsync();
   }
@@ -62,21 +13,6 @@ class AuthService {
       await googleAuthService.signOut();
       await Parse.User.logOut();
       return { success: true };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
-  async loginWithCredentials({ email, password }: LoginData) {
-    try {
-      const user = await Parse.User.logIn(email, password);
-      return {
-        success: true,
-        user,
-      };
     } catch (error: any) {
       return {
         success: false,
@@ -131,59 +67,11 @@ class AuthService {
     }
   }
 
-  async getUserStatus(user: Parse.User): Promise<UserStatus> {
-    const firstName = user.get("firstName");
-    const lastName = user.get("lastName");
-    const hasName = Boolean(firstName && lastName);
-
-    const membershipResult = await authService.checkChoirMembership(user.id);
-    if (!membershipResult.success) {
-      throw new Error(
-        membershipResult.error || "Failed to check choir membership"
-      );
-    }
-
-    return {
-      hasName,
-      isMemberOfAnyChoir: membershipResult.isMember,
-    };
-  }
-
-  async checkChoirMembership(userId: string) {
-    try {
-      // Create a pointer to the User
-      const userPointer = {
-        __type: "Pointer",
-        className: "_User",
-        objectId: userId,
-      };
-
-      // Query ChoirMembers
-      const ChoirMembers = Parse.Object.extend("ChoirMembers");
-      const query = new Parse.Query(ChoirMembers);
-      query.equalTo("user_id", userPointer);
-
-      const result = await query.first();
-
-      return {
-        success: true,
-        isMember: !!result,
-        choirMember: result,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message,
-        isMember: false,
-      };
-    }
-  }
-
-  navigateBasedOnUserStatus = (userStatus: UserStatus) => {
-    if (!userStatus.hasName) {
+  navigateBasedOnUserCredentials = (user: Parse.User, groupId: string) => {
+    if (!user.get("firstName") || !user.get("lastName")) {
       return router.navigate("/name");
     }
-    return userStatus.isMemberOfAnyChoir
+    return groupId
       ? router.navigate("/(authenticated)/(tabs)")
       : router.navigate("/chooseYourPath");
   };

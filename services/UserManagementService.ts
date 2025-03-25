@@ -1,5 +1,6 @@
 import { ErrorCode } from "@/types/errors";
 import Parse from "./Parse";
+import { pointer } from "@/utilities/Helpers";
 
 class UserManagementService {
   async updateUserField(field: string, value: any) {
@@ -34,6 +35,31 @@ class UserManagementService {
       return {
         success: true,
         message: "User deleted successfully",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Get all group IDs the user is a member of.
+   * @param userId - The ID of the user to get group IDs for
+   * @returns An array of group IDs
+   */
+  async getUserGroupIds(userId: string) {
+    try {
+      const ChoirMembers = Parse.Object.extend("ChoirMembers");
+      const query = new Parse.Query(ChoirMembers);
+      query.equalTo("user_id", pointer(userId, "_User"));
+      query.select("choir_groups_id");
+
+      const result = await query.find();
+      return {
+        success: true,
+        groupIds: result.map((member) => member.get("choir_groups_id").id),
       };
     } catch (error: any) {
       return {

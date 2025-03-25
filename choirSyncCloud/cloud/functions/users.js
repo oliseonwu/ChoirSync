@@ -1,3 +1,5 @@
+const { deleteUserMemberRecords } = require("./groups");
+const { deleteUserPushTokens } = require("./token");
 // ROUTES
 
 /**
@@ -149,19 +151,41 @@ const getUserByExpoPushToken = async (expoPushToken) => {
  * Trigger to clean up user data before deletion
  * Automatically removes associated choir member records
  */
-Parse.Cloud.beforeDelete(Parse.User, async (request) => {
+Parse.Cloud.afterDelete(Parse.User, async (request) => {
   const user = request.object;
 
-  const ChoirMembers = Parse.Object.extend("ChoirMembers");
-  const query = new Parse.Query(ChoirMembers);
-  query.equalTo("user_id", user.toPointer());
-
-  const memberRecord = await query.find({ useMasterKey: true });
-
-  if (memberRecord.length > 0) {
-    await Parse.Object.destroyAll(memberRecord, { useMasterKey: true });
+  try {
+    await deleteUserMemberRecords(user);
+    await deleteUserPushTokens(user);
+    await deleteUserSessions(user);
+  } catch (error) {
+    throw new Error(`Failed to delete user member records: ${error.message}`);
   }
 });
+
+/**
+ * Deletes all session data for a specific user
+ * @param {Parse.User} user - The user whose sessions should be deleted
+ * @returns {Promise<Object>} Result of the operation
+ */
+async function deleteUserSessions(user) {
+  try {
+    const query = new Parse.Query(Parse.Session);
+    query.equalTo("user", user.toPointer());
+
+    const sessions = await query.find({ useMasterKey: true });
+    if (sessions.length > 0) {
+      await Parse.Object.destroyAll(sessions, { useMasterKey: true });
+    }
+
+    return {
+      success: true,
+      message: `Deleted ${sessions.length} sessions`,
+    };
+  } catch (error) {
+    throw new Error(`Failed to delete user sessions: ${error.message}`);
+  }
+}
 
 module.exports = {
   updateUserField,

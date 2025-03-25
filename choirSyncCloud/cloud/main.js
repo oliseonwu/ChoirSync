@@ -115,8 +115,31 @@ Parse.Cloud.define("uploadRecordings", recordingsFunctions.uploadRecordings, {
   requireMaster: true,
 });
 
+Parse.Cloud.define(
+  "fetchRecordings",
+  async (request) => {
+    const recordings = await recordingsFunctions.fetchRecordings(request);
+    return recordings;
+  },
+  {
+    fields: {
+      groupId: { type: String, required: true },
+      page: { type: Number, required: false, default: 1 },
+      limit: { type: Number, required: false, default: 20 },
+      returnInClientFormat: {
+        type: Boolean,
+        required: false,
+        default: false,
+      },
+    },
+    requireUser: true,
+  }
+);
+
 Parse.Cloud.define("test", async (request) => {
   // const { userId, installationId, pushToken } = request.params;
+  const recordings = await recordingsFunctions.fetchRecordings(request);
+  return recordings;
 });
 
 Parse.Cloud.define("test2", async (request) => {

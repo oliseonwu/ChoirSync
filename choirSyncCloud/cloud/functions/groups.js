@@ -13,6 +13,8 @@
 const { pointer } = require("../utils/helpers");
 const { getUsersPushTokenObjects, deletePushTokens } = require("./token");
 
+// ROUTES
+
 async function addUserToChoirGroup(request) {
   const { groupId, userId } = request.params;
 
@@ -37,6 +39,9 @@ async function addUserToChoirGroup(request) {
     throw new Error(`Failed to add user to choir group: ${error.message}`);
   }
 }
+
+// FUNCTIONS
+
 async function getAllMembersOfGroup(groupId) {
   try {
     const ChoirMembers = Parse.Object.extend("ChoirMembers");
@@ -52,7 +57,25 @@ async function getAllMembersOfGroup(groupId) {
   }
 }
 
-// ... existing code ...
+/**
+ * Deletes all records of a user being a member of one or more choir groups
+ * @param {Parse.User} user - The user whose member records should be deleted
+ * @returns {Promise<void>}
+ */
+async function deleteUserMemberRecords(user) {
+  try {
+    const ChoirMembers = Parse.Object.extend("ChoirMembers");
+    const query = new Parse.Query(ChoirMembers);
+    query.equalTo("user_id", user.toPointer());
+
+    const memberRecords = await query.find({ useMasterKey: true });
+    if (memberRecords.length > 0) {
+      await Parse.Object.destroyAll(memberRecords, { useMasterKey: true });
+    }
+  } catch (error) {
+    throw new Error(`Failed to delete user member records: ${error.message}`);
+  }
+}
 
 /**
  * Gets all push tokens for all members of a group
@@ -111,4 +134,5 @@ module.exports = {
   getAllMembersOfGroup,
   getGroupMembersPushTokens,
   getIdsOfGroupsWithRecentRecordings,
+  deleteUserMemberRecords,
 };
