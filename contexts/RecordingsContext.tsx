@@ -1,9 +1,6 @@
 import { createContext, useContext, useRef, useState } from "react";
 import { Recording } from "@/types/music.types";
-import Parse from "@/services/Parse";
 import { useUser } from "@/contexts/UserContext";
-import { useAuth } from "@/hooks/useAuth";
-import { pointer } from "@/utilities/Helpers";
 import { recordingsService } from "@/services/RecordingsService";
 
 type RecordingsContextType = {
@@ -43,7 +40,10 @@ export function RecordingsProvider({
         throw new Error("No group ID found");
       }
 
-      recordingsResponse = await recordingsService.fetchRecordings(groupId, 1);
+      recordingsResponse = await recordingsService.fetchRecordings(
+        groupId,
+        currentPageRef.current
+      );
       currentPageRef.current++;
 
       if (!recordingsResponse.success) {
