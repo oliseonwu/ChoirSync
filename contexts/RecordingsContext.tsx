@@ -43,10 +43,7 @@ export function RecordingsProvider({
         throw new Error("No group ID found");
       }
 
-      recordingsResponse = await recordingsService.fetchRecordings(
-        groupId,
-        currentPageRef.current
-      );
+      recordingsResponse = await recordingsService.fetchRecordings(groupId, 1);
       currentPageRef.current++;
 
       if (!recordingsResponse.success) {
@@ -83,11 +80,16 @@ export function RecordingsProvider({
 
     lastRecord = recordings[recordings.length - 1];
 
-    if (
-      lastRecord.rehearsalDate.toDateString() ===
-      newRecordings[0].rehearsalDate.toDateString()
-    ) {
-      newRecordings[0].isFirstRehearsalRecording = false;
+    for (let i = 0; i < newRecordings.length; i++) {
+      if (
+        lastRecord.rehearsalDate.toDateString() ===
+        newRecordings[i].rehearsalDate.toDateString()
+      ) {
+        newRecordings[i].isFirstRehearsalRecording = false;
+        newRecordings[i].index = lastRecord.index + 1 + i;
+      } else {
+        break;
+      }
     }
 
     return newRecordings;

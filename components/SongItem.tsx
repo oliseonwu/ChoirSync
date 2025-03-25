@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   horizontalScale,
   moderateScale,
@@ -58,34 +58,16 @@ export function SongItem(props: {
     };
   });
 
-  const handlePress = useCallback(() => {
-    changeCurrentTrack(
-      recording.id,
-      recording.name,
-      recording.singerName,
-      recording?.link ?? ""
-    );
-
-    openPlayer();
-  }, []);
-
-  return (
-    <TouchableOpacity style={styles.container} onPress={handlePress}>
-      <Text style={styles.order}>{index}</Text>
+  const memoizedClipArtCover = useMemo(() => {
+    return (
       <View style={styles.clipArtCover}>
-        {/* <Image
-          source={{ uri: imgUrl }}
-          style={styles.clipArt}
-          contentFit="cover"
-        /> */}
         <MemoizedEarPhoneIcon />
       </View>
-      <View style={styles.songInfo}>
-        <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
-          {recording.name}
-        </Text>
-        <Text style={styles.artistName}>{recording.singerName}</Text>
-      </View>
+    );
+  }, []);
+
+  const memoizedPlayPauseButton = useMemo(() => {
+    return (
       <View
         style={{
           position: "relative",
@@ -101,11 +83,42 @@ export function SongItem(props: {
           <MemoizedPauseIcon />
         </Animated.View>
       </View>
+    );
+  }, []);
+
+  const handlePress = useCallback(() => {
+    changeCurrentTrack(
+      recording.id,
+      recording.name,
+      recording.singerName,
+      recording?.link ?? ""
+    );
+
+    openPlayer();
+  }, [recording.id]);
+
+  return (
+    <TouchableOpacity style={styles.container} onPress={handlePress}>
+      <Text style={styles.order}>{index}</Text>
+      {memoizedClipArtCover}
+      <View style={styles.songInfo}>
+        <Text style={styles.songName} ellipsizeMode="tail" numberOfLines={1}>
+          {recording.name}
+        </Text>
+        <Text style={styles.artistName}>{recording.singerName}</Text>
+      </View>
+      {memoizedPlayPauseButton}
     </TouchableOpacity>
   );
 }
 
-export default memo(SongItem);
+export default memo(SongItem, (prevProps, nextProps) => {
+  return (
+    prevProps.recording.id === nextProps.recording.id &&
+    prevProps.index === nextProps.index
+  );
+});
+
 const styles = StyleSheet.create({
   container: {
     width: "100%",

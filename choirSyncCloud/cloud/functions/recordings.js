@@ -131,22 +131,37 @@ async function fetchRecordings(request) {
  *   - isFirstRehearsalRecording: boolean - Whether the recording is the first rehearsal recording for the rehearsal date
  */
 function toClientFormat(recordings, page = 1) {
-  return recordings.map((recording, index) => ({
-    id: recording.id,
-    name: recording.get("name"),
-    singerName: recording.get("singer_name"),
-    channel: recording.get("channel"),
-    link: recording.get("link"),
-    file: recording.get("File"),
-    isMultiTracked: recording.get("is_multi_tracked"),
-    rehearsalDate: recording.get("rehearsal_date"),
-    categoryId: recording.get("category_id").id,
-    choirGroupId: recording.get("choir_group_id").id,
-    isFirstRehearsalRecording:
+  let isFirstRehearsalRecording;
+  let currentIndex;
+
+  return recordings.map((recording, index) => {
+    if (
       index === 0 ||
       recording.get("rehearsal_date").toDateString() !==
-        recordings[index - 1].get("rehearsal_date").toDateString(),
-  }));
+        recordings[index - 1].get("rehearsal_date").toDateString()
+    ) {
+      isFirstRehearsalRecording = true;
+      currentIndex = 1;
+    } else {
+      isFirstRehearsalRecording = false;
+      currentIndex++;
+    }
+
+    return {
+      id: recording.id,
+      index: currentIndex,
+      name: recording.get("name"),
+      singerName: recording.get("singer_name"),
+      channel: recording.get("channel"),
+      link: recording.get("link"),
+      file: recording.get("File"),
+      isMultiTracked: recording.get("is_multi_tracked"),
+      rehearsalDate: recording.get("rehearsal_date"),
+      categoryId: recording.get("category_id").id,
+      choirGroupId: recording.get("choir_group_id").id,
+      isFirstRehearsalRecording: isFirstRehearsalRecording,
+    };
+  });
 }
 
 module.exports = {

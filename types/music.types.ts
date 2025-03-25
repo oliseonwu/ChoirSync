@@ -1,5 +1,6 @@
 export type Recording = {
   id: string;
+  index: number;
   name: string;
   singerName: string;
   channel: "YT" | "file";

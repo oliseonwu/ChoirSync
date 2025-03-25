@@ -9,7 +9,7 @@ import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { Recording } from "@/types/music.types";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { FlashList } from "@shopify/flash-list";
-import { SongItem } from "@/components/SongItem";
+import SongItem from "@/components/SongItem";
 import AdComponent from "@/components/AdComponent";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "react-native-paper";
@@ -20,7 +20,6 @@ enum ItemType {
 }
 
 export default function CatalogueScreen() {
-  const rehearsalRecordCount = useRef(1);
   const { width } = useWindowDimensions();
   const { changeCurrentTrack, currentSongDetailsSV } = useCurrentTrack();
   const { recordings, isLoading, fetchRecordings, noMoreRecordings } =
@@ -36,15 +35,14 @@ export default function CatalogueScreen() {
 
   const renderItem = useCallback(({ item }: { item: Recording }) => {
     if (item.isFirstRehearsalRecording) {
-      rehearsalRecordCount.current = 1;
       return (
         <View>
           <Text style={[styles.title, styles.title1]}>
-            {getHeaderText(item.rehearsalDate, rehearsalRecordCount.current)}
+            {getHeaderText(item.rehearsalDate, item.index)}
           </Text>
 
           <SongItem
-            index={1}
+            index={item.index}
             recording={item}
             currentSongDetailsSV={currentSongDetailsSV}
             changeCurrentTrack={changeCurrentTrack}
@@ -54,12 +52,10 @@ export default function CatalogueScreen() {
       );
     }
 
-    rehearsalRecordCount.current++;
-
     return (
       <>
         <SongItem
-          index={rehearsalRecordCount.current}
+          index={item.index}
           recording={item}
           currentSongDetailsSV={currentSongDetailsSV}
           changeCurrentTrack={changeCurrentTrack}
@@ -104,7 +100,7 @@ export default function CatalogueScreen() {
   }
 
   const onEndReached = () => {
-    if (!noMoreRecordings) {
+    if (!noMoreRecordings && !isLoading) {
       fetchRecordings();
     }
   };
@@ -136,7 +132,7 @@ export default function CatalogueScreen() {
       <FlashList
         contentContainerStyle={styles.flashListContent}
         data={recordings}
-        estimatedItemSize={moderateScale(63)}
+        estimatedItemSize={moderateScale(88)}
         renderItem={renderItem}
         getItemType={getItemType}
         onEndReached={onEndReached}
