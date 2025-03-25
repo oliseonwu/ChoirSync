@@ -21,7 +21,7 @@ export function RecordingsProvider({
   children: React.ReactNode;
 }) {
   const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { getCurrentUserData } = useUser();
   const [noMoreRecordings, setNoMoreRecordings] = useState(false);
   const currentPageRef = useRef(1);
@@ -32,7 +32,9 @@ export function RecordingsProvider({
   };
 
   const fetchRecordings = async () => {
-    console.log("fetchRecordings");
+    if (isLoading) {
+      return;
+    }
     setIsLoading(true);
     try {
       const { groupId } = getCurrentUserData();

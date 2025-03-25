@@ -18,25 +18,61 @@ import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router } from "expo-router";
 import Constants from "expo-constants";
-import CustomHeaderComponent from "@/components/CustomHeaderComponent";
-import { useUser } from "@/contexts/UserContext";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { StatusBar } from "expo-status-bar";
 import AdComponent from "@/components/AdComponent";
 import { globalStyles } from "@/shared/css/GlobalCss";
+import { useRecordings } from "@/contexts/RecordingsContext";
 
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
   // We must call this to setup the push notifications on the device
   const { expoPushToken, notification } = usePushNotifications();
-
+  const { fetchRecordings, recordings } = useRecordings();
   useEffect(() => {
     showPlayer();
+
+    fetchRecordings();
+  }, []);
+
+  const hasThisWeekRecordings = useMemo(() => {
+    return recordings.some((recording) => {
+      const rehearsalDate = new Date(recording.rehearsalDate);
+      rehearsalDate.setUTCHours(0, 0, 0, 0);
+      const oneWeekAgo = new Date(new Date().setDate(new Date().getDate() - 7));
+      oneWeekAgo.setUTCHours(0, 0, 0, 0);
+      return rehearsalDate >= oneWeekAgo;
+    });
+  }, [recordings]);
+
+  const hompageBanner = useMemo(() => {
+    return (
+      <>
+        <Text style={globalStyles.heading1}>Members Picks</Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          // disabled={true}
+          style={styles.BannerContainer}
+        >
+          <Image
+            source={require("@/assets/images/color-card-1.png")}
+            style={styles.BannerImage}
+            contentFit="cover"
+          />
+          <View style={styles.BannerContent}>
+            <Text style={styles.BannerTitle}>HandPicked Songs</Text>
+            <Text style={styles.BannerSubtitle}>
+              Listen to Songs picked by your group
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </>
+    );
   }, []);
 
   return (
@@ -49,7 +85,7 @@ export default function HomeScreen() {
           <ThisWeekCard
             title="Recordings"
             icon={require("@/assets/images/mic-icon.png")}
-            showDot={true}
+            showDot={hasThisWeekRecordings}
             onPress={() => {
               router.push({
                 pathname: "/recordings",
@@ -75,24 +111,7 @@ export default function HomeScreen() {
 
       {/* <View style={styles.spacer}></View> */}
       <View style={styles.Section2}>
-        <Text style={globalStyles.heading1}>Members Picks</Text>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          // disabled={true}
-          style={styles.BannerContainer}
-        >
-          <Image
-            source={require("@/assets/images/color-card-1.png")}
-            style={styles.BannerImage}
-            contentFit="cover"
-          />
-          <View style={styles.BannerContent}>
-            <Text style={styles.BannerTitle}>HandPicked Songs</Text>
-            <Text style={styles.BannerSubtitle}>
-              Listen to Songs picked by your group
-            </Text>
-          </View>
-        </TouchableOpacity>
+        {hompageBanner}
         <View style={styles.adContainer}>
           <AdComponent
             borderRadius={moderateScale(6)}

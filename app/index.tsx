@@ -14,6 +14,7 @@ import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
 
 import { useAuth } from "@/hooks/useAuth";
 import { StatusBar } from "expo-status-bar";
+
 export default function LandingPage() {
   const { attemptToLogin, handleLogin } = useAuth();
 

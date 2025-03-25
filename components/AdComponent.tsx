@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Platform, Text } from "react-native";
 import {
   AdsConsent,
@@ -99,7 +99,9 @@ const AdComponent: React.FC<AdComponentProps> = ({
   );
 };
 
-export default AdComponent;
+export default memo(AdComponent, (prevProps, nextProps) => {
+  return true;
+});
 
 const styles = StyleSheet.create({
   container: {
