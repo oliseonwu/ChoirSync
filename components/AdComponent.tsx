@@ -12,7 +12,8 @@ import {
 import { StyleSheet, View } from "react-native";
 import React from "react";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
-
+import { SkeletonLoader } from "./SkeletonLoader";
+import AdItem from "./skeletonItems/AdItem";
 type AdComponentProps = {
   paddingVertical?: number;
   paddingHorizontal?: number;
@@ -44,7 +45,7 @@ const AdComponent: React.FC<AdComponentProps> = ({
   const bannerRef = useRef<BannerAd>(null);
   const [canShowAds, setCanShowAds] = useState(false);
   const [status, setStatus] = useState<string>("");
-
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
   // (iOS) WKWebView can terminate if app is in a "suspended state", resulting in an empty banner when app returns to foreground.
   // Therefore it's advised to "manually" request a new ad when the app is foregrounded (https://groups.google.com/g/google-admob-ads-sdk/c/rwBpqOUr8m8).
   useForeground(() => {
@@ -93,8 +94,20 @@ const AdComponent: React.FC<AdComponentProps> = ({
         },
       ]}
     >
-      {/* <Text>{status}</Text> */}
-      <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.BANNER} />
+      <View style={[styles.adWrapper]}>
+        <BannerAd
+          ref={bannerRef}
+          unitId={adUnitId}
+          size={BannerAdSize.BANNER}
+          onAdLoaded={() => {
+            setIsAdLoaded(true);
+          }}
+        />
+      </View>
+
+      <View style={{ position: "absolute", opacity: isAdLoaded ? 0 : 1 }}>
+        <SkeletonLoader skelectonItem={<AdItem />} />
+      </View>
     </View>
   );
 };
@@ -107,12 +120,15 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+
     paddingVertical: verticalScale(8),
     borderBottomWidth: 0.5,
     borderBottomColor: "#E6E9E8",
-    // backgroundColor: "#F3F2F2",
-    // backgroundColor: "#A3A2A2",
     backgroundColor: "#FAFAFA",
-    // backgroundColor: "#1e81b0",
+    position: "relative",
+  },
+  adWrapper: {
+    width: 320,
+    height: 50,
   },
 });

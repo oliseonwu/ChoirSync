@@ -131,7 +131,7 @@ export const usePushNotifications = (): PushNotificationState => {
 
     //  Check if permissions are granted
     if (finalStatus !== "granted") {
-      alert("Failed to get push notification permissions token");
+      // alert("Failed to get push notification permissions token");
       return;
     }
 
