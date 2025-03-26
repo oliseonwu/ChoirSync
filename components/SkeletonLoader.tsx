@@ -9,20 +9,18 @@ import Animated, {
   FadeIn,
   useSharedValue,
 } from "react-native-reanimated";
-import {
-  horizontalScale,
-  verticalScale,
-  moderateScale,
-} from "@/utilities/TrueScale";
+import { getWindowSize } from "@/utilities/TrueScale";
+import ListItem from "./skeletonItems/ListItem";
 
-const SkeletonItem = () => (
-  <View style={styles.listItem}>
-    <View style={styles.skeletonName} />
-    <View style={styles.skeletonButton} />
-  </View>
-);
+type SkeletonLoaderProps = {
+  width?: number;
+  skelectonItem?: React.ReactNode;
+};
 
-export const SkeletonLoader = ({ width }: { width: number }) => {
+export const SkeletonLoader = ({
+  width = getWindowSize().width,
+  skelectonItem = <ListItem />,
+}: SkeletonLoaderProps) => {
   const translateX = useSharedValue(-width);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -32,17 +30,19 @@ export const SkeletonLoader = ({ width }: { width: number }) => {
     translateX.value = withRepeat(
       withSequence(
         withTiming(-width, { duration: 0 }),
-        withDelay(1000, withTiming(width, { duration: 1000 }))
+        withDelay(500, withTiming(width, { duration: 1000 }))
       ),
       -1
     );
   }, []);
 
   return (
-    <Animated.View entering={FadeIn} style={[styles.skeletonContainer]}>
-      {[1, 2, 3, 4].map((key) => (
-        <SkeletonItem key={key} />
-      ))}
+    <Animated.View
+      entering={FadeIn.duration(200)}
+      style={[styles.skeletonContainer]}
+    >
+      {skelectonItem}
+
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
@@ -61,34 +61,14 @@ export const SkeletonLoader = ({ width }: { width: number }) => {
 const styles = StyleSheet.create({
   skeletonContainer: {
     flex: 1,
-    position: "relative",
+    // position: "relative",
     overflow: "hidden",
-    backgroundColor: "#fff",
-  },
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: verticalScale(20),
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
+    // backgroundColor: "blue",
   },
   shimmer: {
     width: "100%",
     height: "100%",
     backgroundColor: "white",
     transform: [{ skewX: "-20deg" }],
-  },
-  skeletonName: {
-    width: horizontalScale(200),
-    height: verticalScale(20),
-    backgroundColor: "#E5E5E5",
-    borderRadius: moderateScale(4),
-  },
-  skeletonButton: {
-    width: horizontalScale(60),
-    height: verticalScale(30),
-    backgroundColor: "#E5E5E5",
-    borderRadius: moderateScale(4),
   },
 });
