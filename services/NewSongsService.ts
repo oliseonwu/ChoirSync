@@ -8,6 +8,7 @@ export type NewSongsResponse = {
     focusedSongDetected: boolean;
     focusedSongs: NewSong[];
     unFocusedSongs: NewSong[];
+    numberOfSongs: number;
   };
 };
 class NewSongsService {

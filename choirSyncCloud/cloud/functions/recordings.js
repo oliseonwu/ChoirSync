@@ -23,6 +23,10 @@ async function uploadRecordings(request) {
       groupId: choirGroupId,
       title: "New Recordings",
       message: "Check out the new recordings.",
+      data: {
+        pathname: "/recordings",
+        params: {},
+      },
     },
   };
 

@@ -37,26 +37,45 @@ export function NewSongsProvider({ children }: { children: React.ReactNode }) {
   const fetchNewSongs = async () => {
     if (loadingState === LoadingState.LOADING) return;
 
-    setLoadingState(LoadingState.LOADING);
+    try {
+      if (!groupId) {
+        throw new Error("No group ID found");
+      }
 
-    const response: NewSongsResponse = await newSongsService.fetchNewSongs(
-      groupId || "",
-      currentPageRef.current
-    );
+      setLoadingState(LoadingState.LOADING);
 
-    if (!response.success) {
-      console.error("Error fetching new songs:", response.error);
-      return;
+      const response: NewSongsResponse = await newSongsService.fetchNewSongs(
+        groupId || "",
+        currentPageRef.current
+      );
+
+      if (!response.success) {
+        throw response.error;
+      }
+
+      if (response.returnedSongs?.numberOfSongs === 0) {
+        setLoadingState(LoadingState.NO_MORE_SONGS);
+        return;
+      }
+
+      if (response.returnedSongs?.focusedSongDetected) {
+        setThisWeekSongDetected(true);
+      }
+
+      currentPageRef.current++;
+      setFocusedSongs([
+        ...focusedSongs,
+        ...response.returnedSongs!.focusedSongs,
+      ]);
+      setUnFocusedSongs([
+        ...unFocusedSongs,
+        ...response.returnedSongs!.unFocusedSongs,
+      ]);
+    } catch (error) {
+      console.error("Error fetching new songs:", error);
+    } finally {
+      setLoadingState(LoadingState.IDLE);
     }
-
-    if (response.returnedSongs?.focusedSongDetected) {
-      setThisWeekSongDetected(true);
-    }
-
-    currentPageRef.current++;
-    setFocusedSongs(response.returnedSongs!.focusedSongs);
-    setUnFocusedSongs(response.returnedSongs!.unFocusedSongs);
-    setLoadingState(LoadingState.IDLE);
   };
 
   const resetNewSongs = () => {

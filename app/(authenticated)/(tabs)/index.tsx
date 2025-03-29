@@ -157,7 +157,7 @@ export default function HomeScreen() {
         <View style={styles.rowGap}></View>
         <ThisWeekCard
           disabled={true}
-          title="Saved Recordings"
+          title="Saved Songs"
           icon={require("@/assets/images/bookmark-icon.png")}
         />
       </View>

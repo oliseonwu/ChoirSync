@@ -1,6 +1,6 @@
 import { StyleSheet, ScrollView, Text, View } from "react-native";
 import { verticalScale, moderateScale } from "@/utilities/TrueScale";
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import Parse from "@/services/Parse";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
@@ -48,7 +48,7 @@ export default function CatalogueScreen() {
             currentSongDetailsSV={currentSongDetailsSV}
             changeCurrentTrack={changeCurrentTrack}
           />
-          {ItemSeparatorComponent()}
+          {ItemSeparatorComponent}
         </View>
       );
     }
@@ -61,12 +61,12 @@ export default function CatalogueScreen() {
           currentSongDetailsSV={currentSongDetailsSV}
           changeCurrentTrack={changeCurrentTrack}
         />
-        {ItemSeparatorComponent()}
+        {ItemSeparatorComponent}
       </>
     );
   }, []);
 
-  const ItemSeparatorComponent = useCallback(() => {
+  const ItemSeparatorComponent = useMemo(() => {
     return <View style={{ marginTop: verticalScale(44) }} />;
   }, []);
 

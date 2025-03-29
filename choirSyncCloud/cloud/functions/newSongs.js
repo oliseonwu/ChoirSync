@@ -58,16 +58,23 @@ async function uploadNewSongs(request) {
 
     songString = songs.length > 1 ? "Songs" : "Song";
 
-    if (focusedSongDetected) {
+    if (notify || focusedSongDetected) {
       notificationRequestObject = {
         params: {
           groupId: groupId,
-          title: `New ${songString} For the Week!`,
-          message: `Check out new ${songString} for next rehearsal!`,
+          title: focusedSongDetected
+            ? `New ${songString} For the Week`
+            : `New ${songString} Added`,
+          message: focusedSongDetected
+            ? `Check out new ${songString} for next rehearsal!`
+            : `Listen and enjoy!`,
           data: {
             pathname: "/newSongs",
             params: {
-              newSongsType: NewSongsType.FOCUSED,
+              pageTitle: focusedSongDetected ? "New Songs" : "Members Picks",
+              newSongsType: focusedSongDetected
+                ? NewSongsType.FOCUSED
+                : NewSongsType.ALL,
             },
           },
         },
@@ -180,6 +187,7 @@ function toClientFormat(songs) {
     focusedSongDetected: focusedSongDetected,
     unFocusedSongs: unFocusedSongs,
     focusedSongs: focusedSongs,
+    numberOfSongs: songs.length,
   };
 
   return songsInClientFormat;
