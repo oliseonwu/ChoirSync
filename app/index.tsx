@@ -21,7 +21,6 @@ export default function LandingPage() {
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
-
     attemptToLogin();
   }, []);
 

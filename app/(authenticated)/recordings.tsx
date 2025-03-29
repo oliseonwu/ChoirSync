@@ -20,6 +20,7 @@ import SongItem from "@/components/SongItem";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import ListEmptyComponent from "@/components/ListEmptyComponent";
 import AdComponent from "@/components/AdComponent";
+import { globalStyles } from "@/shared/css/GlobalCss";
 
 export default function RecordingsScreen() {
   const { recordings, isLoading, fetchRecordings } = useRecordings();
@@ -87,7 +88,7 @@ export default function RecordingsScreen() {
     <View style={styles.container}>
       <AdComponent />
       <FlashList
-        contentContainerStyle={styles.flashListContent}
+        contentContainerStyle={globalStyles.flashListContent}
         ItemSeparatorComponent={ItemSeparatorComponent}
         data={thisWeekRecordings}
         renderItem={renderItem}
@@ -117,9 +118,7 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(20),
     marginHorizontal: horizontalScale(16),
   },
-  flashListContent: {
-    paddingVertical: verticalScale(16),
-  },
+
   loadingContainer: {
     flex: 1,
     paddingHorizontal: moderateScale(16),

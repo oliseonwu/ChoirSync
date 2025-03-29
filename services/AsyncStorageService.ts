@@ -4,6 +4,11 @@ export enum AsyncStorageKeys {
   NOTIFICATION_STATUS = "NOTIFICATION_STATUS",
   PUSH_TOKEN = "PUSH_TOKEN",
   HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG = "HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG",
+  NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
+}
+
+enum IgnoreOnClearKeys {
+  NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
 }
 
 class AsyncStorageService {
@@ -33,8 +38,11 @@ class AsyncStorageService {
   }
 
   async clear() {
+    const keysToRemove = Object.keys(AsyncStorageKeys).filter(
+      (key) => !Object.keys(IgnoreOnClearKeys).includes(key)
+    );
     try {
-      await AsyncStorage.multiRemove(Object.values(AsyncStorageKeys));
+      await AsyncStorage.multiRemove(keysToRemove);
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
     }

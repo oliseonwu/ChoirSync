@@ -12,3 +12,12 @@ export type Recording = {
   choirGroupId: string;
   isFirstRehearsalRecording: boolean;
 };
+
+export type NewSong = {
+  id: string;
+  name: string;
+  singerName: string;
+  artistName: string;
+  focusThisWeek: boolean;
+  link: string;
+};

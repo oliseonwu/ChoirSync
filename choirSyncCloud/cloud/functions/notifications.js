@@ -12,12 +12,14 @@ const {
   getGroupMembersPushTokens,
   getIdsOfGroupsWithRecentRecordings,
 } = require("./groups");
-const { deletePushTokens } = require("./token");
+const { deletePushTokens, getUsersPushTokenObjects } = require("./token");
 const { NotificationErrors } = require("../utils/notificationErrors");
 const { sleep, isPacificTimeDay } = require("../utils/helpers");
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
 });
+
+// ROUTES
 
 // Send notification to a choir group
 /**
@@ -32,8 +34,8 @@ const expo = new Expo({
  *   - FailedTickets: number - The number of tickets that failed
  */
 async function sendGroupNotification(request) {
-  const { groupId, title, message } = request.params;
-  const data = {};
+  const { groupId, title, message, data = {} } = request.params;
+
   const tokenToUserMap = {};
   let tickets;
   let handlePushTicketsResult;
@@ -123,6 +125,60 @@ async function sendGroupNotification(request) {
     throw new Error(`Failed to send group notification: ${error.message}`);
   }
 }
+
+/**
+ * Send a test notification to the user who made the request
+ * @param {object} request - The request object
+ * @returns {Promise<object>} A promise that resolves to an object containing:
+ *   - success: boolean - Whether the notification was sent successfully
+ *   - message: string - The success or error message
+ */
+const testNotifySingleUser = async (request) => {
+  const NewSongsType = {
+    FOCUSED: "FOCUSED",
+    ALL: "ALL",
+  };
+
+  try {
+    const userId = request.user.id;
+    let userExpoPushList = await getUsersPushTokenObjects([userId]);
+    userExpoPushList = userExpoPushList.map((pushTokenObject) => {
+      return pushTokenObject.get("push_token");
+    });
+
+    if (userExpoPushList.length === 0) {
+      throw new Error("User has no push tokens");
+    }
+
+    const requestObject = {
+      title: "Test Notification",
+      body: "This is a test notification.",
+      data: {
+        pathname: "/newSongs",
+        params: {
+          pageTitle: "Members Picks",
+          newSongsType: NewSongsType.ALL,
+        },
+      },
+    };
+
+    const tickets = await notificationSender(userExpoPushList, requestObject);
+
+    return {
+      success: true,
+      message: "Sent Test Notification to current user",
+      tickets,
+    };
+  } catch (error) {
+    console.error("Failed to send test notification to current user: ", error);
+    return {
+      success: false,
+      message: "Failed to send test notification to current user",
+    };
+  }
+};
+
+// FUNCTIONS
 
 /**
  * Sends a notification to a list of tokens
@@ -295,6 +351,8 @@ function logErrorList(error, errorHeading) {
   }
 }
 
+// Cloud jobs
+
 /**
  * Cloud job to notify group members about recent recordings
  * Runs every Thursday and Friday at 5:00 PM
@@ -334,6 +392,10 @@ Parse.Cloud.job("notifyRecentRecordings", async () => {
           groupId,
           title: "Lets Practice!",
           message: "Check out the recent recordings.",
+          data: {
+            pathname: "/recordings",
+            params: {},
+          },
         },
       };
       sendGroupNotification(requestObject);
@@ -366,6 +428,7 @@ Parse.Cloud.job("testNotify", async () => {
         groupId: "2DDTYeG6X6",
         title: "Test Notification",
         message: "This is a test notification.",
+        data: {},
       },
     };
     sendGroupNotification(requestObject);
@@ -388,6 +451,7 @@ module.exports = {
   sendGroupNotification,
   handlePushTicketsandReceiptsErrors,
   notificationSender,
+  testNotifySingleUser,
 };
 
 /*

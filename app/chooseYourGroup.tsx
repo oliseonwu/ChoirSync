@@ -18,7 +18,7 @@ import {
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import { router } from "expo-router";
+import { router, SplashScreen } from "expo-router";
 import Parse from "@/services/Parse";
 
 import { SkeletonLoader } from "@/components/SkeletonLoader";
@@ -35,6 +35,8 @@ const ChooseYourGroup = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // incase the splash screen is still visible
+    SplashScreen.hideAsync();
     fetchGroups();
   }, []);
 

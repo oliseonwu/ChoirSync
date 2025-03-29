@@ -67,15 +67,6 @@ class AuthService {
     }
   }
 
-  navigateBasedOnUserCredentials = (user: Parse.User, groupId: string) => {
-    if (!user.get("firstName") || !user.get("lastName")) {
-      return router.navigate("/name");
-    }
-    return groupId
-      ? router.navigate("/(authenticated)/(tabs)")
-      : router.navigate("/chooseYourPath");
-  };
-
   async verifyAuth() {
     const currentUser = await this.getCurrentUser();
     if (!currentUser) {

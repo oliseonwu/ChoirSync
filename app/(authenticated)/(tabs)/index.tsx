@@ -19,28 +19,64 @@ import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useMemo } from "react";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { router } from "expo-router";
+import { router, SplashScreen } from "expo-router";
 import Constants from "expo-constants";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { StatusBar } from "expo-status-bar";
 import AdComponent from "@/components/AdComponent";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { useRecordings } from "@/contexts/RecordingsContext";
-
+import { useNewSongs } from "@/contexts/newSongsContext";
+import { NewSongsType } from "../newSongs";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
   // We must call this to setup the push notifications on the device
-  const { expoPushToken, notification } = usePushNotifications();
+  const {
+    notification,
+    registerForPushNotifications,
+    setupListeners,
+    removeListeners,
+  } = usePushNotifications();
   const { fetchRecordings, recordings } = useRecordings();
+  const { fetchNewSongs, focusedSongs, unFocusedSongs, thisWeekSongDetected } =
+    useNewSongs();
+
   useEffect(() => {
+    initialPageSetup();
+
+    return () => {
+      console.log("unmounting");
+      removeListeners();
+    };
+  }, []);
+
+  const initialPageSetup = async () => {
     showPlayer();
+    setupListeners();
+    await registerForPushNotifications();
 
     if (recordings.length === 0) {
-      fetchRecordings();
+      await fetchRecordings();
     }
-  }, []);
+
+    if (focusedSongs.length === 0 && unFocusedSongs.length === 0) {
+      await fetchNewSongs();
+    }
+
+    setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 1000);
+
+    AsyncStorageService.getItem(AsyncStorageKeys.PUSH_TOKEN).then(
+      (pushToken) => {
+        console.log("pushToken", pushToken);
+      }
+    );
+  };
 
   const hasThisWeekRecordings = useMemo(() => {
     return recordings.some((recording) => {
@@ -60,6 +96,15 @@ export default function HomeScreen() {
           activeOpacity={0.8}
           // disabled={true}
           style={styles.BannerContainer}
+          onPress={() => {
+            router.push({
+              pathname: "/newSongs",
+              params: {
+                pageTitle: "Members Picks",
+                newSongsType: NewSongsType.ALL,
+              },
+            });
+          }}
         >
           <Image
             source={require("@/assets/images/color-card-1.png")}
@@ -95,12 +140,18 @@ export default function HomeScreen() {
             }}
           />
           <ThisWeekCard
-            disabled={true}
+            // disabled={true}
             title="New Songs"
             icon={require("@/assets/images/music-icon-2.png")}
-            // onPress={() => {
-            //   Linking.openURL("app-settings:");
-            // }}
+            showDot={thisWeekSongDetected}
+            onPress={() => {
+              router.push({
+                pathname: "/newSongs",
+                params: {
+                  newSongsType: NewSongsType.FOCUSED,
+                },
+              });
+            }}
           />
         </View>
         <View style={styles.rowGap}></View>

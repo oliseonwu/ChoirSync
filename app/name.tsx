@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   StatusBar,
 } from "react-native";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   getWindowSize,
   horizontalScale,
@@ -21,7 +21,7 @@ import {
 } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import { router } from "expo-router";
+import { router, SplashScreen } from "expo-router";
 import { authService } from "@/services/AuthService";
 import Parse from "@/services/Parse";
 import { useNavigation, StackActions } from "@react-navigation/native";
@@ -34,6 +34,11 @@ const NamePage = () => {
   const [lastName, setLastName] = useState("");
   const [isLoading, setIsLoading] = useLoadingState(false);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    // incase the splash screen is still visible
+    SplashScreen.hideAsync();
+  }, []);
 
   // Validate form using useMemo to prevent unnecessary recalculations
   const isFormValid = useMemo(() => {

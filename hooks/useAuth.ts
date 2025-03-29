@@ -2,6 +2,7 @@ import { useLoading } from "@/contexts/LoadingContext";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { router } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
@@ -44,7 +45,7 @@ export const useAuth = () => {
   };
 
   const attemptToLogin = async () => {
-    showLoading();
+    // showLoading();
     let currentUser;
 
     try {
@@ -54,7 +55,11 @@ export const useAuth = () => {
 
       if (currentUser) {
         onSuccessfulLogin(currentUser);
+        return;
       }
+
+      // Hide the splash screen if user is not logged in
+      SplashScreen.hideAsync();
     } catch (error: any) {
       console.log("error attempting to login: ", error.message);
 
@@ -62,9 +67,10 @@ export const useAuth = () => {
       if (error.message === Parse.Error.INVALID_SESSION_TOKEN) {
         await authService.logout();
       }
-      hideLoading();
+
+      // Hide the splash screen if error
+      SplashScreen.hideAsync();
     }
-    hideLoading();
   };
 
   const handleLogin = async () => {
@@ -85,6 +91,19 @@ export const useAuth = () => {
     hideLoading();
   };
 
+  const navigateBasedOnUserCredentials = async (
+    user: Parse.User,
+    groupId: string
+  ) => {
+    if (!user.get("firstName") || !user.get("lastName")) {
+      return router.navigate("/name");
+    }
+
+    return groupId
+      ? router.navigate("/(authenticated)/(tabs)")
+      : router.navigate("/chooseYourPath");
+  };
+
   async function onSuccessfulLogin(user: Parse.User) {
     const groupIdsResult = await userManagementService.getUserGroupIds(user.id);
     const groupId = groupIdsResult.groupIds?.[0] || "";
@@ -97,7 +116,7 @@ export const useAuth = () => {
       groupId
     );
 
-    authService.navigateBasedOnUserCredentials(user, groupId);
+    navigateBasedOnUserCredentials(user, groupId);
   }
 
   // Checks if the user is fully authenticated

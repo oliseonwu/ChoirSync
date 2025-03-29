@@ -9,7 +9,7 @@ import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
 import PlayIcon from "@/assets/images/SVG/item-play.svg";
 import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { Recording } from "@/types/music.types";
+import { NewSong, Recording } from "@/types/music.types";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import {
@@ -19,7 +19,7 @@ import {
 
 export function SongItem(props: {
   index: number;
-  recording: Recording;
+  recording: Recording | NewSong;
   currentSongDetailsSV: CurrentSongDetailsSVType;
   changeCurrentTrack: (
     songId: string,
