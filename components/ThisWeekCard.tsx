@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   dot: {
     marginLeft: moderateScale(8.63),
     padding: moderateScale(3.24),
-    backgroundColor: "#FF3B30",
+    backgroundColor: "#EA5C43",
     borderRadius: moderateScale(4),
     marginRight: moderateScale(8.63),
   },

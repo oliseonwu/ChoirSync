@@ -23,6 +23,10 @@ async function uploadRecordings(request) {
       groupId: choirGroupId,
       title: "New Recordings",
       message: "Check out the new recordings.",
+      data: {
+        pathname: "/recordings",
+        params: {},
+      },
     },
   };
 
@@ -78,7 +82,12 @@ async function uploadRecordings(request) {
  *   - recordings: Object[] - An array of objects containing recording details
  */
 async function fetchRecordings(request) {
-  const { groupId, page, limit, returnInClientFormat } = request.params;
+  const {
+    groupId,
+    page = 1,
+    limit = 20,
+    returnInClientFormat = true,
+  } = request.params;
 
   const skip = (page - 1) * limit;
   const Recordings = Parse.Object.extend("Recordings");

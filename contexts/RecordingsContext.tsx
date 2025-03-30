@@ -25,6 +25,7 @@ export function RecordingsProvider({
   const { getCurrentUserData } = useUser();
   const [noMoreRecordings, setNoMoreRecordings] = useState(false);
   const currentPageRef = useRef(1);
+  const { groupId } = getCurrentUserData();
   let recordingsResponse: {
     success: boolean;
     recordings: Recording[];
@@ -37,8 +38,6 @@ export function RecordingsProvider({
     }
     setIsLoading(true);
     try {
-      const { groupId } = getCurrentUserData();
-
       if (!groupId) {
         throw new Error("No group ID found");
       }

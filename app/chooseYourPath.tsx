@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import { router } from "expo-router";
+import { router, SplashScreen } from "expo-router";
 import LabeledCard from "@/components/LabeledCard";
 import LoadingButton from "@/components/LoadingButton";
 
@@ -19,6 +19,10 @@ const ChooseYourPath = () => {
   const headerHeight = useHeaderHeight();
   const [selectedPath, setSelectedPath] = useState<"join" | "create">("join");
 
+  useEffect(() => {
+    // incase the splash screen is still visible
+    SplashScreen.hideAsync();
+  }, []);
   return (
     <View
       style={[

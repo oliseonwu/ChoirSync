@@ -14,6 +14,7 @@ const notificationFunctions = require("./functions/notifications");
 const userFunctions = require("./functions/users");
 const tokenFunctions = require("./functions/token");
 const recordingsFunctions = require("./functions/recordings");
+const newSongsFunctions = require("./functions/newSongs");
 const helpers = require("./utils/helpers");
 const { Expo } = require("expo-server-sdk");
 
@@ -48,7 +49,19 @@ Parse.Cloud.define(
         type: String,
         required: true,
       },
+      data: {
+        type: Object,
+        required: false,
+      },
     },
+  }
+);
+
+Parse.Cloud.define(
+  "testNotifySingleUser",
+  notificationFunctions.testNotifySingleUser,
+  {
+    requireUser: true,
   }
 );
 
@@ -124,17 +137,68 @@ Parse.Cloud.define(
   {
     fields: {
       groupId: { type: String, required: true },
-      page: { type: Number, required: false, default: 1 },
-      limit: { type: Number, required: false, default: 20 },
+      page: {
+        type: Number,
+        required: false,
+        options: (val) => val > 0,
+      },
+      limit: {
+        type: Number,
+        required: false,
+        options: (val) => val > 0,
+      },
       returnInClientFormat: {
         type: Boolean,
         required: false,
-        default: false,
       },
     },
     requireUser: true,
   }
 );
+
+// Register new songs functions
+Parse.Cloud.define("uploadNewSongs", newSongsFunctions.uploadNewSongs, {
+  fields: {
+    groupId: { type: String, required: true },
+    newSongsData: {
+      type: Object,
+      required: true,
+      options: (val) => {
+        return Object.values(val).every(
+          (item) =>
+            typeof item.name === "string" &&
+            typeof item.singerName === "string" &&
+            typeof item.focusThisWeek === "boolean" &&
+            typeof item.url === "string"
+        );
+      },
+    },
+    notify: { type: Boolean, required: false, default: true },
+  },
+  requireMaster: true,
+});
+
+Parse.Cloud.define("fetchNewSongs", newSongsFunctions.fetchNewSongs, {
+  fields: {
+    groupId: { type: String, required: true },
+    page: {
+      type: Number,
+      required: false,
+      options: (val) => val > 0,
+    },
+    limit: {
+      type: Number,
+      required: false,
+      options: (val) => val > 0,
+    },
+    returnInClientFormat: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  requireUser: true,
+});
 
 Parse.Cloud.define("test", async (request) => {
   // const { userId, installationId, pushToken } = request.params;
@@ -147,3 +211,11 @@ Parse.Cloud.define("test2", async (request) => {
 });
 
 Parse.Cloud.define("test3", async (request) => {});
+
+Parse.Cloud.define(
+  "testNotifySingleUser",
+  notificationFunctions.testNotifySingleUser,
+  {
+    requireUser: true,
+  }
+);

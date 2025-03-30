@@ -1,11 +1,9 @@
 import { StyleSheet, ScrollView, Text, View } from "react-native";
 import { verticalScale, moderateScale } from "@/utilities/TrueScale";
-import React, { useEffect, useRef, useCallback } from "react";
-import Parse from "@/services/Parse";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { useWindowDimensions } from "react-native";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
-import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { Recording } from "@/types/music.types";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { FlashList } from "@shopify/flash-list";
@@ -48,7 +46,7 @@ export default function CatalogueScreen() {
             currentSongDetailsSV={currentSongDetailsSV}
             changeCurrentTrack={changeCurrentTrack}
           />
-          {ItemSeparatorComponent()}
+          {ItemSeparatorComponent}
         </View>
       );
     }
@@ -61,12 +59,12 @@ export default function CatalogueScreen() {
           currentSongDetailsSV={currentSongDetailsSV}
           changeCurrentTrack={changeCurrentTrack}
         />
-        {ItemSeparatorComponent()}
+        {ItemSeparatorComponent}
       </>
     );
   }, []);
 
-  const ItemSeparatorComponent = useCallback(() => {
+  const ItemSeparatorComponent = useMemo(() => {
     return <View style={{ marginTop: verticalScale(44) }} />;
   }, []);
 
@@ -144,6 +142,7 @@ export default function CatalogueScreen() {
           <ListEmptyComponent
             text="No recordings found"
             paddingTop={verticalScale(30)}
+            visible={!isLoading}
           />
         }
       />

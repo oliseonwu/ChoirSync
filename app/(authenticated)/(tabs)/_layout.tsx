@@ -5,7 +5,6 @@ import { useNavigation, Tabs, router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { authService } from "@/services/AuthService";
 import { StackActions } from "@react-navigation/native";
-import { Image } from "expo-image";
 import {
   horizontalScale,
   moderateScale,

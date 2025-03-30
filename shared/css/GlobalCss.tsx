@@ -74,4 +74,7 @@ export const globalStyles = StyleSheet.create({
     color: "#3E3C48",
     marginBottom: verticalScale(26),
   },
+  flashListContent: {
+    paddingVertical: verticalScale(16),
+  },
 });

@@ -1,9 +1,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+/**
+ * Enum representing the keys used in AsyncStorage
+ * @enum {string} THIS_WEEK_NEW_SONG_ACCESS_DATE - Timestamp of the first access to the new songs page when this week's songs are available
+ * @enum {string} THIS_WEEK_RECORDINGS_ACCESS_DATE - Timestamp of the first access to the this week's recordings page when this week's recordings are available
+ */
 export enum AsyncStorageKeys {
   NOTIFICATION_STATUS = "NOTIFICATION_STATUS",
   PUSH_TOKEN = "PUSH_TOKEN",
   HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG = "HAS_SEEN_NOTIFICATION_PERMISSIONS_DIALOG",
+  NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
+  THIS_WEEK_RECORDINGS_ACCESS_DATE = "THIS_WEEK_RECORDINGS_ACCESS_DATE",
+  THIS_WEEK_NEW_SONGS_ACCESS_DATE = "THIS_WEEK_NEW_SONGS_ACCESS_DATE",
+}
+
+enum IgnoreOnClearKeys {
+  NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
 }
 
 class AsyncStorageService {
@@ -33,8 +45,11 @@ class AsyncStorageService {
   }
 
   async clear() {
+    const keysToRemove = Object.keys(AsyncStorageKeys).filter(
+      (key) => !Object.keys(IgnoreOnClearKeys).includes(key)
+    );
     try {
-      await AsyncStorage.multiRemove(Object.values(AsyncStorageKeys));
+      await AsyncStorage.multiRemove(keysToRemove);
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
     }
