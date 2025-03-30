@@ -97,6 +97,7 @@ export default function RecordingsScreen() {
           <ListEmptyComponent
             text="No recordings found"
             paddingTop={verticalScale(12)}
+            visible={!isLoading}
           />
         }
       />

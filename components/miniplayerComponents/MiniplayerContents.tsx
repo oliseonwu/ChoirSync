@@ -101,15 +101,6 @@ export default function MiniplayerContents() {
       {displayMusicDetails}
 
       {displayPauseAndPlayIcons}
-      {/* <View
-        style={{
-          position: "relative",
-          width: moderateScale(25),
-          height: moderateScale(25),
-        }}
-      >
-        {currentTrackState === "playing" ? MemoizedPauseIcon : MemoizedPlayIcon}
-      </View> */}
     </TouchableOpacity>
   );
 }

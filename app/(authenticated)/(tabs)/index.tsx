@@ -18,7 +18,7 @@ import ThisWeekCard from "@/components/ThisWeekCard";
 import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { router, SplashScreen } from "expo-router";
 import Constants from "expo-constants";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -28,36 +28,30 @@ import { globalStyles } from "@/shared/css/GlobalCss";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useNewSongs } from "@/contexts/newSongsContext";
 import { NewSongsType } from "../newSongs";
-import AsyncStorageService, {
-  AsyncStorageKeys,
-} from "@/services/AsyncStorageService";
+import { useLastNotificationResponse } from "expo-notifications";
+
 export default function HomeScreen() {
   const { isVisibleSV, showPlayer } = useMiniPlayer();
   const tabBarHeight = useBottomTabBarHeight();
+
   // We must call this to setup the push notifications on the device
-  const {
-    notification,
-    registerForPushNotifications,
-    setupListeners,
-    removeListeners,
-  } = usePushNotifications();
+  const { registerForPushNotifications, setupListeners } =
+    usePushNotifications();
   const { fetchRecordings, recordings } = useRecordings();
   const { fetchNewSongs, focusedSongs, unFocusedSongs, thisWeekSongDetected } =
     useNewSongs();
+  const lastNotificationResponse = useLastNotificationResponse();
 
   useEffect(() => {
     initialPageSetup();
-
-    return () => {
-      console.log("unmounting");
-      removeListeners();
-    };
   }, []);
 
   const initialPageSetup = async () => {
     showPlayer();
-    setupListeners();
+
     await registerForPushNotifications();
+
+    setupListeners();
 
     if (recordings.length === 0) {
       await fetchRecordings();
@@ -70,12 +64,6 @@ export default function HomeScreen() {
     setTimeout(() => {
       SplashScreen.hideAsync();
     }, 1000);
-
-    AsyncStorageService.getItem(AsyncStorageKeys.PUSH_TOKEN).then(
-      (pushToken) => {
-        console.log("pushToken", pushToken);
-      }
-    );
   };
 
   const hasThisWeekRecordings = useMemo(() => {

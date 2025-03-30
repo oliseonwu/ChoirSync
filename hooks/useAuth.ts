@@ -33,7 +33,6 @@ export const useAuth = () => {
       await notificationService.deletePushNotificationToken(pushToken || "");
 
       await authService.logout();
-
       router.dismissAll();
       resetCurrentTrack();
       resetRecordings();
@@ -64,7 +63,7 @@ export const useAuth = () => {
       console.log("error attempting to login: ", error.message);
 
       // If the session is invalid, logout the user
-      if (error.message === Parse.Error.INVALID_SESSION_TOKEN) {
+      if (error.message === "Invalid session token") {
         await authService.logout();
       }
 

@@ -1,9 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import AdComponent from "@/components/AdComponent";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
-import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  SplashScreen,
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { useNewSongs, LoadingState } from "@/contexts/newSongsContext";
 import { NewSong } from "@/types/music.types";
@@ -28,6 +33,10 @@ export default function NewSongsScreen() {
   const { pageTitle, newSongsType } = useLocalSearchParams();
   const { focusedSongs, unFocusedSongs, loadingState, fetchNewSongs } =
     useNewSongs();
+
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   const renderItem = useCallback(
     ({ item, index }: { item: NewSong; index: number }) => {
@@ -79,6 +88,7 @@ export default function NewSongsScreen() {
           <ListEmptyComponent
             text="No New Songs found"
             paddingTop={verticalScale(12)}
+            visible={loadingState === LoadingState.IDLE}
           />
         }
         ListFooterComponent={

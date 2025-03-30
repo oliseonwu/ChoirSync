@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Alert, Linking, Platform } from "react-native";
+
 import { notificationService } from "../services/NotificationService";
 import AsyncStorageService, {
   AsyncStorageKeys,
@@ -34,11 +35,7 @@ export const usePushNotifications = (): PushNotificationState => {
   useEffect(() => {
     //  Cleanup listeners if added
     return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current!
-      );
-      Notifications.removeNotificationSubscription(responseListener.current!);
-      Notifications.unregisterForNotificationsAsync();
+      removeListeners();
     };
   }, []);
 
@@ -84,61 +81,52 @@ export const usePushNotifications = (): PushNotificationState => {
     ]);
   };
 
-  const setupListeners = () => {
-    console.log("settin up listener");
-
-    // Alert when a notification is received (when app is running)
+  const setupListeners = async () => {
+    // Alert when a notification is received (when app is in foreground)
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
+        console.log("Notification received");
         setNotification(notification);
       });
 
-    // // Get the most recent notification response and check if it has a url
-    // // If it does, redirect to the url
-    // Notifications.getLastNotificationResponseAsync().then(async (response) => {
-    //   // if (!response?.notification) {
-    //   //   console.log("No notification response");
-    //   //   return;
-    //   // }
-    //   // console.log("Notification received");
-    //   // await redirect(response?.notification);
-    //   Notifications.clearLastNotificationResponseAsync();
-    // });
+    // Get the most recent notification response and check if it has a url
+    // If it does, redirect to the url
+    Notifications.getLastNotificationResponseAsync().then(async (response) => {
+      let notificationRefId = response?.notification.request.identifier;
+      let storedNotificationRefId;
 
-    //  when a notification is pressed (when app is closed/opened)
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener(
-        async (response) => {
-          let notificationRefId = response?.notification.request.identifier;
-          const storedNotificationRefId = await AsyncStorageService.getItem(
-            AsyncStorageKeys.NOTIFICATION_RESPONSE_ID
-          );
+      if (!notificationRefId) {
+        console.log("No notification respone");
+        return;
+      }
 
-          if (notificationRefId === storedNotificationRefId) {
-            return;
-          }
-
-          redirect(response?.notification);
-
-          await AsyncStorageService.setItem(
-            AsyncStorageKeys.NOTIFICATION_RESPONSE_ID,
-            notificationRefId
-          );
-        }
+      storedNotificationRefId = await AsyncStorageService.getItem(
+        AsyncStorageKeys.NOTIFICATION_RESPONSE_ID
       );
-    return;
+
+      if (notificationRefId === storedNotificationRefId) {
+        return;
+      }
+
+      await redirect(response?.notification!);
+
+      await AsyncStorageService.setItem(
+        AsyncStorageKeys.NOTIFICATION_RESPONSE_ID,
+        notificationRefId
+      );
+    });
   };
 
   const removeListeners = () => {
-    if (!notificationListener.current || !responseListener.current) {
-      return;
+    if (notificationListener.current) {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
     }
 
-    // notificationListener.current.remove();
-    // responseListener.current.remove();
-
-    Notifications.removeNotificationSubscription(responseListener.current!);
-    Notifications.removeNotificationSubscription(notificationListener.current!);
+    if (responseListener.current) {
+      Notifications.removeNotificationSubscription(responseListener.current);
+    }
   };
 
   async function redirect(notification: Notifications.Notification) {

@@ -8,6 +8,7 @@ type ListEmptyComponentProps = {
   fontSize?: number;
   fontFamily?: string;
   color?: string;
+  visible: boolean;
 };
 
 const ListEmptyComponent = ({
@@ -16,9 +17,15 @@ const ListEmptyComponent = ({
   fontSize = moderateScale(15),
   fontFamily = "Inter-Medium",
   color = "#868686",
+  visible,
 }: ListEmptyComponentProps) => {
   return (
-    <View style={[styles.container, { paddingTop: paddingTop }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: paddingTop, opacity: visible ? 1 : 0 },
+      ]}
+    >
       <Text
         style={[{ fontSize: fontSize, fontFamily: fontFamily, color: color }]}
       >
@@ -34,7 +41,8 @@ export default memo(ListEmptyComponent, (prevProps, nextProps) => {
     prevProps.text === nextProps.text &&
     prevProps.fontSize === nextProps.fontSize &&
     prevProps.fontFamily === nextProps.fontFamily &&
-    prevProps.color === nextProps.color
+    prevProps.color === nextProps.color &&
+    prevProps.visible === nextProps.visible
   );
 });
 

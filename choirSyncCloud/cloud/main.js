@@ -211,3 +211,11 @@ Parse.Cloud.define("test2", async (request) => {
 });
 
 Parse.Cloud.define("test3", async (request) => {});
+
+Parse.Cloud.define(
+  "testNotifySingleUser",
+  notificationFunctions.testNotifySingleUser,
+  {
+    requireUser: true,
+  }
+);

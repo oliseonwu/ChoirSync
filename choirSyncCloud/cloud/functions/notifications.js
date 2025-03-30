@@ -428,7 +428,10 @@ Parse.Cloud.job("testNotify", async () => {
         groupId: "2DDTYeG6X6",
         title: "Test Notification",
         message: "This is a test notification.",
-        data: {},
+        data: {
+          pathname: "/recordings",
+          params: {},
+        },
       },
     };
     sendGroupNotification(requestObject);

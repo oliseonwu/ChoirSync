@@ -21,6 +21,7 @@ import { useWebView } from "@/contexts/WebViewContext";
 import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { WebViewComponent } from "@/components/WebViewComponent";
 import { notificationService } from "@/services/NotificationService";
+import { useAuth } from "@/hooks/useAuth";
 import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
@@ -38,40 +39,12 @@ const notificationIconMemo = memo(NotificationSettingsIcon);
 const profileIconMemo = memo(ProfileSettingsIcon);
 
 export default function SettingsScreen() {
-  const { showLoading, hideLoading } = useLoading();
+  const { performLogout } = useAuth();
   const [webViewTitle, setWebViewTitle] = useState("");
   const [webViewUrl, setWebViewUrl] = useState(
     "https://oliseonwu.github.io/choirsync.github.io/privacy.html"
   );
-  const { resetCurrentTrack } = useCurrentTrack();
-  const { resetRecordings } = useRecordings();
   const { showWebView } = useWebView();
-
-  const performLogout = async () => {
-    const pushToken = await AsyncStorageService.getItem(
-      AsyncStorageKeys.PUSH_TOKEN
-    );
-
-    try {
-      showLoading();
-      await AsyncStorageService.clear();
-      await notificationService.deletePushNotificationToken(pushToken || ""); // delete the push token from the DB
-
-      const result = await authService.logout();
-
-      if (result.success) {
-        router.dismissAll();
-        resetCurrentTrack();
-        resetRecordings();
-      } else {
-        Alert.alert("Error", "Failed to logout");
-      }
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
-    } finally {
-      hideLoading();
-    }
-  };
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
