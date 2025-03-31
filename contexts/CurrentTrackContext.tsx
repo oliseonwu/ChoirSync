@@ -1,10 +1,12 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import {
   CurrentTrackContextType,
   CurrentTrackDetailsType,
   CurrentTrackState,
 } from "@/types/currentTrackContext.types";
+import { useSQLiteContext } from "expo-sqlite";
+import songService from "@/services/sqlite/songService";
 
 const CurrentTrackContext = createContext<CurrentTrackContextType | undefined>(
   undefined
@@ -15,6 +17,7 @@ export const CurrentTrackProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const localDbRef = useRef(useSQLiteContext());
   // Shared value to store the current song id and state
   // This is used to update the catalog screen when the current song changes
   // and avoid using the render cycle of react.
@@ -37,17 +40,26 @@ export const CurrentTrackProvider = ({
     useState<CurrentTrackState>("paused");
 
   // Custom Function to set the current song details and state
-  const changeCurrentTrack = (
+  const changeCurrentTrack = async (
     songId: string,
     songName: string,
     artistName: string,
     songUrl: string
   ) => {
-    setCurrentTrackDetails({ songId, songName, artistName, songUrl });
-    setCurrentTrackState("playing");
+    try {
+      setCurrentTrackDetails({
+        songId,
+        songName,
+        artistName,
+        songUrl,
+      });
+      setCurrentTrackState("playing");
 
-    // set the shared value used to update the catalog screen
-    currentSongDetailsSV.value = { songId, state: "playing" };
+      // set the shared value used to update the catalog screen
+      currentSongDetailsSV.value = { songId, state: "playing" };
+    } catch (error) {
+      console.error("Error changing current track", error);
+    }
   };
 
   const togglePlay = () => {

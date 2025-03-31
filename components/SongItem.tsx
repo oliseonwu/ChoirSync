@@ -86,7 +86,7 @@ export function SongItem(props: {
     );
   }, []);
 
-  const handlePress = useCallback(() => {
+  const handlePress = useCallback(async () => {
     changeCurrentTrack(
       recording.id,
       recording.name,
