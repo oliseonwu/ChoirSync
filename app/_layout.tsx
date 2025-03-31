@@ -377,6 +377,19 @@ function RootLayoutNav() {
                                 headerLeft: () => <BackButtonComponent />,
                               }}
                             />
+                            <Stack.Screen
+                              name="(authenticated)/savedSongs"
+                              options={{
+                                headerShown: true,
+                                animation: "slide_from_right",
+                                headerTitle: "Saved Songs",
+                                headerTitleAlign: "center",
+                                headerTitleStyle: styles.smallHeaderTitle,
+                                headerShadowVisible: false,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerLeft: () => <BackButtonComponent />,
+                              }}
+                            />
                           </Stack>
                         </NowPlayingProvider>
                       </NewSongsProvider>
