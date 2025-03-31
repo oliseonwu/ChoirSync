@@ -12,6 +12,7 @@ import AdComponent from "@/components/AdComponent";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "react-native-paper";
 import ListEmptyComponent from "@/components/ListEmptyComponent";
+import ListFooterComponent from "@/components/ListFooterComponent";
 
 enum ItemType {
   DATE_AND_SONG = "DateAndSong",
@@ -98,32 +99,25 @@ export default function CatalogueScreen() {
     });
   }
 
-  const onEndReached = () => {
+  const onEndReached = useCallback(() => {
     if (!noMoreRecordings && !isLoading) {
       fetchRecordings();
     }
-  };
+  }, [noMoreRecordings, isLoading]);
 
-  const ListFooterComponent = () => {
-    if (!isLoading) {
-      return null;
-    }
-    return (
-      <View>
-        <Button disabled loading>
-          Fetching more...
-        </Button>
-      </View>
-    );
-  };
+  const listFooterComponent = useMemo(() => {
+    return <ListFooterComponent isLoading={isLoading} />;
+  }, [isLoading]);
 
-  if (isLoading && recordings.length === 0) {
+  const listEmptyComponent = useMemo(() => {
     return (
-      <View style={styles.loadingContainer}>
-        <SkeletonLoader width={width} />
-      </View>
+      <ListEmptyComponent
+        text="No recordings found"
+        paddingTop={verticalScale(30)}
+        visible={!isLoading}
+      />
     );
-  }
+  }, [isLoading]);
 
   return (
     <View style={styles.container}>
@@ -135,16 +129,10 @@ export default function CatalogueScreen() {
         renderItem={renderItem}
         getItemType={getItemType}
         onEndReached={onEndReached}
-        ListFooterComponent={ListFooterComponent}
+        ListFooterComponent={listFooterComponent}
         showsVerticalScrollIndicator={true}
         onEndReachedThreshold={0.7} // Trigger onEndReached when user is 70% away from the bottom of the list
-        ListEmptyComponent={
-          <ListEmptyComponent
-            text="No recordings found"
-            paddingTop={verticalScale(30)}
-            visible={!isLoading}
-          />
-        }
+        ListEmptyComponent={listEmptyComponent}
       />
     </View>
   );

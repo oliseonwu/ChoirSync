@@ -28,6 +28,7 @@ export function NowPlayingComponent() {
   // const headingContainerHeight =
   //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
+  const [isSaved, setIsSaved] = useState(false);
   const {
     togglePlay,
     currentTrackState,
@@ -62,15 +63,22 @@ export function NowPlayingComponent() {
     }
   };
 
+  const handleSaveIconPress = () => {
+    setIsSaved(!isSaved);
+  };
+
   const SaveIconMemoized = useMemo(
     () => (
       <SaveIcon
-        opacity={0.5}
+        opacity={isSaved ? 0.5 : 0.2}
         height={verticalScale(25)}
         width={horizontalScale(22)}
+        hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
+        onPress={handleSaveIconPress}
+        fill={"black"}
       />
     ),
-    []
+    [isSaved]
   );
 
   const ArrownDownMemoized = useMemo(
@@ -79,11 +87,29 @@ export function NowPlayingComponent() {
         height={verticalScale(25)}
         width={horizontalScale(22)}
         fill={"#313234"}
+        onPress={handleClose}
         hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
       />
     ),
-    []
+    [ytVideoId]
   );
+
+  const yTPlayer = useMemo(() => {
+    return (
+      <View style={styles.videoPlayerContainer}>
+        <YoutubePlayer
+          height={SCREEN_WIDTH / VIDEO_ASPECT_RATIO}
+          videoId={ytVideoId}
+          play={currentTrackState === "playing" && ytVideoId !== undefined}
+          webViewStyle={styles.videoPlayer}
+          onError={(e) => {
+            console.log("Playback error:", e);
+            console.log("ytVideoId:", ytVideoId);
+          }}
+        />
+      </View>
+    );
+  }, [ytVideoId, currentTrackState]);
   return (
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
@@ -96,34 +122,22 @@ export function NowPlayingComponent() {
             },
           ]}
         >
-          <TouchableOpacity onPress={handleClose}>
-            {ArrownDownMemoized}
-          </TouchableOpacity>
+          {ArrownDownMemoized}
 
           <Text style={styles.headingText}>{headingText}</Text>
-          <TouchableOpacity disabled={true}>
-            {SaveIconMemoized}
-          </TouchableOpacity>
+
+          {SaveIconMemoized}
         </View>
 
-        <View style={styles.videoPlayerContainer}>
-          <YoutubePlayer
-            height={SCREEN_WIDTH / VIDEO_ASPECT_RATIO}
-            videoId={ytVideoId}
-            play={currentTrackState === "playing" && ytVideoId !== undefined}
-            webViewStyle={styles.videoPlayer}
-            onError={(e) => {
-              console.log("Playback error:", e);
-              console.log("ytVideoId:", ytVideoId);
-            }}
-          />
-        </View>
+        {yTPlayer}
         <SectionDisplay />
       </Animated.View>
     </Portal>
   );
 }
-export default memo(NowPlayingComponent);
+export default memo(NowPlayingComponent, (prevProps, nextProps) => {
+  return true;
+});
 
 const styles = StyleSheet.create({
   container: {

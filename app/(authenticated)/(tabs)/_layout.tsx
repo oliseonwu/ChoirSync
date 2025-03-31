@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { useNavigation, Tabs, router } from "expo-router";
 
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { authService } from "@/services/AuthService";
 import { StackActions } from "@react-navigation/native";
 import {

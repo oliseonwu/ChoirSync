@@ -24,40 +24,56 @@ export default function LandingPage() {
     attemptToLogin();
   }, []);
 
+  const SignInWithGoogleBtnMemoized = useMemo(
+    () => (
+      <TouchableOpacity
+        style={styles.googleBtnContainer}
+        onPress={() => {
+          handleLogin();
+        }}
+      >
+        <SignInWithGoogleBtn
+          width={horizontalScale(230)}
+          // height={verticalScale(55)}
+        />
+      </TouchableOpacity>
+    ),
+    []
+  );
+
+  const content = useMemo(() => {
+    return (
+      <>
+        <View style={styles.TopContainer}>
+          <Image
+            style={styles.LandingPageImage}
+            source={LandingPageImage}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            priority="high"
+            transition={0}
+          />
+        </View>
+        <View style={styles.BottomContainer}>
+          <Text style={styles.Heading1}>
+            {"Organise and share\nchoir recording."}
+          </Text>
+          <Text style={styles.Heading2}>
+            {"This app is designed for choir groups, providing easy" +
+              " access to rehearsal recordings for their choir members."}
+          </Text>
+          {SignInWithGoogleBtnMemoized}
+        </View>
+
+        <LoadingScreenComponent />
+      </>
+    );
+  }, []);
+
   return (
     <View style={styles.MainContainer}>
       <StatusBar style="light" />
-      <View style={styles.TopContainer}>
-        <Image
-          style={styles.LandingPageImage}
-          source={LandingPageImage}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          priority="high"
-          transition={0}
-        />
-      </View>
-      <View style={styles.BottomContainer}>
-        <Text style={styles.Heading1}>
-          {"Organise and share\nchoir recording."}
-        </Text>
-        <Text style={styles.Heading2}>
-          {"This app is designed for choir groups, providing easy" +
-            " access to rehearsal recordings for their choir members."}
-        </Text>
-        <TouchableOpacity
-          style={styles.googleBtnContainer}
-          onPress={() => {
-            handleLogin();
-          }}
-        >
-          <SignInWithGoogleBtn
-            width={horizontalScale(230)}
-            // height={verticalScale(55)}
-          />
-        </TouchableOpacity>
-      </View>
-      <LoadingScreenComponent />
+      {content}
     </View>
   );
 }

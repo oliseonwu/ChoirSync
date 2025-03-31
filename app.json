@@ -122,7 +122,8 @@
         }
       ],
       "expo-font",
-      "expo-tracking-transparency"
+      "expo-tracking-transparency",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
