@@ -53,13 +53,13 @@ export default function HomeScreen() {
 
     setupListeners();
 
-    if (recordings.length === 0) {
-      await fetchRecordings();
-    }
+    // if (recordings.length === 0) {
+    //   await fetchRecordings();
+    // }
 
-    if (focusedSongs.length === 0 && unFocusedSongs.length === 0) {
-      await fetchNewSongs();
-    }
+    // if (focusedSongs.length === 0 && unFocusedSongs.length === 0) {
+    //   await fetchNewSongs();
+    // }
 
     setTimeout(() => {
       SplashScreen.hideAsync();

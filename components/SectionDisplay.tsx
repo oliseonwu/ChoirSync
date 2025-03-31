@@ -2,6 +2,7 @@
 
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import React, {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -21,7 +22,7 @@ type SongData = {
   timeStamp: string;
 };
 
-export default function SectionDisplay() {
+export function SectionDisplay() {
   const selectedSongSV = useSharedValue<SongData | null>(null);
 
   const unclickSong = useRef<(() => void) | null>(null);
@@ -108,6 +109,8 @@ export default function SectionDisplay() {
     </View>
   );
 }
+
+export default memo(SectionDisplay);
 
 const styles = StyleSheet.create({
   container: {

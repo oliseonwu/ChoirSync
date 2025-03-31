@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -22,18 +22,18 @@ import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import YoutubePlayer from "react-native-youtube-iframe";
 import SectionDisplay from "./SectionDisplay";
+import songService, { Song } from "@/services/sqlite/songService";
+import { useSQLiteContext } from "expo-sqlite";
 
 export function NowPlayingComponent() {
   // const headerAndStatusBarHeight = useHeaderHeight();
   // const headingContainerHeight =
   //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
-  const {
-    togglePlay,
-    currentTrackState,
-    currentTrackDetails,
-    currentSongDetailsSV,
-  } = useCurrentTrack();
+  const [isSaved, setIsSaved] = useState(false);
+  const localDbRef = useRef(useSQLiteContext());
+  const { togglePlay, currentTrackState, currentTrackDetails } =
+    useCurrentTrack();
   const [headingText, setHeadingText] = useState("");
   const [ytVideoId, setYtVideoId] = useState<string | undefined>(undefined);
   const VIDEO_ASPECT_RATIO = 16 / 9;
@@ -42,6 +42,10 @@ export function NowPlayingComponent() {
   useEffect(() => {
     setHeadingText(currentTrackDetails.songName);
     setYtVideoId(getYouTubeVideoId(currentTrackDetails.songUrl));
+
+    checkIfSongIsSaved().then((isSaved) => {
+      setIsSaved(isSaved);
+    });
   }, [currentTrackDetails.songId]);
 
   const translateYStyle = useAnimatedStyle(() => ({
@@ -62,15 +66,52 @@ export function NowPlayingComponent() {
     }
   };
 
+  const handleSaveIconPress = async () => {
+    if (!isSaved) {
+      await saveCurrentTrack();
+    } else {
+      await deleteCurrentTrack();
+    }
+
+    setIsSaved(!isSaved);
+  };
+
+  const saveCurrentTrack = async () => {
+    await songService.createSong(
+      currentTrackDetails.songName,
+      currentTrackDetails.artistName,
+      currentTrackDetails.songUrl,
+      localDbRef.current
+    );
+  };
+
+  const deleteCurrentTrack = async () => {
+    await songService.deleteSong(
+      currentTrackDetails.songUrl,
+      localDbRef.current
+    );
+  };
+
+  const checkIfSongIsSaved = async () => {
+    const isSaved = await songService.getSongsByLink(
+      currentTrackDetails.songUrl,
+      localDbRef.current
+    );
+    return !!isSaved;
+  };
+
   const SaveIconMemoized = useMemo(
     () => (
       <SaveIcon
-        opacity={0.5}
+        opacity={isSaved ? 1 : 0.2}
         height={verticalScale(25)}
         width={horizontalScale(22)}
+        hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
+        onPress={handleSaveIconPress}
+        fill={isSaved ? "#BDA293" : "black"}
       />
     ),
-    []
+    [isSaved]
   );
 
   const ArrownDownMemoized = useMemo(
@@ -79,11 +120,34 @@ export function NowPlayingComponent() {
         height={verticalScale(25)}
         width={horizontalScale(22)}
         fill={"#313234"}
+        onPress={handleClose}
         hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
       />
     ),
-    []
+    [ytVideoId, currentTrackState]
   );
+
+  const yTPlayer = useMemo(() => {
+    console.log("ytVideoId:", ytVideoId);
+    console.log("currentTrackState:", currentTrackState);
+    return (
+      <View style={styles.videoPlayerContainer}>
+        <YoutubePlayer
+          height={SCREEN_WIDTH / VIDEO_ASPECT_RATIO}
+          videoId={ytVideoId}
+          play={currentTrackState === "playing" && ytVideoId !== undefined}
+          webViewStyle={styles.videoPlayer}
+          onError={(e) => {
+            console.log("Playback error:", e);
+            console.log("ytVideoId:", ytVideoId);
+          }}
+          onReady={() => {
+            console.log("YTPlayer is ready");
+          }}
+        />
+      </View>
+    );
+  }, [ytVideoId, currentTrackState]);
   return (
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>
@@ -96,34 +160,22 @@ export function NowPlayingComponent() {
             },
           ]}
         >
-          <TouchableOpacity onPress={handleClose}>
-            {ArrownDownMemoized}
-          </TouchableOpacity>
+          {ArrownDownMemoized}
 
           <Text style={styles.headingText}>{headingText}</Text>
-          <TouchableOpacity disabled={true}>
-            {SaveIconMemoized}
-          </TouchableOpacity>
+
+          {SaveIconMemoized}
         </View>
 
-        <View style={styles.videoPlayerContainer}>
-          <YoutubePlayer
-            height={SCREEN_WIDTH / VIDEO_ASPECT_RATIO}
-            videoId={ytVideoId}
-            play={currentTrackState === "playing" && ytVideoId !== undefined}
-            webViewStyle={styles.videoPlayer}
-            onError={(e) => {
-              console.log("Playback error:", e);
-              console.log("ytVideoId:", ytVideoId);
-            }}
-          />
-        </View>
+        {yTPlayer}
         <SectionDisplay />
       </Animated.View>
     </Portal>
   );
 }
-export default memo(NowPlayingComponent);
+export default memo(NowPlayingComponent, (prevProps, nextProps) => {
+  return true;
+});
 
 const styles = StyleSheet.create({
   container: {

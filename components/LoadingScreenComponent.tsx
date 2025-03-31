@@ -28,7 +28,9 @@ export function LoadingScreenComponent() {
   );
 }
 
-export default memo(LoadingScreenComponent);
+export default memo(LoadingScreenComponent, (prevProps, nextProps) => {
+  return true;
+});
 
 const styles = StyleSheet.create({
   container: {
