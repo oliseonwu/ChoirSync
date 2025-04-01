@@ -1,14 +1,9 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import React, { memo, useEffect, useMemo, useState } from "react";
+import { EventRegister } from "react-native-event-listeners";
 import { Portal } from "react-native-paper";
 import Constants from "expo-constants";
-import { useHeaderHeight } from "@react-navigation/elements";
+
 import ArrownDown from "@/assets/images/SVG/down-arrow.svg";
 import SaveIcon from "@/assets/images/SVG/save-icon.svg";
 import {
@@ -22,16 +17,13 @@ import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
 import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
 import YoutubePlayer from "react-native-youtube-iframe";
 import SectionDisplay from "./SectionDisplay";
-import songService, { Song } from "@/services/sqlite/songService";
+import songService from "@/services/sqlite/songService";
 import { useSQLiteContext } from "expo-sqlite";
 
 export function NowPlayingComponent() {
-  // const headerAndStatusBarHeight = useHeaderHeight();
-  // const headingContainerHeight =
-  //   headerAndStatusBarHeight - Constants.statusBarHeight;
   const { yOffsetSV, closePlayer } = useNowPlayingContext();
   const [isSaved, setIsSaved] = useState(false);
-  const localDbRef = useRef(useSQLiteContext());
+  const localDb = useSQLiteContext();
   const { togglePlay, currentTrackState, currentTrackDetails } =
     useCurrentTrack();
   const [headingText, setHeadingText] = useState("");
@@ -73,6 +65,7 @@ export function NowPlayingComponent() {
       await deleteCurrentTrack();
     }
 
+    fireSaveEvent();
     setIsSaved(!isSaved);
   };
 
@@ -81,22 +74,20 @@ export function NowPlayingComponent() {
       currentTrackDetails.songName,
       currentTrackDetails.artistName,
       currentTrackDetails.songUrl,
-      localDbRef.current
+      localDb
     );
   };
 
   const deleteCurrentTrack = async () => {
-    await songService.deleteSong(
-      currentTrackDetails.songUrl,
-      localDbRef.current
-    );
+    await songService.deleteSong(currentTrackDetails.songUrl, localDb);
   };
 
   const checkIfSongIsSaved = async () => {
     const isSaved = await songService.getSongsByLink(
       currentTrackDetails.songUrl,
-      localDbRef.current
+      localDb
     );
+
     return !!isSaved;
   };
 
@@ -111,7 +102,7 @@ export function NowPlayingComponent() {
         fill={isSaved ? "#BDA293" : "black"}
       />
     ),
-    [isSaved]
+    [isSaved, ytVideoId]
   );
 
   const ArrownDownMemoized = useMemo(
@@ -128,8 +119,6 @@ export function NowPlayingComponent() {
   );
 
   const yTPlayer = useMemo(() => {
-    console.log("ytVideoId:", ytVideoId);
-    console.log("currentTrackState:", currentTrackState);
     return (
       <View style={styles.videoPlayerContainer}>
         <YoutubePlayer
@@ -148,6 +137,19 @@ export function NowPlayingComponent() {
       </View>
     );
   }, [ytVideoId, currentTrackState]);
+
+  /*
+  This function is used to fire an event when the save icon is pressed.
+  Other components can listen to this event and perform actions based on the event.
+  */
+  const fireSaveEvent = () => {
+    EventRegister.emit("saveSong", {
+      songName: currentTrackDetails.songName,
+      artistName: currentTrackDetails.artistName,
+      link: currentTrackDetails.songUrl,
+      isSaved: !isSaved,
+    });
+  };
   return (
     <Portal>
       <Animated.View style={[styles.container, translateYStyle]}>

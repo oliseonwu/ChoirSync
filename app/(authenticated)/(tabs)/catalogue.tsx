@@ -10,7 +10,6 @@ import { FlashList } from "@shopify/flash-list";
 import SongItem from "@/components/SongItem";
 import AdComponent from "@/components/AdComponent";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "react-native-paper";
 import ListEmptyComponent from "@/components/ListEmptyComponent";
 import ListFooterComponent from "@/components/ListFooterComponent";
 

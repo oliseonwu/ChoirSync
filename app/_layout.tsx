@@ -183,7 +183,7 @@ export default function RootLayout() {
 
 async function createDbIfNeeded(db: SQLiteDatabase) {
   const result = await db.execAsync(
-    "CREATE TABLE IF NOT EXISTS Songs (id INTEGER PRIMARY KEY AUTOINCREMENT, song_name TEXT, artist_name TEXT, link TEXT)"
+    "CREATE TABLE IF NOT EXISTS Songs (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, singerName TEXT, link TEXT)"
   );
   console.log("DB created", result);
 }

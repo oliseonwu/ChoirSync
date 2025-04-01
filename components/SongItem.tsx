@@ -9,13 +9,9 @@ import EarPhoneIcon from "@/assets/images/SVG/earphone.svg";
 import PlayIcon from "@/assets/images/SVG/item-play.svg";
 import PauseIcon from "@/assets/images/SVG/item-pause.svg";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { NewSong, Recording } from "@/types/music.types";
-import { useCurrentTrack } from "@/contexts/CurrentTrackContext";
+import { NewSong, Recording, SavedSong } from "@/types/music.types";
 import { useNowPlayingContext } from "@/contexts/NowPlayingContext";
-import {
-  CurrentTrackContextType,
-  CurrentSongDetailsSVType,
-} from "@/types/currentTrackContext.types";
+import { CurrentSongDetailsSVType } from "@/types/currentTrackContext.types";
 
 export function SongItem(props: {
   index: number;
