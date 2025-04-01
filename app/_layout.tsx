@@ -33,7 +33,8 @@ import { AppStateProvider } from "@/contexts/AppStateContext";
 import mobileAds, { AdsConsent } from "react-native-google-mobile-ads";
 import { StatusBarProvider } from "@/contexts/StatusBarContext";
 import { NewSongsProvider } from "@/contexts/newSongsContext";
-import { SQLiteDatabase, SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
+import initService from "@/services/sqlite/initService";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -181,17 +182,10 @@ export default function RootLayout() {
   }
 }
 
-async function createDbIfNeeded(db: SQLiteDatabase) {
-  const result = await db.execAsync(
-    "CREATE TABLE IF NOT EXISTS Songs (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, singerName TEXT, link TEXT)"
-  );
-  console.log("DB created", result);
-}
-
 function RootLayoutNav() {
   return (
     <PaperProvider>
-      <SQLiteProvider databaseName="ChoirSyncDB" onInit={createDbIfNeeded}>
+      <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
         <StatusBarProvider>
           <AppStateProvider>
             <LoadingProvider>

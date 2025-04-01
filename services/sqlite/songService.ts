@@ -23,6 +23,10 @@ class SongService {
   }
 
   async getSongsByLink(link: string, db: SQLiteDatabase) {
+    if (!link) {
+      return null;
+    }
+
     try {
       const result: SavedSong | null = await db.getFirstAsync(
         "SELECT * FROM Songs WHERE link = ?",

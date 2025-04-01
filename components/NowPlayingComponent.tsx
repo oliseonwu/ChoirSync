@@ -83,6 +83,10 @@ export function NowPlayingComponent() {
   };
 
   const checkIfSongIsSaved = async () => {
+    if (!currentTrackDetails.songUrl) {
+      return false;
+    }
+
     const isSaved = await songService.getSongsByLink(
       currentTrackDetails.songUrl,
       localDb
