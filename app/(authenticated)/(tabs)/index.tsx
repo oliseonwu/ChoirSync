@@ -144,9 +144,13 @@ export default function HomeScreen() {
         </View>
         <View style={styles.rowGap}></View>
         <ThisWeekCard
-          disabled={true}
           title="Saved Songs"
           icon={require("@/assets/images/bookmark-icon.png")}
+          onPress={() => {
+            router.push({
+              pathname: "/savedSongs",
+            });
+          }}
         />
       </View>
 

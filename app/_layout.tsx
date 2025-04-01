@@ -33,7 +33,8 @@ import { AppStateProvider } from "@/contexts/AppStateContext";
 import mobileAds, { AdsConsent } from "react-native-google-mobile-ads";
 import { StatusBarProvider } from "@/contexts/StatusBarContext";
 import { NewSongsProvider } from "@/contexts/newSongsContext";
-import { SQLiteDatabase, SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
+import initService from "@/services/sqlite/initService";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -181,17 +182,10 @@ export default function RootLayout() {
   }
 }
 
-async function createDbIfNeeded(db: SQLiteDatabase) {
-  const result = await db.execAsync(
-    "CREATE TABLE IF NOT EXISTS Songs (id INTEGER PRIMARY KEY AUTOINCREMENT, song_name TEXT, artist_name TEXT, link TEXT)"
-  );
-  console.log("DB created", result);
-}
-
 function RootLayoutNav() {
   return (
     <PaperProvider>
-      <SQLiteProvider databaseName="ChoirSyncDB" onInit={createDbIfNeeded}>
+      <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
         <StatusBarProvider>
           <AppStateProvider>
             <LoadingProvider>
@@ -370,6 +364,19 @@ function RootLayoutNav() {
                                 headerShown: true,
                                 animation: "slide_from_right",
                                 headerTitle: "New Songs",
+                                headerTitleAlign: "center",
+                                headerTitleStyle: styles.smallHeaderTitle,
+                                headerShadowVisible: false,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerLeft: () => <BackButtonComponent />,
+                              }}
+                            />
+                            <Stack.Screen
+                              name="(authenticated)/savedSongs"
+                              options={{
+                                headerShown: true,
+                                animation: "slide_from_right",
+                                headerTitle: "Saved Songs",
                                 headerTitleAlign: "center",
                                 headerTitleStyle: styles.smallHeaderTitle,
                                 headerShadowVisible: false,

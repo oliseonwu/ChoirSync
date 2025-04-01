@@ -36,6 +36,7 @@ export function NotificationMenuItem({
   borderBottomWidth = 0,
 }: NotificationMenuItemProps) {
   const isNotificationEnabledSV = useSharedValue(true);
+
   useEffect(() => {
     const listener = EventRegister.addEventListener(
       "appStateChange",
