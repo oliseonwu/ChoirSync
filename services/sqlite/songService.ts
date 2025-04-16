@@ -1,5 +1,6 @@
 import { SavedSong } from "@/types/music.types";
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
+import { authService } from "../AuthService";
 
 class SongService {
   async createSong(
@@ -9,16 +10,23 @@ class SongService {
     db: SQLiteDatabase
   ) {
     try {
+      const currentUser = await authService.getCurrentUser();
+
+      if (!currentUser) {
+        throw new Error("No user found");
+      }
+
       const result = await db.runAsync(
-        "INSERT INTO Songs (name, singerName, link) VALUES (?, ?, ?)",
+        "INSERT INTO Songs (name, singerName, link, user_id) VALUES (?, ?, ?, ?)",
         songName,
         artistName,
-        link
+        link,
+        currentUser.id
       );
 
       return result;
     } catch (error) {
-      console.log("error creating song", error);
+      console.error("[SQLite] Error creating song:", error);
     }
   }
 
@@ -28,25 +36,39 @@ class SongService {
     }
 
     try {
+      const currentUser = await authService.getCurrentUser();
+
+      if (!currentUser) {
+        throw new Error("No user found");
+      }
+
       const result: SavedSong | null = await db.getFirstAsync(
-        "SELECT * FROM Songs WHERE link = ?",
-        link
+        "SELECT * FROM Songs WHERE link = ? AND (user_id = ? OR user_id IS NULL)",
+        link,
+        currentUser.id
       );
       return result;
     } catch (error) {
-      console.log("error getting songs by link", error);
+      console.error("[SQLite] Error getting songs by link:", error);
     }
   }
 
   async deleteSong(link: string, db: SQLiteDatabase) {
     try {
+      const currentUser = await authService.getCurrentUser();
+
+      if (!currentUser) {
+        throw new Error("No user found");
+      }
+
       const result = await db.runAsync(
-        "DELETE FROM Songs WHERE link = ?",
-        link
+        "DELETE FROM Songs WHERE link = ? AND (user_id = ? OR user_id IS NULL)",
+        link,
+        currentUser.id
       );
       return result;
     } catch (error) {
-      console.log("error deleting song", error);
+      console.error("[SQLite] Error deleting song:", error);
     }
   }
 
@@ -59,15 +81,22 @@ class SongService {
    */
   async fetchSongs(db: SQLiteDatabase, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
+    const currentUser = await authService.getCurrentUser();
+
     try {
+      if (!currentUser) {
+        throw new Error("No user found");
+      }
+
       const result: SavedSong[] = await db.getAllAsync(
-        "SELECT * FROM Songs ORDER BY id DESC LIMIT ? OFFSET ?",
+        "SELECT * FROM Songs WHERE user_id = ? OR user_id IS NULL ORDER BY id DESC LIMIT ? OFFSET ?",
+        currentUser.id,
         limit,
         skip
       );
       return result;
     } catch (error) {
-      console.log("error fetching songs", error);
+      console.error("[SQLite] Error fetching songs:", error);
     }
   }
 }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "ChoirSync",
     "slug": "ChoirSync",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "exp+choirsync",
@@ -18,7 +18,9 @@
         "ITSAppUsesNonExemptEncryption": false
       },
       "icon": {
-        "light": "./assets/images/icon-light-ios.png"
+        "light": "./assets/images/app-icons/ios-light.png",
+        "dark": "./assets/images/app-icons/ios-dark.png",
+        "tinted": "./assets/images/app-icons/ios-tinted.png"
       },
       "runtimeVersion": {
         "policy": "appVersion"
@@ -26,7 +28,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon-android.png",
+        "foregroundImage": "./assets/images/app-icons/adaptive-icon.png",
+        "monochromeImage": "./assets/images/app-icons/adaptive-icon.png",
         "backgroundColor": "#FCF5F3"
       },
       "package": "com.olise.ChoirSync",
@@ -46,9 +49,10 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFf",
-          "image": "./assets/images/splash-icon-light.png",
-          "imageWidth": 200
+          "backgroundColor": "#FCF5F3",
+          "image": "./assets/images/app-icons/splash-icon-light.png",
+          "imageWidth": 200,
+          "resizeMode": "contain"
         }
       ],
       [
@@ -64,7 +68,7 @@
             "useFrameworks": "static"
           },
           "android": {
-            "extraProguardRules": "-keep class com.google.android.gms.internal.consent_sdk.** { *; }\n-keep class com.android.installreferrer.api.** { *; }\n-keep class com.google.android.gms.common.** { *; }"
+            "extraProguardRules": "-keep class com.google.android.gms.internal.consent_sdk.** { *; }"
           }
         }
       ],

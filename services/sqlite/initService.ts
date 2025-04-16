@@ -1,5 +1,5 @@
 import { SQLiteDatabase } from "expo-sqlite";
-const DATABASE_VERSION = 1; // The Latest version of my DB
+const DATABASE_VERSION = 2; // The Latest version of my DB
 
 class InitService {
   public setupDB = async (db: SQLiteDatabase) => {
@@ -13,16 +13,13 @@ class InitService {
 
       // to use the "this" we need to use the arrow function for setupDB
       await this.makeMigrations(db, deviceDbVersion);
-
-      // Update the DB version
-      await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
     } catch (error) {
-      console.error("Error occured setting up sqlite DB: ", error);
+      console.error("[SQLite] Error setting up sqlite DB:", error);
     }
   };
 
   private async makeMigrations(db: SQLiteDatabase, deviceDbVersion: number) {
-    console.log("Making migratios: ", deviceDbVersion);
+    console.log("Making migrations: ", deviceDbVersion);
     // If the DB is brand new, we need to update the DB schema
     // to match the lasest Version
 
@@ -40,6 +37,17 @@ class InitService {
         );
         deviceDbVersion = 1;
       }
+      if (deviceDbVersion === 1) {
+        // Create a table for users
+        await db.execAsync(
+          "CREATE TABLE IF NOT EXISTS Users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT)"
+        );
+
+        // Alter the Songs table to add user_id column
+        await db.execAsync("ALTER TABLE Songs ADD COLUMN user_id INTEGER");
+
+        deviceDbVersion = 2;
+      }
 
       // its good to use if statements to seperate the migrations
       // because you can easily know what changed in the DB for
@@ -48,10 +56,13 @@ class InitService {
       // if (deviceDbVersion === 1) {
       //   Add more migrations
       // }
+
+      // Update the DB version
+      await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
     } catch (error) {
       // This will let us track which migrations are causing errors
       throw new Error(
-        `Error making migrations(sqlite DB): ${error}\nDEVICE_DB_VERSION = ${deviceDbVersion}\nDATABASE_VERSION = ${DATABASE_VERSION}`
+        `[SQLite] Error making migrations: ${error}\nDEVICE_DB_VERSION = ${deviceDbVersion}\nDATABASE_VERSION = ${DATABASE_VERSION}`
       );
     }
   }
