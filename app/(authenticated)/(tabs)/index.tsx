@@ -40,7 +40,6 @@ export default function HomeScreen() {
   const { fetchRecordings, recordings } = useRecordings();
   const { fetchNewSongs, focusedSongs, unFocusedSongs, thisWeekSongDetected } =
     useNewSongs();
-  const lastNotificationResponse = useLastNotificationResponse();
 
   useEffect(() => {
     initialPageSetup();

@@ -58,7 +58,7 @@ async function uploadNewSongs(request) {
 
     songString = songs.length > 1 ? "Songs" : "Song";
 
-    if (notify || focusedSongDetected) {
+    if (notify) {
       notificationRequestObject = {
         params: {
           groupId: groupId,
@@ -132,8 +132,8 @@ async function fetchNewSongs(request) {
 
   try {
     query.equalTo("group", pointer(groupId, "ChoirGroups"));
-    query.descending("createdAt");
     query.descending("this_week_focus");
+    query.descending("createdAt");
     query.skip(skip);
     query.limit(limit);
 
