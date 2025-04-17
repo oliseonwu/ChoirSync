@@ -19,6 +19,7 @@ import { NowPlayingComponent } from "@/components/NowPlayingComponent";
 import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { PlatformPressable } from "@react-navigation/elements";
 import { useUser } from "@/contexts/UserContext";
+import CustomTabBar from "@/components/CustomTabBar";
 
 export default function TabLayout() {
   const navigation = useNavigation();
@@ -43,65 +44,64 @@ export default function TabLayout() {
   }, []);
 
   return (
-    <PaperProvider>
-      <MiniPlayerProvider>
-        <Tabs
-          screenOptions={{
-            tabBarActiveTintColor: "#8F8F8F",
-            tabBarInactiveTintColor: "#C2C2C2",
-            tabBarButton: (props) => (
-              <PlatformPressable
-                {...props}
-                android_ripple={{ color: "transparent" }} // Disables the ripple effect for Android
+    <MiniPlayerProvider>
+      <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          tabBarActiveTintColor: "#8F8F8F",
+          tabBarInactiveTintColor: "#C2C2C2",
+          tabBarButton: (props) => (
+            <PlatformPressable
+              {...props}
+              android_ripple={{ color: "transparent" }} // Disables the ripple effect for Android
+            />
+          ),
+          headerShown: false,
+          tabBarLabelStyle: {
+            fontFamily: "Inter-Medium",
+            fontSize: moderateScale(11),
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }) => (
+              <HomeIcon
+                fill={color}
+                width={verticalScale(24)}
+                height={verticalScale(24)}
               />
             ),
-            headerShown: false,
-            tabBarLabelStyle: {
-              fontFamily: "Inter-Medium",
-              fontSize: moderateScale(11),
-            },
-          }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: "Home",
-              tabBarIcon: ({ color }) => (
-                <HomeIcon
-                  fill={color}
-                  width={verticalScale(24)}
-                  height={verticalScale(24)}
-                />
-              ),
-              headerShown: true,
+            headerShown: true,
 
-              headerTitleStyle: styles.headerTitle,
-              headerRight: () => (
-                <HeaderProfileImage
-                  onPress={() => router.push("/(authenticated)/(Settings)")}
-                  marginRight={horizontalScale(20)}
-                />
-              ),
-              headerShadowVisible: false,
-            }}
-          />
-          <Tabs.Screen
-            name="catalogue"
-            options={{
-              title: "Catalogue",
-              headerShown: true,
-              tabBarIcon: ({ color }) => (
-                <CatalogIcon
-                  fill={color}
-                  width={verticalScale(24)}
-                  height={verticalScale(24)}
-                />
-              ),
-            }}
-          />
-        </Tabs>
-      </MiniPlayerProvider>
-    </PaperProvider>
+            headerTitleStyle: styles.headerTitle,
+            headerRight: () => (
+              <HeaderProfileImage
+                onPress={() => router.push("/(authenticated)/(Settings)")}
+                marginRight={horizontalScale(20)}
+              />
+            ),
+            headerShadowVisible: false,
+          }}
+        />
+        <Tabs.Screen
+          name="catalogue"
+          options={{
+            title: "Catalogue",
+            headerShown: true,
+            tabBarIcon: ({ color }) => (
+              <CatalogIcon
+                fill={color}
+                width={verticalScale(24)}
+                height={verticalScale(24)}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </MiniPlayerProvider>
   );
 }
 

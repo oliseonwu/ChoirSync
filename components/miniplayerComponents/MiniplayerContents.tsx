@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { memo, useCallback, useMemo } from "react";
 import {
   horizontalScale,
@@ -90,9 +96,8 @@ export default function MiniplayerContents() {
     );
   }, [currentTrackDetails.songId]);
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.MiniMusicPlayerContent}
-      activeOpacity={0.8}
       onPress={handlePress}
       disabled={currentTrackDetails.songId === ""}
     >
@@ -101,7 +106,7 @@ export default function MiniplayerContents() {
       {displayMusicDetails}
 
       {displayPauseAndPlayIcons}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

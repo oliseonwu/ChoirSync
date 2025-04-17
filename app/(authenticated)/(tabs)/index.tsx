@@ -15,8 +15,7 @@ import {
 } from "@/utilities/TrueScale";
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
-import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
-import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useMemo, useRef } from "react";
 import { router, SplashScreen } from "expo-router";
@@ -28,12 +27,8 @@ import { globalStyles } from "@/shared/css/GlobalCss";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useNewSongs } from "@/contexts/newSongsContext";
 import { NewSongsType } from "../newSongs";
-import { useLastNotificationResponse } from "expo-notifications";
 
 export default function HomeScreen() {
-  const { isVisibleSV, showPlayer } = useMiniPlayer();
-  const tabBarHeight = useBottomTabBarHeight();
-
   // We must call this to setup the push notifications on the device
   const { registerForPushNotifications, setupListeners } =
     usePushNotifications();
@@ -42,14 +37,11 @@ export default function HomeScreen() {
     useNewSongs();
 
   useEffect(() => {
-    initialPageSetup();
+    // initialPageSetup();
   }, []);
 
   const initialPageSetup = async () => {
-    showPlayer();
-
     await registerForPushNotifications();
-
     setupListeners();
 
     if (recordings.length === 0) {
@@ -167,7 +159,6 @@ export default function HomeScreen() {
           />
         </View>
       </View>
-      <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );
 }

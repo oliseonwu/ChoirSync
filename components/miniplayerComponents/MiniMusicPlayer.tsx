@@ -1,13 +1,4 @@
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Platform,
-  Text,
-} from "react-native";
-import { horizontalScale, moderateScale } from "@/utilities/TrueScale";
-
-import { Portal } from "react-native-paper";
+import { StyleSheet, Platform } from "react-native";
 
 import Animated, {
   SharedValue,
@@ -18,49 +9,30 @@ import MiniplayerContents from "./MiniplayerContents";
 
 type MiniMusicPlayerProps = {
   bottomOffset: number;
-  isVisibleSV: SharedValue<boolean>;
 };
 
-function MiniMusicPlayer({ bottomOffset, isVisibleSV }: MiniMusicPlayerProps) {
-  const miniplayerStyleSV = useAnimatedStyle(() => {
-    return {
-      opacity: isVisibleSV.value ? 1 : 0,
-      pointerEvents: isVisibleSV.value ? "auto" : "none",
-    };
-  });
-
+function MiniMusicPlayer({ bottomOffset }: MiniMusicPlayerProps) {
   return (
-    <Portal>
-      <Animated.View
-        style={[
-          styles.MiniMusicPlayer,
-          {
-            bottom:
-              bottomOffset > 90 && Platform.OS === "android"
-                ? 49
-                : bottomOffset,
-          },
-          miniplayerStyleSV,
-        ]}
-      >
-        <MiniplayerContents />
-      </Animated.View>
-    </Portal>
+    <Animated.View
+      style={[
+        styles.MiniMusicPlayer,
+        {
+          bottom: bottomOffset,
+        },
+      ]}
+    >
+      <MiniplayerContents />
+    </Animated.View>
   );
 }
 
 export default memo(MiniMusicPlayer, (prev, next) => {
-  return (
-    prev.bottomOffset === next.bottomOffset &&
-    prev.isVisibleSV === next.isVisibleSV
-  );
+  return true;
 });
 const styles = StyleSheet.create({
   MiniMusicPlayer: {
     width: "100%",
     height: "7.5%",
-    position: "absolute",
-    left: 0,
-    // zIndex: 1000,
+    zIndex: 0,
   },
 });
