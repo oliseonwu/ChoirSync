@@ -37,7 +37,7 @@ export default function HomeScreen() {
     useNewSongs();
 
   useEffect(() => {
-    // initialPageSetup();
+    initialPageSetup();
   }, []);
 
   const initialPageSetup = async () => {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffff",
     // paddingBottom: "22%",
-    paddingBottom: verticalScale(100),
+    paddingBottom: verticalScale(5),
   },
   statusBar: {
     height: Constants.statusBarHeight,
@@ -201,15 +201,8 @@ const styles = StyleSheet.create({
   Section1: {
     marginTop: "1%",
     marginHorizontal: horizontalScale(16),
-    // paddingBottom: verticalScale(12),
-    // marginBottom: verticalScale(10),
-    // flex: 1,
     flexBasis: "39%",
-    // flexGrow: 2,
-    // flexGrow: 0,
-    // flexShrink: 1,
-    // flexGrow: 0,
-    // flexShrink: 0,
+    flexShrink: 1,
   },
   Section1Content1: {
     flexDirection: "row",
@@ -223,7 +216,8 @@ const styles = StyleSheet.create({
   Section2: {
     // marginTop: "16%",
     marginHorizontal: horizontalScale(16),
-    flex: 4,
+    flexBasis: "50%",
+    flexGrow: 1,
     marginTop: isSmallHeightDevice() ? "8%" : verticalScale(0),
   },
   BannerContainer: {

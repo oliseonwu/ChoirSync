@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { PlatformPressable } from "@react-navigation/elements";
@@ -8,6 +8,8 @@ import CatalogIcon from "@/assets/images/SVG/folder-music.svg";
 import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import MiniMusicPlayer from "./miniplayerComponents/MiniMusicPlayer";
 import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 const CustomTabBar = ({
   state,
   descriptors,
@@ -16,8 +18,7 @@ const CustomTabBar = ({
   const activeColor = "#8F8F8F";
   const inactiveColor = "#C2C2C2";
   const { buildHref } = useLinkBuilder();
-  const { isVisibleSV } = useMiniPlayer();
-
+  const insets = useSafeAreaInsets();
   const getIcon = (route: string, isFocused: boolean) => {
     switch (route) {
       case "index":
@@ -42,7 +43,15 @@ const CustomTabBar = ({
   return (
     <>
       <MiniMusicPlayer bottomOffset={0} />
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingBottom:
+              Platform.OS === "ios" ? insets.bottom : verticalScale(5),
+          },
+        ]}
+      >
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
 
@@ -118,6 +127,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     marginTop: verticalScale(10),
+    paddingBottom: Platform.OS === "ios" ? verticalScale(25) : verticalScale(5),
     zIndex: 1,
   },
   tabItem: {

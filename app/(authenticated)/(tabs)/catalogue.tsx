@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   flashListContent: {
-    paddingBottom: verticalScale(100),
+    paddingBottom: verticalScale(10),
   },
   title: {
     fontSize: moderateScale(20),
