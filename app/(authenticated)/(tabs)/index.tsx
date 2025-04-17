@@ -15,8 +15,7 @@ import {
 } from "@/utilities/TrueScale";
 import { Image } from "expo-image";
 import ThisWeekCard from "@/components/ThisWeekCard";
-import MiniMusicPlayer from "@/components/miniplayerComponents/MiniMusicPlayer";
-import { useMiniPlayer } from "@/contexts/MiniPlayerContext";
+
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useMemo, useRef } from "react";
 import { router, SplashScreen } from "expo-router";
@@ -28,12 +27,8 @@ import { globalStyles } from "@/shared/css/GlobalCss";
 import { useRecordings } from "@/contexts/RecordingsContext";
 import { useNewSongs } from "@/contexts/newSongsContext";
 import { NewSongsType } from "../newSongs";
-import { useLastNotificationResponse } from "expo-notifications";
 
 export default function HomeScreen() {
-  const { isVisibleSV, showPlayer } = useMiniPlayer();
-  const tabBarHeight = useBottomTabBarHeight();
-
   // We must call this to setup the push notifications on the device
   const { registerForPushNotifications, setupListeners } =
     usePushNotifications();
@@ -46,10 +41,7 @@ export default function HomeScreen() {
   }, []);
 
   const initialPageSetup = async () => {
-    showPlayer();
-
     await registerForPushNotifications();
-
     setupListeners();
 
     if (recordings.length === 0) {
@@ -167,7 +159,6 @@ export default function HomeScreen() {
           />
         </View>
       </View>
-      <MiniMusicPlayer bottomOffset={tabBarHeight} isVisibleSV={isVisibleSV} />
     </View>
   );
 }
@@ -178,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffff",
     // paddingBottom: "22%",
-    paddingBottom: verticalScale(100),
+    paddingBottom: verticalScale(5),
   },
   statusBar: {
     height: Constants.statusBarHeight,
@@ -210,15 +201,8 @@ const styles = StyleSheet.create({
   Section1: {
     marginTop: "1%",
     marginHorizontal: horizontalScale(16),
-    // paddingBottom: verticalScale(12),
-    // marginBottom: verticalScale(10),
-    // flex: 1,
     flexBasis: "39%",
-    // flexGrow: 2,
-    // flexGrow: 0,
-    // flexShrink: 1,
-    // flexGrow: 0,
-    // flexShrink: 0,
+    flexShrink: 1,
   },
   Section1Content1: {
     flexDirection: "row",
@@ -232,7 +216,8 @@ const styles = StyleSheet.create({
   Section2: {
     // marginTop: "16%",
     marginHorizontal: horizontalScale(16),
-    flex: 4,
+    flexBasis: "50%",
+    flexGrow: 1,
     marginTop: isSmallHeightDevice() ? "8%" : verticalScale(0),
   },
   BannerContainer: {
