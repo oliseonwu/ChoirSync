@@ -80,9 +80,7 @@ export default function SettingsScreen() {
         title: "Privacy",
         onPress: () => {
           setWebViewTitle("Privacy Policy");
-          setWebViewUrl(
-            "https://oliseonwu.github.io/choirsync.github.io/privacy.html"
-          );
+          setWebViewUrl("https://choirsync.info/privacy");
           showWebView();
         },
       },
@@ -92,9 +90,7 @@ export default function SettingsScreen() {
         title: "Terms and Conditions",
         onPress: () => {
           setWebViewTitle("Terms and Conditions");
-          setWebViewUrl(
-            "https://oliseonwu.github.io/choirsync.github.io/terms.html"
-          );
+          setWebViewUrl("https://choirsync.info/terms");
           showWebView();
         },
       },

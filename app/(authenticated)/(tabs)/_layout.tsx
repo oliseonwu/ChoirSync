@@ -36,7 +36,7 @@ export default function TabLayout() {
       }
 
       if (!groupId) {
-        router.replace("/chooseYourPath");
+        router.replace("/chooseYourGroup");
       }
     };
 

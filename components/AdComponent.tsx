@@ -36,12 +36,12 @@ const AdComponent: React.FC<AdComponentProps> = ({
   borderColor = "#E6E9E8",
   backgroundColor = "#FAFAFA",
 }) => {
-  // const adUnitId = __DEV__
-  //   ? TestIds.ADAPTIVE_BANNER
-  //   : Platform.OS === "ios"
-  //     ? `${process.env.EXPO_PUBLIC_ADMOB_BANNER_ID_IOS}`
-  //     : `${process.env.EXPO_PUBLIC_ADMOB_BANNER_ID_ANDROID}`;
-  const adUnitId = TestIds.ADAPTIVE_BANNER;
+  const adUnitId = __DEV__
+    ? TestIds.ADAPTIVE_BANNER
+    : Platform.OS === "ios"
+      ? `${process.env.EXPO_PUBLIC_ADMOB_BANNER_ID_IOS}`
+      : `${process.env.EXPO_PUBLIC_ADMOB_BANNER_ID_ANDROID}`;
+  // const adUnitId = TestIds.ADAPTIVE_BANNER;
   const bannerRef = useRef<BannerAd>(null);
   const [canShowAds, setCanShowAds] = useState(false);
   const [status, setStatus] = useState<string>("");

@@ -95,12 +95,15 @@ export const useAuth = () => {
     groupId: string
   ) => {
     if (!user.get("firstName") || !user.get("lastName")) {
-      return router.navigate("/name");
+      router.navigate("/name");
+      return;
     }
 
-    return groupId
-      ? router.navigate("/(authenticated)/(tabs)")
-      : router.navigate("/chooseYourPath");
+    if (groupId) {
+      router.navigate("/(authenticated)/(tabs)");
+    } else {
+      router.navigate("/chooseYourGroup");
+    }
   };
 
   async function onSuccessfulLogin(user: Parse.User) {

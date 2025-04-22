@@ -70,6 +70,7 @@ export default function HomeScreen() {
   const hompageBanner = useMemo(() => {
     return (
       <>
+        <StatusBar style="dark" />
         <Text style={globalStyles.heading1}>Members Picks</Text>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -201,8 +202,9 @@ const styles = StyleSheet.create({
   Section1: {
     marginTop: "1%",
     marginHorizontal: horizontalScale(16),
-    flexBasis: "39%",
-    flexShrink: 1,
+    // flexBasis: "39%",
+    // flexShrink: 1,
+    // flex: 1,
   },
   Section1Content1: {
     flexDirection: "row",
@@ -211,14 +213,18 @@ const styles = StyleSheet.create({
   },
   rowGap: {
     flex: 1,
-    maxHeight: "10%",
+    // maxHeight: "10%",
+    paddingVertical: verticalScale(12),
   },
   Section2: {
     // marginTop: "16%",
     marginHorizontal: horizontalScale(16),
-    flexBasis: "50%",
-    flexGrow: 1,
-    marginTop: isSmallHeightDevice() ? "8%" : verticalScale(0),
+    // flexBasis: "50%",
+    // flexGrow: 1,
+    flex: 1.7,
+    paddingTop: "12%",
+
+    // marginTop: isSmallHeightDevice() ? "8%" : verticalScale(0),
   },
   BannerContainer: {
     backgroundColor: "#FAFAFA",

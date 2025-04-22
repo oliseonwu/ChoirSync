@@ -31,10 +31,10 @@ import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 
 import mobileAds, { AdsConsent } from "react-native-google-mobile-ads";
-import { StatusBarProvider } from "@/contexts/StatusBarContext";
 import { NewSongsProvider } from "@/contexts/newSongsContext";
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
 import initService from "@/services/sqlite/initService";
+import { BottomSheetProvider } from "@/contexts/ButtomSheetContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -185,8 +185,8 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider>
-      <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
-        <StatusBarProvider>
+      <BottomSheetProvider>
+        <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
           <AppStateProvider>
             <LoadingProvider>
               <UserProvider>
@@ -393,8 +393,8 @@ function RootLayoutNav() {
               </UserProvider>
             </LoadingProvider>
           </AppStateProvider>
-        </StatusBarProvider>
-      </SQLiteProvider>
+        </SQLiteProvider>
+      </BottomSheetProvider>
     </PaperProvider>
   );
 }
