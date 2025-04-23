@@ -7,12 +7,16 @@ import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
 import { notificationService } from "@/services/NotificationService";
-import { authService } from "@/services/AuthService";
+import { googleAuthService } from "@/services/GoogleAuthService";
+import { appleAuthService } from "@/services/AppleAuthService";
 import { Alert } from "react-native";
 import { useUser } from "@/contexts/UserContext";
 import Parse from "@/services/Parse";
 
 import { userManagementService } from "@/services/UserManagementService";
+
+// Export login method type
+export type LoginMethod = "email" | "google" | "apple";
 
 // Handles Login, Logout, and Session Management
 
@@ -22,22 +26,102 @@ export const useAuth = () => {
   const { resetRecordings } = useRecordings();
   const { updateCurrentUserData, getCurrentUserData } = useUser();
 
-  const performLogout = async () => {
-    const pushToken = await AsyncStorageService.getItem(
-      AsyncStorageKeys.PUSH_TOKEN
-    );
+  const getCurrentUser = async () => {
+    const user = await Parse.User.currentAsync();
+    return user;
+  };
 
+  const socialLogoutMethod = async (method: LoginMethod) => {
+    if (method === "google") {
+      await googleAuthService.socialSignOut();
+    }
+
+    // Apple signout shows login screen when signing out
+    // so we don't need to call socialSignOut
+
+    // else if (method === "apple") {
+    //   await appleAuthService.socialSignOut();
+    // }
+    // No action needed for "email" method
+  };
+
+  const performLogout = async () => {
+    let method: LoginMethod;
     try {
       showLoading();
-      await AsyncStorageService.clear();
-      await notificationService.deletePushNotificationToken(pushToken || "");
 
-      await authService.logout();
+      // Get current sign in method
+      method = (await AsyncStorageService.getItem(
+        AsyncStorageKeys.SIGN_IN_METHOD
+      )) as LoginMethod;
+
+      if (!method) {
+        throw new Error("No sign in method found");
+      }
+
+      // 1. Logout from social provider if applicable
+      await socialLogoutMethod(method);
+
+      // 2. Clear AsyncStorage
+      await AsyncStorageService.clear();
+
+      // 3. Logout from Parse
+      await Parse.User.logOut();
+
+      // 4. Reset app state
       router.dismissAll();
       resetCurrentTrack();
       resetRecordings();
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
+
+      return { success: true };
+    } catch (error: any) {
+      console.log("Logout error:", error);
+      Alert.alert("Error", "An unexpected error occurred during logout");
+      return { success: false, error: error.message };
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const performLogin = async (
+    method: LoginMethod,
+    username?: string,
+    password?: string
+  ) => {
+    try {
+      let loginResponse;
+
+      // Choose login method based on type
+      if (method === "google") {
+        loginResponse = await googleAuthService.loginWithGoogle();
+      } else if (method === "apple") {
+        loginResponse = await appleAuthService.loginWithApple();
+      } else if (method === "email" && username && password) {
+        // Email login will be implemented later
+        // loginResponse = await emailAuthService.loginWithEmail(username, password);
+        throw new Error("Email login not implemented yet");
+      } else {
+        throw new Error("Invalid login method or missing credentials");
+      }
+
+      showLoading();
+      if (loginResponse?.success) {
+        await AsyncStorageService.setItem(
+          AsyncStorageKeys.SIGN_IN_METHOD,
+          method
+        );
+        await onSuccessfulLogin(loginResponse.user!);
+        return { success: true };
+      } else {
+        throw new Error(loginResponse?.error || "Login failed");
+      }
+    } catch (error: any) {
+      console.log("Login error:", error);
+      Alert.alert(
+        "Login Error",
+        error.message || "Failed to login. Please try again."
+      );
+      return { success: false, error: error.message };
     } finally {
       hideLoading();
     }
@@ -64,30 +148,12 @@ export const useAuth = () => {
 
       // If the session is invalid, logout the user
       if (error.message === "Invalid session token") {
-        await authService.logout();
+        await performLogout(); // Default to email if method unknown during auto-login
       }
 
       // Hide the splash screen if error
       SplashScreen.hideAsync();
     }
-  };
-
-  const handleLogin = async () => {
-    showLoading();
-    let loginResponse = null;
-
-    try {
-      loginResponse = await authService.loginWithGoogle();
-      if (loginResponse.success) {
-        onSuccessfulLogin(loginResponse.user!);
-      }
-    } catch (error: any) {
-      console.log("error", error.message);
-      hideLoading();
-      Alert.alert("Error", "Failed to login. Please try again.");
-    }
-
-    hideLoading();
   };
 
   const navigateBasedOnUserCredentials = async (
@@ -142,15 +208,28 @@ export const useAuth = () => {
     // If the user is not fully authenticated, logout the user
     const isAuthenticated = await isFullyAuthenticated();
     if (!isAuthenticated) {
-      await performLogout();
+      await performLogout(); // Default to email method if we don't know
     }
+  }
+
+  async function verifyAuth() {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        error: "User not logged in",
+      };
+    }
+    return { success: true };
   }
 
   return {
     performLogout,
+    getCurrentUser,
+    performLogin,
     attemptToLogin,
-    handleLogin,
     isFullyAuthenticated,
     logoutIfNotFullyAuthenticated,
+    verifyAuth,
   };
 };

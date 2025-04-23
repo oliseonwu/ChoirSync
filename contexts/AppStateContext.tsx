@@ -1,13 +1,14 @@
 import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import * as Notifications from "expo-notifications";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 import { notificationService } from "@/services/NotificationService";
 import { EventRegister } from "react-native-event-listeners";
-import { authService } from "@/services/AuthService";
+import Parse from "@/services/Parse";
+
 type AppStateContextType = {
   appStateSV: SharedValue<AppStateStatus>;
 };
@@ -15,6 +16,16 @@ type AppStateContextType = {
 const AppStateContext = createContext<AppStateContextType | undefined>(
   undefined
 );
+
+// Simple authentication check without using useAuth hook
+const checkAuthentication = async () => {
+  try {
+    const currentUser = await Parse.User.currentAsync();
+    return { success: !!currentUser };
+  } catch (error) {
+    return { success: false };
+  }
+};
 
 // OPTIMIZATION TIP:
 // Lets not keep notification logic in the AppStateContext.
@@ -37,7 +48,7 @@ export const AppStateProvider = ({
     nextAppState: AppStateStatus,
     currentAppState: AppStateStatus
   ) => {
-    const isAuthenticated = (await authService.verifyAuth()).success;
+    const isAuthenticated = (await checkAuthentication()).success;
     let authorized = false;
     const storedNotificationSetting = await AsyncStorageService.getItem(
       AsyncStorageKeys.NOTIFICATION_STATUS

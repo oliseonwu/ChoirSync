@@ -7,19 +7,17 @@ import {
   Platform,
   Linking,
 } from "react-native";
-import React, { Component } from "react";
+import React, { Component, useCallback } from "react";
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from "@/utilities/TrueScale";
 import Logo from "@/assets/images/SVG/logo.svg";
-import LoadingButton from "./LoadingButton";
 import AppleIcon from "@/assets/images/SVG/apple.svg";
 import GoogleIcon from "@/assets/images/SVG/google.svg";
-import { googleAuthService } from "@/services/GoogleAuthService";
-import { router } from "expo-router";
-import * as AppleAuthentication from "expo-apple-authentication";
+import { useAuth } from "@/hooks/useAuth";
+
 import EnvelopeIcon from "@/assets/images/SVG/envelope.svg";
 import GmailIconColored from "@/assets/images/SVG/google-colored.svg";
 import SocialButton from "./SocialButton";
@@ -34,38 +32,22 @@ export default function LoginBottomSheet({
 }: {
   dismissBottomSheet: () => void;
 }) {
-  async function onAppleButtonPress() {
+  const { performLogin } = useAuth();
+
+  const onAppleButtonPress = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     dismissBottomSheet();
-    try {
-      // performs login request for apple
-      // const appleAuthRequestResponse = await appleAuth.performRequest({
-      //   requestedOperation: appleAuth.Operation.LOGIN,
-      //   // Note: it appears putting FULL_NAME first is important, see issue #293
-      //   requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      // });
-      // // Ensure Apple returned a user identityToken
-      // if (!appleAuthRequestResponse.identityToken) {
-      //   throw new Error("Apple Sign-In failed - no identify token returned");
-      // }
-      // // Create a Firebase credential from the response
-      // const { identityToken, nonce } = appleAuthRequestResponse;
-      // const appleCredential = AppleAuthProvider.credential(
-      //   identityToken,
-      //   nonce
-      // );
-      // const authInstance = getAuth();
-      // // Sign the user in with the credential
-      // const user = await signInWithCredential(authInstance, appleCredential);
-      // console.log("Signed in with Apple: ", user);
-      // router.push("/(tabs)");
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    await performLogin("apple");
+  }, []);
+
+  const onGoogleButtonPress = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    dismissBottomSheet();
+    await performLogin("google");
+  }, []);
 
   // Function to handle opening URLs
-  const openURL = (url: string) => {
+  const openURL = useCallback((url: string) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
@@ -73,7 +55,7 @@ export default function LoginBottomSheet({
         console.log(`Cannot open URL: ${url}`);
       }
     });
-  };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -119,14 +101,7 @@ export default function LoginBottomSheet({
           label=""
           buttonStyle={styles.socialButton}
           iconColor="#F4F4F4"
-          onPress={async () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            dismissBottomSheet();
-            const response = await googleAuthService.signIn();
-            if (response.success) {
-              // router.push("/(tabs)");
-            }
-          }}
+          onPress={onGoogleButtonPress}
           visible={Platform.OS === "ios"}
         />
       </View>

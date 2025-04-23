@@ -26,8 +26,8 @@ import BottomSheet from "@/components/BottomSheet";
 import LoginBottomSheet from "@/components/LoginBottomSheet";
 
 export default function LandingPage() {
-  const { attemptToLogin, handleLogin } = useAuth();
-  const { open } = useBottomSheet();
+  const { attemptToLogin } = useAuth();
+  const { open, close } = useBottomSheet();
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
@@ -74,7 +74,7 @@ export default function LandingPage() {
   return (
     <View style={styles.MainContainer}>
       <BottomSheet>
-        <LoginBottomSheet dismissBottomSheet={() => {}} />
+        <LoginBottomSheet dismissBottomSheet={close} />
       </BottomSheet>
       <StatusBar style="light" />
       {content}

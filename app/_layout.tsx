@@ -184,17 +184,17 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <PaperProvider>
-      <BottomSheetProvider>
-        <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
-          <AppStateProvider>
-            <LoadingProvider>
-              <UserProvider>
-                <WebViewProvider>
-                  <RecordingsProvider>
-                    <CurrentTrackProvider>
-                      <NewSongsProvider>
-                        <NowPlayingProvider>
+    <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
+      <LoadingProvider>
+        <UserProvider>
+          <RecordingsProvider>
+            <CurrentTrackProvider>
+              <NewSongsProvider>
+                <NowPlayingProvider>
+                  <PaperProvider>
+                    <AppStateProvider>
+                      <WebViewProvider>
+                        <BottomSheetProvider>
                           <NowPlayingComponent />
                           <Stack>
                             {/* Public routes */}
@@ -385,17 +385,17 @@ function RootLayoutNav() {
                               }}
                             />
                           </Stack>
-                        </NowPlayingProvider>
-                      </NewSongsProvider>
-                    </CurrentTrackProvider>
-                  </RecordingsProvider>
-                </WebViewProvider>
-              </UserProvider>
-            </LoadingProvider>
-          </AppStateProvider>
-        </SQLiteProvider>
-      </BottomSheetProvider>
-    </PaperProvider>
+                        </BottomSheetProvider>
+                      </WebViewProvider>
+                    </AppStateProvider>
+                  </PaperProvider>
+                </NowPlayingProvider>
+              </NewSongsProvider>
+            </CurrentTrackProvider>
+          </RecordingsProvider>
+        </UserProvider>
+      </LoadingProvider>
+    </SQLiteProvider>
   );
 }
 const styles2 = StyleSheet.create({

@@ -6,7 +6,6 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { router } from "expo-router";
-import { authService } from "@/services/AuthService";
 import { useState, useMemo, useCallback, memo } from "react";
 import { SettingsItem } from "@/components/SettingsItem";
 import NotificationSettingsIcon from "@/assets/images/SVG/notification-settings-icon.svg";

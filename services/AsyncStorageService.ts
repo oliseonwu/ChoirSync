@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  * Enum representing the keys used in AsyncStorage
  * @enum {string} THIS_WEEK_NEW_SONG_ACCESS_DATE - Timestamp of the first access to the new songs page when this week's songs are available
  * @enum {string} THIS_WEEK_RECORDINGS_ACCESS_DATE - Timestamp of the first access to the this week's recordings page when this week's recordings are available
+ * @enum {string} APPLE_USER_ID - Apple user ID
+ * @enum {string} SIGN_IN_METHOD - Sign in method (apple, google, email)
  */
 export enum AsyncStorageKeys {
   NOTIFICATION_STATUS = "NOTIFICATION_STATUS",
@@ -12,6 +14,8 @@ export enum AsyncStorageKeys {
   NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
   THIS_WEEK_RECORDINGS_ACCESS_DATE = "THIS_WEEK_RECORDINGS_ACCESS_DATE",
   THIS_WEEK_NEW_SONGS_ACCESS_DATE = "THIS_WEEK_NEW_SONGS_ACCESS_DATE",
+  APPLE_USER_ID = "APPLE_USER_ID",
+  SIGN_IN_METHOD = "SIGN_IN_METHOD",
 }
 
 enum IgnoreOnClearKeys {

@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { useNavigation, Tabs, router } from "expo-router";
 
 import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
-import { authService } from "@/services/AuthService";
 import { StackActions } from "@react-navigation/native";
 import {
   horizontalScale,
@@ -20,15 +19,16 @@ import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { PlatformPressable } from "@react-navigation/elements";
 import { useUser } from "@/contexts/UserContext";
 import CustomTabBar from "@/components/CustomTabBar";
-
+import { useAuth } from "@/hooks/useAuth";
 export default function TabLayout() {
   const navigation = useNavigation();
   const { getCurrentUserData } = useUser();
+  const { getCurrentUser } = useAuth();
 
   const { groupId } = getCurrentUserData();
   useEffect(() => {
     const checkMembership = async () => {
-      const currentUser = await authService.getCurrentUser();
+      const currentUser = await getCurrentUser();
 
       if (!currentUser) {
         navigation.dispatch(StackActions.popToTop());

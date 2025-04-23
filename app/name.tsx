@@ -21,7 +21,6 @@ import {
 import { useHeaderHeight } from "@react-navigation/elements";
 import { globalStyles } from "@/shared/css/GlobalCss";
 import { router, SplashScreen } from "expo-router";
-import { authService } from "@/services/AuthService";
 import Parse from "@/services/Parse";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import LoadingButton from "@/components/LoadingButton";
