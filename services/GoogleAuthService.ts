@@ -7,6 +7,15 @@ import {
   isSuccessResponse,
 } from "@react-native-google-signin/google-signin";
 
+export enum GoogleAuthError {
+  CANCELED = "User canceled sign in",
+  FAILED = "Google sign in failed",
+  INVALID_RESPONSE = "Invalid response from Google",
+  NOT_HANDLED = "Google sign in not handled",
+  UNKNOWN = "Unknown error with Google sign in",
+  IN_PROGRESS = "Sign in already in progress",
+  PLAY_SERVICES_NOT_AVAILABLE = "Play services not available",
+}
 class GoogleAuthService {
   configure() {
     GoogleSignin.configure({
@@ -18,7 +27,7 @@ class GoogleAuthService {
     });
   }
 
-  private async socialLogin() {
+  async socialLogin() {
     const currentUser = GoogleSignin.getCurrentUser();
 
     try {
@@ -31,10 +40,10 @@ class GoogleAuthService {
       if (isSuccessResponse(response)) {
         return { success: true, data: response.data };
       } else {
-        return { success: false, error: "Sign in cancelled" };
+        throw new Error(GoogleAuthError.CANCELED);
       }
     } catch (error) {
-      return this.handleError(error);
+      this.handleError(error);
     }
   }
 
@@ -52,15 +61,15 @@ class GoogleAuthService {
   }
 
   async loginWithGoogle() {
-    // First attempt Google sign in
-    const googleResponse = await this.socialLogin();
-
-    if (!googleResponse.success) {
-      throw new Error("Google sign in failed: " + googleResponse.error);
-    }
-
     try {
-      const { user: googleUser, idToken } = googleResponse.data!;
+      // First attempt Google sign in
+      const googleResponse = await this.socialLogin();
+
+      if (!googleResponse?.success || !("data" in googleResponse)) {
+        throw new Error(GoogleAuthError.FAILED);
+      }
+
+      const { user: googleUser, idToken } = googleResponse.data;
       const parseUser = await Parse.User.currentAsync();
 
       const userToLogin = parseUser || new Parse.User();
@@ -85,8 +94,6 @@ class GoogleAuthService {
 
       return { success: true, user: loggedInUser };
     } catch (error: Parse.Error | any) {
-      console.log("error:", error);
-
       if (
         error instanceof Parse.Error &&
         error.code === Parse.Error.ACCOUNT_ALREADY_LINKED
@@ -98,7 +105,8 @@ class GoogleAuthService {
         }
         await Parse.User.logOut();
       }
-      return { success: false, error: error.message };
+
+      this.handleError(error);
     }
   }
 
@@ -106,14 +114,14 @@ class GoogleAuthService {
     if (isErrorWithCode(error)) {
       switch (error.code) {
         case statusCodes.IN_PROGRESS:
-          throw { success: false, error: "Sign in already in progress" };
+          throw new Error(GoogleAuthError.IN_PROGRESS);
         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-          throw { success: false, error: "Play services not available" };
+          throw new Error(GoogleAuthError.PLAY_SERVICES_NOT_AVAILABLE);
         default:
-          throw { success: false, error: "Sign in failed" };
+          throw new Error(GoogleAuthError.FAILED + ": " + error.message);
       }
     }
-    return { success: false, error: "Unknown error occurred" };
+    throw new Error(GoogleAuthError.UNKNOWN + ": " + error.message);
   }
 }
 

@@ -1,6 +1,15 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import Parse from "./Parse";
 import AsyncStorageService, { AsyncStorageKeys } from "./AsyncStorageService";
+import { decodeJWT } from "@/utilities/Helpers";
+
+export enum AppleAuthError {
+  CANCELED = "User canceled sign in",
+  FAILED = "Apple sign in failed",
+  INVALID_RESPONSE = "Invalid response from Apple",
+  NOT_HANDLED = "Apple sign in not handled",
+  UNKNOWN = "Unknown error with Apple sign in",
+}
 
 class AppleAuthService {
   private async socialLogin() {
@@ -11,23 +20,18 @@ class AppleAuthService {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       });
-
-      if (credential) {
-        return {
-          success: true,
-          data: {
-            id: credential.user,
-            identityToken: credential.identityToken,
-            authorizationCode: credential.authorizationCode,
-            fullName: credential.fullName,
-            email: credential.email,
-          },
-        };
-      } else {
-        return { success: false, error: "Failed to get Apple credentials" };
-      }
+      return {
+        success: true,
+        data: {
+          id: credential.user,
+          identityToken: credential.identityToken,
+          authorizationCode: credential.authorizationCode,
+          fullName: credential.fullName,
+          email: credential.email,
+        },
+      };
     } catch (error) {
-      return this.handleError(error);
+      this.handleError(error);
     }
   }
 
@@ -52,12 +56,7 @@ class AppleAuthService {
   async loginWithApple() {
     try {
       const appleResponse = await this.socialLogin();
-
-      if (!appleResponse.success) {
-        throw new Error(
-          "Apple sign in failed: " + (appleResponse as { error: string }).error
-        );
-      }
+      let decodedToken: any;
 
       // If we get here, we know appleResponse is successful and has data
       const successResponse = appleResponse as {
@@ -72,10 +71,13 @@ class AppleAuthService {
       };
       const { id, identityToken, fullName, email } = successResponse.data;
 
+      decodedToken = decodeJWT(identityToken || "");
+
       const userToLogin = new Parse.User();
 
+      // Some t
       userToLogin.set("username", email);
-      userToLogin.set("email", email);
+      userToLogin.set("email", decodedToken.email);
       if (fullName) {
         userToLogin.set("firstName", fullName.givenName);
         userToLogin.set("lastName", fullName.familyName);
@@ -92,16 +94,7 @@ class AppleAuthService {
 
       return { success: true, user: loggedInUser };
     } catch (error: Parse.Error | any) {
-      console.log("error:", error);
-
-      if (
-        error instanceof Parse.Error &&
-        error.code === Parse.Error.ACCOUNT_ALREADY_LINKED
-      ) {
-        // Log out user if account already linked
-        await Parse.User.logOut();
-      }
-      return { success: false, error: error.message };
+      return this.handleError(error);
     }
   }
 
@@ -109,20 +102,18 @@ class AppleAuthService {
     if (error.code) {
       switch (error.code) {
         case "ERR_CANCELED":
-          return { success: false, error: "User canceled Apple sign in" };
+          throw new Error(AppleAuthError.CANCELED);
         case "ERR_FAILED":
-          return { success: false, error: "Apple sign in failed" };
+          throw new Error(AppleAuthError.FAILED);
         case "ERR_INVALID_RESPONSE":
-          return { success: false, error: "Invalid response from Apple" };
+          throw new Error(AppleAuthError.INVALID_RESPONSE);
         case "ERR_NOT_HANDLED":
-          return { success: false, error: "Apple sign in not handled" };
+          throw new Error(AppleAuthError.NOT_HANDLED);
         case "ERR_UNKNOWN":
-          return { success: false, error: "Unknown error with Apple sign in" };
-        default:
-          return { success: false, error: "Sign in failed" };
+          throw new Error(AppleAuthError.UNKNOWN);
       }
     }
-    return { success: false, error: "Unknown error occurred" };
+    throw new Error("Apple sign in failed : " + error.message);
   }
 }
 

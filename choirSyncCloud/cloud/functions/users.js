@@ -86,6 +86,7 @@ const getUser = async (userId) => {
     throw new Error(`Failed to get user: ${error.message}`);
   }
 };
+
 /**
  * Fetches multiple users by their IDs
  * @param {string[]} userIds - Array of user IDs to fetch
@@ -187,6 +188,31 @@ async function deleteUserSessions(user) {
   }
 }
 
+/**
+ * Checks if a user with the specified email exists
+ * @param {string} email - Email address to check
+ * @returns {Promise<Object>} Object containing existence status and user (if found)
+ */
+async function checkUserExistsByEmail(request) {
+  try {
+    const { email } = request.params;
+    const query = new Parse.Query(Parse.User);
+    query.equalTo("email", email.toLowerCase());
+
+    const user = await query.first({ useMasterKey: true });
+
+    return {
+      success: true,
+      exists: !!user,
+    };
+  } catch (error) {
+    console.error("Error checking user by email:", error);
+    throw new Error(
+      `Cloud error. Failed to check user existence: ${error.message}`
+    );
+  }
+}
+
 module.exports = {
   updateUserField,
   updateUserFields,
@@ -195,4 +221,5 @@ module.exports = {
   fetchUsersByIds,
   updateMultipleUsers,
   deleteCurrentUser,
+  checkUserExistsByEmail,
 };

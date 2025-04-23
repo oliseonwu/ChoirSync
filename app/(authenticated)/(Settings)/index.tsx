@@ -54,7 +54,10 @@ export default function SettingsScreen() {
       {
         text: "Logout",
         style: "destructive",
-        onPress: performLogout,
+        onPress: async () => {
+          await performLogout();
+          router.dismissAll();
+        },
       },
     ]);
   };

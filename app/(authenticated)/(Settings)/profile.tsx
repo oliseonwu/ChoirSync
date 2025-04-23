@@ -22,12 +22,9 @@ export default function Profile() {
 
   const deleteUser = async () => {
     try {
-      const result = await userManagementService.deleteCurrentUser();
-      if (result.success) {
-        performLogout();
-      } else {
-        console.log("Error", result.error);
-      }
+      await userManagementService.deleteCurrentUser();
+      await performLogout();
+      router.dismissAll();
     } catch (error) {
       console.log("Error", error);
     }

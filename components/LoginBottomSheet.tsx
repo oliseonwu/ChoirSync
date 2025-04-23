@@ -22,6 +22,7 @@ import EnvelopeIcon from "@/assets/images/SVG/envelope.svg";
 import GmailIconColored from "@/assets/images/SVG/google-colored.svg";
 import SocialButton from "./SocialButton";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 
 // Terms of Service and Privacy Policy URLs
 const TERMS_URL = "https://choirsync.info/terms";
@@ -71,7 +72,7 @@ export default function LoginBottomSheet({
         label="Continue with Email"
         onPress={() => {
           dismissBottomSheet();
-          // router.navigate("/email");
+          router.navigate("/email");
         }}
       />
 

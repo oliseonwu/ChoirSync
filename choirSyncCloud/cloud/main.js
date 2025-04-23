@@ -94,6 +94,21 @@ Parse.Cloud.define("deleteCurrentUser", userFunctions.deleteCurrentUser, {
   requireUser: true,
 });
 
+Parse.Cloud.define(
+  "checkUserExistsByEmail",
+  userFunctions.checkUserExistsByEmail,
+  {
+    fields: {
+      email: {
+        type: String,
+        required: true,
+        options: (val) => helpers.isEmailValid(val),
+        error: "Cloud function error: Invalid email",
+      },
+    },
+  }
+);
+
 // Register recording functions
 Parse.Cloud.define("uploadRecordings", recordingsFunctions.uploadRecordings, {
   fields: {

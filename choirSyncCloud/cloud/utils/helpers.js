@@ -20,6 +20,10 @@ function pointer(id, className = "ChoirGroups") {
   };
 }
 
+function isEmailValid(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function random_between(min, max) {
@@ -99,4 +103,5 @@ module.exports = {
   returnMin,
   retryWithBackoff,
   isPacificTimeDay,
+  isEmailValid,
 };

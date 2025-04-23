@@ -94,7 +94,7 @@ const NamePage = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <>
+      <View style={{ flex: 1 }}>
         <StatusBar style="dark" />
         <View
           style={[
@@ -149,7 +149,7 @@ const NamePage = () => {
             backgroundColor="#313234"
           />
         </View>
-      </>
+      </View>
     </TouchableWithoutFeedback>
   );
 };

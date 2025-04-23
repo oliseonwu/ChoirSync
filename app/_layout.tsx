@@ -213,6 +213,49 @@ function RootLayoutNav() {
                                 headerBackVisible: false,
                               }}
                             />
+                            <Stack.Screen
+                              name="email"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+
+                            <Stack.Screen
+                              name="existingUserPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="newUserPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
 
                             <Stack.Screen
                               name="chooseYourPath"
@@ -258,7 +301,6 @@ function RootLayoutNav() {
                               }}
                             />
 
-                            {/* Authenticated routes */}
                             <Stack.Screen
                               name="(authenticated)/(tabs)"
                               options={{

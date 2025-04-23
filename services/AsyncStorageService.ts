@@ -58,6 +58,14 @@ class AsyncStorageService {
       console.error("Error clearing AsyncStorage:", error);
     }
   }
+
+  async clearAll() {
+    try {
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.error("Error clearing all AsyncStorage items:", error);
+    }
+  }
 }
 
 export default new AsyncStorageService();
