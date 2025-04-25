@@ -7,12 +7,19 @@ import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
 import { notificationService } from "@/services/NotificationService";
-import { authService } from "@/services/AuthService";
+import {
+  GoogleAuthError,
+  googleAuthService,
+} from "@/services/GoogleAuthService";
+import { AppleAuthError, appleAuthService } from "@/services/AppleAuthService";
 import { Alert } from "react-native";
 import { useUser } from "@/contexts/UserContext";
 import Parse from "@/services/Parse";
-
 import { userManagementService } from "@/services/UserManagementService";
+import { emailAuthService } from "@/services/EmailAuthService";
+
+// Export login method type
+export type LoginMethod = "email" | "google" | "apple";
 
 // Handles Login, Logout, and Session Management
 
@@ -21,39 +28,162 @@ export const useAuth = () => {
   const { resetCurrentTrack } = useCurrentTrack();
   const { resetRecordings } = useRecordings();
   const { updateCurrentUserData, getCurrentUserData } = useUser();
+  const getCurrentUser = async () => {
+    const user = await Parse.User.currentAsync();
+    return user;
+  };
 
+  const socialLogoutMethod = async (method: LoginMethod) => {
+    if (method === "google") {
+      await googleAuthService.socialSignOut();
+    }
+
+    // Apple signout shows login screen when signing out
+    // so we don't need to call socialSignOut
+    // else if (method === "apple") {
+    //   await appleAuthService.socialSignOut();
+    // }
+    // No action needed for "email" method
+  };
+
+  const getLoginMethod = async (
+    ignoreError: boolean = true
+  ): Promise<LoginMethod | null> => {
+    const loginMethod = (await AsyncStorageService.getItem(
+      AsyncStorageKeys.SIGN_IN_METHOD
+    )) as LoginMethod | null;
+
+    if (!loginMethod && !ignoreError) {
+      throw new Error("No sign in method found");
+    }
+
+    return loginMethod;
+  };
+
+  /**
+   * Performs a logout operation.
+   * If no sign in method is found, it defaults to email.
+   */
   const performLogout = async () => {
-    const pushToken = await AsyncStorageService.getItem(
-      AsyncStorageKeys.PUSH_TOKEN
-    );
-
     try {
       showLoading();
-      await AsyncStorageService.clear();
-      await notificationService.deletePushNotificationToken(pushToken || "");
 
-      await authService.logout();
-      router.dismissAll();
-      resetCurrentTrack();
-      resetRecordings();
-    } catch (error) {
-      Alert.alert("Error", "An unexpected error occurred");
+      // Get current sign in method
+      let method = await getLoginMethod();
+
+      if (!method) {
+        method = "email";
+      }
+
+      await handleLogoutProcess(method);
+
+      return { success: true };
+    } catch (error: any) {
+      if (error.message === "Invalid session token") {
+        return { success: true };
+      }
+
+      console.log("Logout error:", error);
+      Alert.alert("Error", "An unexpected error occurred during logout");
+      return { success: false, error: error.message };
     } finally {
       hideLoading();
+    }
+  };
+
+  const handleLogoutProcess = async (method: LoginMethod) => {
+    // 1. Navigate to start screen
+    router.dismissAll();
+
+    // 2. Reset app state
+    resetCurrentTrack();
+    resetRecordings();
+
+    // 3. Logout from social provider if applicable
+    await socialLogoutMethod(method);
+
+    // 4. Clear AsyncStorage
+    await AsyncStorageService.clear();
+
+    // 5. Delete push notification token
+    await notificationService.deletePushNotificationToken();
+
+    // 6. Logout from Parse
+    await Parse.User.logOut();
+  };
+
+  const performLogin = async (
+    method: LoginMethod,
+    username?: string,
+    password?: string
+  ) => {
+    showLoading();
+    try {
+      let loginResponse;
+
+      // Choose login method based on type
+      if (method === "google") {
+        loginResponse = await googleAuthService.loginWithGoogle();
+      } else if (method === "apple") {
+        loginResponse = await appleAuthService.loginWithApple();
+      } else if (method === "email" && username && password) {
+        loginResponse = await emailAuthService.loginWithEmailAndPassword(
+          username,
+          password
+        );
+      }
+
+      if (loginResponse?.success) {
+        await onSuccessfulLogin(loginResponse.user!, method);
+
+        return { success: true };
+      }
+    } catch (error: any) {
+      if (
+        error.message !== AppleAuthError.CANCELED &&
+        error.message !== GoogleAuthError.CANCELED
+      ) {
+        Alert.alert("Failed to login", "Please try again.");
+        console.error("Login error:", error);
+      }
+
+      return { success: false, error: error.message };
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const performEmailSignUp = async (email: string, password: string) => {
+    try {
+      const result = await emailAuthService.signUpWithEmailAndPassword(
+        email,
+        password
+      );
+      if (result?.success) {
+        await onSuccessfulLogin(result.user!, "email");
+
+        return { success: true };
+      }
+    } catch (error: any) {
+      console.log("Email signup error:", error);
+      Alert.alert("Error", "Failed to sign up");
+      return { success: false, error: error.message };
     }
   };
 
   const attemptToLogin = async () => {
     // showLoading();
     let currentUser;
+    let loginMethod: LoginMethod | null;
 
     try {
       // If the session is valid, get the user from the session
       const session = await Parse.Session.current();
       currentUser = session.get("user");
+      loginMethod = await getLoginMethod();
 
-      if (currentUser) {
-        onSuccessfulLogin(currentUser);
+      if (currentUser && loginMethod) {
+        onSuccessfulLogin(currentUser, loginMethod);
         return;
       }
 
@@ -64,7 +194,7 @@ export const useAuth = () => {
 
       // If the session is invalid, logout the user
       if (error.message === "Invalid session token") {
-        await authService.logout();
+        await performLogout(); // Default to email if method unknown during auto-login
       }
 
       // Hide the splash screen if error
@@ -72,40 +202,30 @@ export const useAuth = () => {
     }
   };
 
-  const handleLogin = async () => {
-    showLoading();
-    let loginResponse = null;
-
-    try {
-      loginResponse = await authService.loginWithGoogle();
-      if (loginResponse.success) {
-        onSuccessfulLogin(loginResponse.user!);
-      }
-    } catch (error: any) {
-      console.log("error", error.message);
-      hideLoading();
-      Alert.alert("Error", "Failed to login. Please try again.");
-    }
-
-    hideLoading();
-  };
-
   const navigateBasedOnUserCredentials = async (
     user: Parse.User,
     groupId: string
   ) => {
     if (!user.get("firstName") || !user.get("lastName")) {
-      return router.navigate("/name");
+      router.navigate("/name");
+      return;
     }
 
-    return groupId
-      ? router.navigate("/(authenticated)/(tabs)")
-      : router.navigate("/chooseYourPath");
+    if (groupId) {
+      router.navigate("/(authenticated)/(tabs)");
+    } else {
+      router.navigate("/chooseYourGroup");
+    }
   };
 
-  async function onSuccessfulLogin(user: Parse.User) {
+  async function onSuccessfulLogin(user: Parse.User, loginMethod: LoginMethod) {
     const groupIdsResult = await userManagementService.getUserGroupIds(user.id);
     const groupId = groupIdsResult.groupIds?.[0] || "";
+
+    await AsyncStorageService.setItem(
+      AsyncStorageKeys.SIGN_IN_METHOD,
+      loginMethod
+    );
 
     updateCurrentUserData(
       user.get("firstName"),
@@ -139,15 +259,30 @@ export const useAuth = () => {
     // If the user is not fully authenticated, logout the user
     const isAuthenticated = await isFullyAuthenticated();
     if (!isAuthenticated) {
-      await performLogout();
+      await performLogout(); // Default to email method if we don't know
     }
+  }
+
+  async function verifyAuth() {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        error: "User not logged in",
+      };
+    }
+    return { success: true };
   }
 
   return {
     performLogout,
+    getCurrentUser,
+    performLogin,
+    performEmailSignUp,
     attemptToLogin,
-    handleLogin,
     isFullyAuthenticated,
     logoutIfNotFullyAuthenticated,
+    verifyAuth,
+    getLoginMethod,
   };
 };

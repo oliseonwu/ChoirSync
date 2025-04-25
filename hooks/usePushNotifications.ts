@@ -104,6 +104,8 @@ export const usePushNotifications = (): PushNotificationState => {
         AsyncStorageKeys.NOTIFICATION_RESPONSE_ID
       );
 
+      // means we have already displayed this notification
+      // but the user re-opened the app
       if (notificationRefId === storedNotificationRefId) {
         return;
       }

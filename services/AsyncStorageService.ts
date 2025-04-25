@@ -2,8 +2,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * Enum representing the keys used in AsyncStorage
+ * @enum {string} NOTIFICATION_RESPONSE_ID - Id of the most recent notification the user clicked on
  * @enum {string} THIS_WEEK_NEW_SONG_ACCESS_DATE - Timestamp of the first access to the new songs page when this week's songs are available
  * @enum {string} THIS_WEEK_RECORDINGS_ACCESS_DATE - Timestamp of the first access to the this week's recordings page when this week's recordings are available
+ * @enum {string} APPLE_USER_ID - Apple user ID
+ * @enum {string} SIGN_IN_METHOD - Sign in method (apple, google, email)
  */
 export enum AsyncStorageKeys {
   NOTIFICATION_STATUS = "NOTIFICATION_STATUS",
@@ -12,10 +15,18 @@ export enum AsyncStorageKeys {
   NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
   THIS_WEEK_RECORDINGS_ACCESS_DATE = "THIS_WEEK_RECORDINGS_ACCESS_DATE",
   THIS_WEEK_NEW_SONGS_ACCESS_DATE = "THIS_WEEK_NEW_SONGS_ACCESS_DATE",
+  APPLE_USER_ID = "APPLE_USER_ID",
+  SIGN_IN_METHOD = "SIGN_IN_METHOD",
 }
 
+/**
+ * Enum representing the keys that should not be cleared from AsyncStorage
+ * when the user logs out
+ * @enum {string} NOTIFICATION_RESPONSE_ID - Notification response ID
+ */
 enum IgnoreOnClearKeys {
   NOTIFICATION_RESPONSE_ID = "NOTIFICATION_RESPONSE_ID",
+  PUSH_TOKEN = "PUSH_TOKEN",
 }
 
 class AsyncStorageService {
@@ -44,6 +55,10 @@ class AsyncStorageService {
     }
   }
 
+  /**
+   * Clears all items from AsyncStorage except for the keys in IgnoreOnClearKeys
+   * @returns void
+   */
   async clear() {
     const keysToRemove = Object.keys(AsyncStorageKeys).filter(
       (key) => !Object.keys(IgnoreOnClearKeys).includes(key)
@@ -52,6 +67,14 @@ class AsyncStorageService {
       await AsyncStorage.multiRemove(keysToRemove);
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
+    }
+  }
+
+  async clearAll() {
+    try {
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.error("Error clearing all AsyncStorage items:", error);
     }
   }
 }

@@ -37,10 +37,7 @@ class UserManagementService {
         message: "User deleted successfully",
       };
     } catch (error: any) {
-      return {
-        success: false,
-        error: error.message,
-      };
+      throw new Error(error.message);
     }
   }
 

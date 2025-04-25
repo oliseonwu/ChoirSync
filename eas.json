@@ -44,6 +44,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "olise.meduaonwuatogwu@gmail.com",
+        "ascAppId": "6744724433",
+        "appleTeamId": "GJUTY9T5U3"
+      }
+    }
   }
 }

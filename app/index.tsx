@@ -1,45 +1,38 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Image } from "expo-image";
 import LandingPageImage from "../assets/images/landing-Page.png";
 import {
   horizontalScale,
   moderateScale,
-  getWindowSize,
+  verticalScale,
 } from "@/utilities/TrueScale";
 import SignInWithGoogleBtn from "@/assets/images/SVG/sign-in-with-google.svg";
 import { googleAuthService } from "@/services/GoogleAuthService";
 
 import { LoadingScreenComponent } from "@/components/LoadingScreenComponent";
+import LoadingButton from "@/components/LoadingButton";
 
 import { useAuth } from "@/hooks/useAuth";
 import { StatusBar } from "expo-status-bar";
+import { useBottomSheet } from "@/contexts/ButtomSheetContext";
+import BottomSheet from "@/components/BottomSheet";
+import LoginBottomSheet from "@/components/LoginBottomSheet";
 
 export default function LandingPage() {
-  const { attemptToLogin, handleLogin } = useAuth();
-
+  const { attemptToLogin } = useAuth();
+  const { open, close } = useBottomSheet();
   useEffect(() => {
     // Configure the google auth service
     googleAuthService.configure();
     attemptToLogin();
   }, []);
-
-  const SignInWithGoogleBtnMemoized = useMemo(
-    () => (
-      <TouchableOpacity
-        style={styles.googleBtnContainer}
-        onPress={() => {
-          handleLogin();
-        }}
-      >
-        <SignInWithGoogleBtn
-          width={horizontalScale(230)}
-          // height={verticalScale(55)}
-        />
-      </TouchableOpacity>
-    ),
-    []
-  );
 
   const content = useMemo(() => {
     return (
@@ -62,7 +55,15 @@ export default function LandingPage() {
             {"This app is designed for choir groups, providing easy" +
               " access to rehearsal recordings for their choir members."}
           </Text>
-          {SignInWithGoogleBtnMemoized}
+          {/* {SignInWithGoogleBtnMemoized} */}
+          <LoadingButton
+            isLoading={false}
+            buttonText="Get Started"
+            onPress={() => open()}
+            style={styles.getStartedButton}
+            textStyle={styles.getStartedButtonText}
+            backgroundColor="#313234"
+          />
         </View>
 
         <LoadingScreenComponent />
@@ -72,6 +73,9 @@ export default function LandingPage() {
 
   return (
     <View style={styles.MainContainer}>
+      <BottomSheet>
+        <LoginBottomSheet dismissBottomSheet={close} />
+      </BottomSheet>
       <StatusBar style="light" />
       {content}
     </View>
@@ -141,9 +145,20 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontSize: moderateScale(16),
   },
-  googleBtnContainer: {
+
+  getStartedButton: {
     marginTop: "14%",
     marginBottom: "16%",
+
+    paddingVertical: verticalScale(15),
+    borderRadius: moderateScale(10),
     alignItems: "center",
+    justifyContent: "center",
+    borderCurve: "continuous",
+  },
+  getStartedButtonText: {
+    color: "#FFFFFF",
+    fontFamily: "Inter-Medium",
+    fontSize: moderateScale(16),
   },
 });

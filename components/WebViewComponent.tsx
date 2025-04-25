@@ -56,7 +56,11 @@ export function WebViewComponent({ title, url }: WebViewComponentProps) {
         </View>
 
         {url.includes("https://") ? (
-          <WebView source={{ uri: url }} style={styles.webview} />
+          <WebView
+            source={{ uri: url }}
+            originWhitelist={["*"]}
+            style={styles.webview}
+          />
         ) : (
           <Text>Invalid URL</Text>
         )}

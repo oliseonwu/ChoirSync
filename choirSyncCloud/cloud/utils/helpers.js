@@ -20,6 +20,10 @@ function pointer(id, className = "ChoirGroups") {
   };
 }
 
+function isEmailValid(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function random_between(min, max) {
@@ -92,6 +96,60 @@ function isPacificTimeDay(validDays) {
   return validDays.includes(pacificDay);
 }
 
+/**
+ * Generates a random 6-digit alphanumeric code for OTP
+ * @returns {string} 6-character alphanumeric code
+ */
+function generateOtpCode() {
+  // Characters to use (alphanumeric excluding ambiguous characters)
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+
+  // Generate 6 random characters
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    code += chars[randomIndex];
+  }
+
+  return code;
+}
+
+/**
+ * Checks if a date has exceeded the current time plus a specified duration
+ * @param {Date} date - Date to check
+ * @param {number} timeMs - Time in milliseconds
+ * @returns {boolean} True if date has exceeded (current time + timeMs)
+ */
+function isDateExpired(date, timeMs) {
+  const currentDate = new Date();
+  const timeDiff = currentDate - date;
+
+  return timeDiff > timeMs;
+}
+
+// I moved this function here to avoid circular dependency
+// between users and code functions
+/**
+ * Fetches a user by their email address.
+ * @param {string} email - Email address to search for
+ * @returns {Promise<Parse.User>} User object if found, otherwise null
+ */
+async function getUserByEmail(email) {
+  try {
+    const query = new Parse.Query(Parse.User);
+    query.equalTo("email", email.toLowerCase());
+
+    const user = await query.first({ useMasterKey: true });
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    throw new Error(
+      `Cloud error. Failed to fetch user by email: ${error.message}`
+    );
+  }
+}
+
 module.exports = {
   pointer,
   sleep,
@@ -99,4 +157,8 @@ module.exports = {
   returnMin,
   retryWithBackoff,
   isPacificTimeDay,
+  isEmailValid,
+  generateOtpCode,
+  isDateExpired,
+  getUserByEmail,
 };

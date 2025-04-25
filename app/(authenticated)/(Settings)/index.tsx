@@ -6,7 +6,6 @@ import {
   verticalScale,
 } from "@/utilities/TrueScale";
 import { router } from "expo-router";
-import { authService } from "@/services/AuthService";
 import { useState, useMemo, useCallback, memo } from "react";
 import { SettingsItem } from "@/components/SettingsItem";
 import NotificationSettingsIcon from "@/assets/images/SVG/notification-settings-icon.svg";
@@ -55,7 +54,9 @@ export default function SettingsScreen() {
       {
         text: "Logout",
         style: "destructive",
-        onPress: performLogout,
+        onPress: async () => {
+          await performLogout();
+        },
       },
     ]);
   };
@@ -80,9 +81,7 @@ export default function SettingsScreen() {
         title: "Privacy",
         onPress: () => {
           setWebViewTitle("Privacy Policy");
-          setWebViewUrl(
-            "https://oliseonwu.github.io/choirsync.github.io/privacy.html"
-          );
+          setWebViewUrl("https://choirsync.info/privacy");
           showWebView();
         },
       },
@@ -92,9 +91,7 @@ export default function SettingsScreen() {
         title: "Terms and Conditions",
         onPress: () => {
           setWebViewTitle("Terms and Conditions");
-          setWebViewUrl(
-            "https://oliseonwu.github.io/choirsync.github.io/terms.html"
-          );
+          setWebViewUrl("https://choirsync.info/terms");
           showWebView();
         },
       },

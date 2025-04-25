@@ -12,6 +12,9 @@
  */
 
 module.exports = {
-  INVITE_CODE_EXPIRY: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  // INVITE_CODE_EXPIRY: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  INVITE_CODE_EXPIRY: 60 * 24 * 60 * 60 * 1000, // 60 days (2 months) in milliseconds
+  OTP_EXPIRY: 1000 * 60 * 5, // 5 minutes in milliseconds
+
   MIN_REMAINING_TIME: 60 * 60 * 1000, // 1 hour in milliseconds
 };

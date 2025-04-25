@@ -22,7 +22,7 @@ import Parse from "@/services/Parse";
 import LoadingButton from "@/components/LoadingButton";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { useUser } from "@/contexts/UserContext";
-import { authService } from "@/services/AuthService";
+import { useAuth } from "@/hooks/useAuth";
 type EditUserParams = {
   type: "firstName" | "lastName";
   title: string;
@@ -35,6 +35,7 @@ const EditUserPage = () => {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useLoadingState(false);
   const { updateCurrentUserData, getCurrentUserData } = useUser();
+  const { getCurrentUser } = useAuth();
   const isFormValid = useMemo(() => {
     return name.trim().length >= 1;
   }, [name]);
@@ -50,7 +51,7 @@ const EditUserPage = () => {
     setIsLoading(true);
 
     result = await userManagementService.updateUserField(params.type, name);
-    currentUser = await authService.getCurrentUser();
+    currentUser = await getCurrentUser();
 
     if (!result.success && !currentUser) {
       router.dismissAll();

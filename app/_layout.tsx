@@ -31,10 +31,10 @@ import { HeaderProfileImage } from "@/components/HeaderProfileImage";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 
 import mobileAds, { AdsConsent } from "react-native-google-mobile-ads";
-import { StatusBarProvider } from "@/contexts/StatusBarContext";
 import { NewSongsProvider } from "@/contexts/newSongsContext";
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite";
 import initService from "@/services/sqlite/initService";
+import { BottomSheetProvider } from "@/contexts/ButtomSheetContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -184,17 +184,17 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <PaperProvider>
-      <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
-        <StatusBarProvider>
-          <AppStateProvider>
-            <LoadingProvider>
-              <UserProvider>
-                <WebViewProvider>
-                  <RecordingsProvider>
-                    <CurrentTrackProvider>
-                      <NewSongsProvider>
-                        <NowPlayingProvider>
+    <SQLiteProvider databaseName="ChoirSyncDB" onInit={initService.setupDB}>
+      <LoadingProvider>
+        <UserProvider>
+          <RecordingsProvider>
+            <CurrentTrackProvider>
+              <NewSongsProvider>
+                <NowPlayingProvider>
+                  <PaperProvider>
+                    <AppStateProvider>
+                      <WebViewProvider>
+                        <BottomSheetProvider>
                           <NowPlayingComponent />
                           <Stack>
                             {/* Public routes */}
@@ -211,6 +211,91 @@ function RootLayoutNav() {
                                 headerTitle: "",
                                 headerBackButtonDisplayMode: "minimal",
                                 headerBackVisible: false,
+                              }}
+                            />
+                            <Stack.Screen
+                              name="email"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+
+                            <Stack.Screen
+                              name="existingUserPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="forgotPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="verifyOtp"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="resetPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="newUserPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
                               }}
                             />
 
@@ -258,7 +343,6 @@ function RootLayoutNav() {
                               }}
                             />
 
-                            {/* Authenticated routes */}
                             <Stack.Screen
                               name="(authenticated)/(tabs)"
                               options={{
@@ -311,7 +395,21 @@ function RootLayoutNav() {
                               }}
                             />
                             <Stack.Screen
-                              name="(authenticated)/(Settings)/editUser"
+                              name="(authenticated)/(Settings)/editname"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerTitle: "",
+                                headerBackButtonDisplayMode: "minimal",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="(authenticated)/(Settings)/changePassword"
                               options={{
                                 animation: "none",
                                 headerTransparent: true,
@@ -385,17 +483,17 @@ function RootLayoutNav() {
                               }}
                             />
                           </Stack>
-                        </NowPlayingProvider>
-                      </NewSongsProvider>
-                    </CurrentTrackProvider>
-                  </RecordingsProvider>
-                </WebViewProvider>
-              </UserProvider>
-            </LoadingProvider>
-          </AppStateProvider>
-        </StatusBarProvider>
-      </SQLiteProvider>
-    </PaperProvider>
+                        </BottomSheetProvider>
+                      </WebViewProvider>
+                    </AppStateProvider>
+                  </PaperProvider>
+                </NowPlayingProvider>
+              </NewSongsProvider>
+            </CurrentTrackProvider>
+          </RecordingsProvider>
+        </UserProvider>
+      </LoadingProvider>
+    </SQLiteProvider>
   );
 }
 const styles2 = StyleSheet.create({

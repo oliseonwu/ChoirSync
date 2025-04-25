@@ -1,6 +1,6 @@
 import { SavedSong } from "@/types/music.types";
 import { openDatabaseAsync, SQLiteDatabase } from "expo-sqlite";
-import { authService } from "../AuthService";
+import Parse from "../Parse";
 
 class SongService {
   async createSong(
@@ -10,7 +10,7 @@ class SongService {
     db: SQLiteDatabase
   ) {
     try {
-      const currentUser = await authService.getCurrentUser();
+      const currentUser = await Parse.User.currentAsync();
 
       if (!currentUser) {
         throw new Error("No user found");
@@ -36,7 +36,7 @@ class SongService {
     }
 
     try {
-      const currentUser = await authService.getCurrentUser();
+      const currentUser = await Parse.User.currentAsync();
 
       if (!currentUser) {
         throw new Error("No user found");
@@ -55,7 +55,7 @@ class SongService {
 
   async deleteSong(link: string, db: SQLiteDatabase) {
     try {
-      const currentUser = await authService.getCurrentUser();
+      const currentUser = await Parse.User.currentAsync();
 
       if (!currentUser) {
         throw new Error("No user found");
@@ -72,6 +72,24 @@ class SongService {
     }
   }
 
+  async deleteAllUserSongs(db: SQLiteDatabase, user: Parse.User | null = null) {
+    const currentUser = user || (await Parse.User.currentAsync());
+
+    if (!currentUser) {
+      throw new Error("No user found");
+    }
+
+    try {
+      const result = await db.runAsync(
+        "DELETE FROM Songs WHERE user_id = ?",
+        currentUser.id
+      );
+      return result;
+    } catch (error) {
+      console.error("[SQLite] Error deleting all songs for user:", error);
+    }
+  }
+
   /**
    * Fetches songs from the database
    * @param db - The database instance
@@ -81,7 +99,7 @@ class SongService {
    */
   async fetchSongs(db: SQLiteDatabase, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-    const currentUser = await authService.getCurrentUser();
+    const currentUser = await Parse.User.currentAsync();
 
     try {
       if (!currentUser) {

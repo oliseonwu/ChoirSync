@@ -22,6 +22,7 @@ import { router, SplashScreen } from "expo-router";
 import Parse from "@/services/Parse";
 
 import { SkeletonLoader } from "@/components/SkeletonLoader";
+import { StatusBar } from "expo-status-bar";
 
 type GroupItem = {
   id: string;
@@ -74,6 +75,7 @@ const ChooseYourGroup = () => {
         });
       }}
     >
+      <StatusBar style="dark" />
       <Text style={style2.groupName}>{item.name}</Text>
       <TouchableOpacity
         style={style2.joinButton}

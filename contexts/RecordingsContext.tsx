@@ -2,6 +2,7 @@ import { createContext, useContext, useRef, useState } from "react";
 import { Recording } from "@/types/music.types";
 import { useUser } from "@/contexts/UserContext";
 import { recordingsService } from "@/services/RecordingsService";
+import Parse from "@/services/Parse";
 
 type RecordingsContextType = {
   recordings: Recording[];
@@ -33,13 +34,15 @@ export function RecordingsProvider({
   };
 
   const fetchRecordings = async () => {
+    let user;
     if (isLoading) {
       return;
     }
     setIsLoading(true);
     try {
-      if (!groupId) {
-        throw new Error("No group ID found");
+      user = await Parse.User.current();
+      if (!user || !groupId) {
+        return;
       }
 
       recordingsResponse = await recordingsService.fetchRecordings(
