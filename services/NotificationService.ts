@@ -27,9 +27,17 @@ class NotificationService {
    * @param token - The push notification token
    * @returns void
    */
-  async deletePushNotificationToken(token: string) {
+  async deletePushNotificationToken(token: string | null = null) {
     if (!token) {
-      return;
+      const currentToken = await AsyncStorageService.getItem(
+        AsyncStorageKeys.PUSH_TOKEN
+      );
+
+      if (!currentToken) {
+        return;
+      }
+
+      token = currentToken;
     }
 
     try {

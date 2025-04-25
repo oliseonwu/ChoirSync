@@ -49,7 +49,7 @@ export const useAuth = () => {
   };
 
   const getLoginMethod = async (
-    ignoreError: boolean = false
+    ignoreError: boolean = true
   ): Promise<LoginMethod | null> => {
     const loginMethod = (await AsyncStorageService.getItem(
       AsyncStorageKeys.SIGN_IN_METHOD
@@ -77,17 +77,23 @@ export const useAuth = () => {
         method = "email";
       }
 
-      // 4. Reset app state
+      // 6. Navigate to start screen
+      router.dismissAll();
+
+      // 1. Reset app state
       resetCurrentTrack();
       resetRecordings();
 
-      // 1. Logout from social provider if applicable
+      // 2. Logout from social provider if applicable
       await socialLogoutMethod(method);
 
       // 3. Clear AsyncStorage
       await AsyncStorageService.clear();
 
-      // 2. Logout from Parse
+      // 4. Delete push notification token
+      await notificationService.deletePushNotificationToken();
+
+      // 5. Logout from Parse
       await Parse.User.logOut();
 
       return { success: true };
@@ -132,14 +138,13 @@ export const useAuth = () => {
       }
     } catch (error: any) {
       if (
-        error.message === AppleAuthError.CANCELED ||
-        error.message === GoogleAuthError.CANCELED
+        error.message !== AppleAuthError.CANCELED &&
+        error.message !== GoogleAuthError.CANCELED
       ) {
-        return { success: false, error: error.message };
+        Alert.alert("Failed to login", "Please try again.");
+        console.error("Login error:", error);
       }
 
-      // Alert.alert("Failed to login", error.message);
-      console.error("Login error:", error);
       return { success: false, error: error.message };
     } finally {
       hideLoading();

@@ -2,19 +2,12 @@ import { GoogleUser } from "@/types/user.types";
 import Parse from "./Parse";
 import {
   GoogleSignin,
-  statusCodes,
-  isErrorWithCode,
   isSuccessResponse,
 } from "@react-native-google-signin/google-signin";
-
+import { throwErrorWithMessage, throwError } from "@/utilities/Helpers";
 export enum GoogleAuthError {
   CANCELED = "User canceled sign in",
-  FAILED = "Google sign in failed",
-  INVALID_RESPONSE = "Invalid response from Google",
-  NOT_HANDLED = "Google sign in not handled",
-  UNKNOWN = "Unknown error with Google sign in",
-  IN_PROGRESS = "Sign in already in progress",
-  PLAY_SERVICES_NOT_AVAILABLE = "Play services not available",
+  WRONG_SIGN_IN_METHOD = "Google Login failed: Account already exists for a different sign in method",
 }
 class GoogleAuthService {
   configure() {
@@ -43,7 +36,7 @@ class GoogleAuthService {
         throw new Error(GoogleAuthError.CANCELED);
       }
     } catch (error) {
-      this.handleError(error);
+      throwError(error);
     }
   }
 
@@ -66,7 +59,7 @@ class GoogleAuthService {
       const googleResponse = await this.socialLogin();
 
       if (!googleResponse?.success || !("data" in googleResponse)) {
-        throw new Error(GoogleAuthError.FAILED);
+        throw new Error("Google Login failed");
       }
 
       const { user: googleUser, idToken } = googleResponse.data;
@@ -94,34 +87,12 @@ class GoogleAuthService {
 
       return { success: true, user: loggedInUser };
     } catch (error: Parse.Error | any) {
-      if (
-        error instanceof Parse.Error &&
-        error.code === Parse.Error.ACCOUNT_ALREADY_LINKED
-      ) {
-        // Log out if account already linked
-        const currentGoogleUser = GoogleSignin.getCurrentUser();
-        if (currentGoogleUser) {
-          await GoogleSignin.signOut();
-        }
-        await Parse.User.logOut();
+      if (error.code === Parse.Error.USERNAME_TAKEN) {
+        throw new Error(GoogleAuthError.WRONG_SIGN_IN_METHOD);
       }
 
-      this.handleError(error);
+      throwError(error);
     }
-  }
-
-  private handleError(error: any) {
-    if (isErrorWithCode(error)) {
-      switch (error.code) {
-        case statusCodes.IN_PROGRESS:
-          throw new Error(GoogleAuthError.IN_PROGRESS);
-        case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-          throw new Error(GoogleAuthError.PLAY_SERVICES_NOT_AVAILABLE);
-        default:
-          throw new Error(GoogleAuthError.FAILED + ": " + error.message);
-      }
-    }
-    throw new Error(GoogleAuthError.UNKNOWN + ": " + error.message);
   }
 }
 

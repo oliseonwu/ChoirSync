@@ -243,6 +243,48 @@ function RootLayoutNav() {
                               }}
                             />
                             <Stack.Screen
+                              name="forgotPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="verifyOtp"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="resetPassword"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerBackButtonDisplayMode: "minimal",
+                                headerTitle: "",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
                               name="newUserPassword"
                               options={{
                                 animation: "none",
@@ -353,7 +395,21 @@ function RootLayoutNav() {
                               }}
                             />
                             <Stack.Screen
-                              name="(authenticated)/(Settings)/editUser"
+                              name="(authenticated)/(Settings)/editname"
+                              options={{
+                                animation: "none",
+                                headerTransparent: true,
+                                headerTitle: "",
+                                headerBackButtonDisplayMode: "minimal",
+                                headerLeft: () => (
+                                  <BackButtonComponent
+                                    style={styles2.BackButton}
+                                  />
+                                ),
+                              }}
+                            />
+                            <Stack.Screen
+                              name="(authenticated)/(Settings)/changePassword"
                               options={{
                                 animation: "none",
                                 headerTransparent: true,

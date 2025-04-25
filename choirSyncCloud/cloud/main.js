@@ -15,6 +15,7 @@ const userFunctions = require("./functions/users");
 const tokenFunctions = require("./functions/token");
 const recordingsFunctions = require("./functions/recordings");
 const newSongsFunctions = require("./functions/newSongs");
+const codeFunctions = require("./functions/code");
 const helpers = require("./utils/helpers");
 const { Expo } = require("expo-server-sdk");
 
@@ -108,6 +109,49 @@ Parse.Cloud.define(
     },
   }
 );
+
+Parse.Cloud.define("resetPassword", userFunctions.resetPassword, {
+  fields: {
+    email: {
+      type: String,
+      required: true,
+      options: (val) => helpers.isEmailValid(val),
+      error: "Cloud function error: Invalid email",
+    },
+    newPassword: {
+      type: String,
+      required: true,
+    },
+  },
+});
+
+// Register forgotPassword function
+Parse.Cloud.define("forgotPassword", userFunctions.forgotPassword, {
+  fields: {
+    email: {
+      type: String,
+      required: true,
+      options: (val) => helpers.isEmailValid(val),
+      error: "Cloud function error: Invalid email",
+    },
+  },
+});
+
+// Register OTP verification functions
+Parse.Cloud.define("verifyOtpCode", codeFunctions.verifyOtpCode, {
+  fields: {
+    code: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      options: (val) => helpers.isEmailValid(val),
+      error: "Cloud function error: Invalid email",
+    },
+  },
+});
 
 // Register recording functions
 Parse.Cloud.define("uploadRecordings", recordingsFunctions.uploadRecordings, {

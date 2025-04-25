@@ -35,4 +35,12 @@ function decodeJWT(token: string) {
   }
 }
 
-export { pointer, decodeJWT };
+function throwErrorWithMessage(customMessage: string, error: any) {
+  throw new Error(customMessage + error.message);
+}
+
+function throwError(error: any) {
+  throw new Error(error.message);
+}
+
+export { pointer, decodeJWT, throwErrorWithMessage, throwError };

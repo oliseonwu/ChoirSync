@@ -8,34 +8,48 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState } from "react";
-import { moderateScale, verticalScale } from "@/utilities/TrueScale";
+import { verticalScale } from "@/utilities/TrueScale";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
 import { globalStyles } from "@/shared/css/GlobalCss";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import LoadingButton from "@/components/LoadingButton";
-import { useAuth } from "@/hooks/useAuth";
 import { emailAuthService } from "@/services/EmailAuthService";
 
-const ExistingUserPasswordPage = () => {
+const VerifyOtpPage = () => {
   const headerHeight = useHeaderHeight();
-  const [password, setPassword] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { email } = useLocalSearchParams<{ email: string }>();
-  const { performLogin } = useAuth();
 
-  const isValidPassword = (password: string) => {
-    return password.length >= 6; // Basic validation, adjust as needed
+  const isValidOtp = (code: string) => {
+    // Check for alphanumeric code with 6 characters
+    return code.length === 6 && /^[a-zA-Z0-9]+$/.test(code);
   };
 
   const handleSubmit = async () => {
-    if (!isValidPassword(password)) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+    if (!isValidOtp(otpCode)) {
+      Alert.alert("Error", "Please enter a valid 6-character code");
       return;
     }
+
     setIsLoading(true);
-    await performLogin("email", email, password);
-    setIsLoading(false);
+    try {
+      const result = await emailAuthService.verifyOtpCode(email, otpCode);
+
+      if (result.success) {
+        router.push({
+          pathname: "/resetPassword",
+          params: { email },
+        });
+      } else {
+        Alert.alert("Error", result.message || "Failed to verify code");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to verify code");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,53 +64,38 @@ const ExistingUserPasswordPage = () => {
 
         <View style={globalStyles.TopContainer}>
           <Text style={[globalStyles.H1, { marginBottom: verticalScale(32) }]}>
-            Enter Your Password
+            Verify Code
           </Text>
 
           <Text style={globalStyles.regularText}>
-            Please enter your password to sign in to your account.
+            Enter the 6-character verification code sent to your email.
           </Text>
 
           <TextInput
             style={[globalStyles.Input, { marginTop: verticalScale(32) }]}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
+            placeholder="6-character code"
+            value={otpCode}
+            onChangeText={setOtpCode}
             autoCapitalize="none"
             autoCorrect={false}
-            textContentType="password"
+            keyboardType="visible-password"
+            maxLength={6}
             placeholderTextColor="#C9C8CA"
           />
         </View>
 
-        <Link style={styles.forgotPasswordLink} href="/forgotPassword">
-          <Text style={[globalStyles.regularText, styles.forgotPasswordText]}>
-            Forgot your password?
-          </Text>
-        </Link>
         <LoadingButton
           isLoading={isLoading}
           onPress={handleSubmit}
-          buttonText="Sign In"
+          buttonText="Verify Code"
           style={[globalStyles.Btn, globalStyles.BtnBlack]}
           textStyle={[globalStyles.btnText, { color: "#ffff" }]}
           backgroundColor="#313234"
-          disabled={!isValidPassword(password)}
+          disabled={!isValidOtp(otpCode)}
         />
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-const styles = StyleSheet.create({
-  forgotPasswordLink: {
-    marginBottom: verticalScale(12),
-  },
-  forgotPasswordText: {
-    textAlign: "center",
-    textDecorationLine: "underline",
-  },
-});
-
-export default ExistingUserPasswordPage;
+export default VerifyOtpPage;

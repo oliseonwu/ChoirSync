@@ -9,8 +9,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
     "axios": "^1.8.1",
     "expo-server-sdk": "^3.14.0",
+    "i": "^0.3.7",
+    "npm": "^11.3.0",
     "undici": "^7.4.0"
   }
 }

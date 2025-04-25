@@ -1,5 +1,12 @@
 const { deleteUserMemberRecords } = require("./groups");
 const { deleteUserPushTokens } = require("./token");
+const { getUserByEmail } = require("../utils/helpers");
+const { redeemOtpCode } = require("./code");
+const {
+  storeOtpCode,
+  sendOtpEmail,
+  getOtpCodeObjectForUser,
+} = require("./code");
 // ROUTES
 
 /**
@@ -213,6 +220,81 @@ async function checkUserExistsByEmail(request) {
   }
 }
 
+/**
+ * Initiates password reset process for a user
+ * Generates and sends a 6-digit OTP code
+ * @param {Object} request - Parse Cloud request object
+ * @returns {Promise<Object>} Result of operation
+ */
+const forgotPassword = async (request) => {
+  try {
+    // Get current user
+    const { email } = request.params;
+    const user = await getUserByEmail(email);
+
+    // Generate and store OTP code
+    const { code } = await storeOtpCode(user);
+
+    // Send OTP code via email
+    await sendOtpEmail(email, code);
+
+    return {
+      success: true,
+      message: "Password reset code sent to your email",
+      email: email,
+    };
+  } catch (error) {
+    console.error(`Password reset error: ${error.message}`);
+    throw new Error(`Failed to initiate password reset: ${error.message}`);
+  }
+};
+
+/**
+ * Resets a user's password after verifying OTP code
+ * @param {Object} request - Parse Cloud request object
+ * @returns {Promise<Object>} Result of operation
+ */
+const resetPassword = async (request) => {
+  const { email, newPassword } = request.params;
+
+  try {
+    // 1. Get user by email
+    const user = await getUserByEmail(email);
+    if (!user) {
+      throw new Error(`No user found with email: ${email}`);
+    }
+
+    // 2. Check if the OTP code has been redeemed and verified by user
+    const otpObject = await getOtpCodeObjectForUser(user);
+
+    if (!otpObject) {
+      throw new Error("No OTP code found for this user");
+    }
+
+    const isCodeVerified = otpObject.get("verified_by_user") || false;
+    const isCodeRedeemed = otpObject.get("redeemed_by_user") || false;
+
+    if (isCodeRedeemed || !isCodeVerified) {
+      throw new Error("OTP code has already been used or not verified");
+    }
+
+    // 3. Redeem the OTP code
+    await redeemOtpCode(otpObject);
+
+    // 4. Reset the password
+    user.setPassword(newPassword);
+    await user.save(null, { useMasterKey: true });
+
+    return {
+      success: true,
+      message: "Password changed successfully",
+    };
+  } catch (error) {
+    console.error(`Password reset error: ${error.message}`);
+    throw new Error(`Failed to reset password: ${error.message}`);
+  }
+};
+
 module.exports = {
   updateUserField,
   updateUserFields,
@@ -222,4 +304,6 @@ module.exports = {
   updateMultipleUsers,
   deleteCurrentUser,
   checkUserExistsByEmail,
+  forgotPassword,
+  resetPassword,
 };

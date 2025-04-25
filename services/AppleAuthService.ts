@@ -1,14 +1,15 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import Parse from "./Parse";
 import AsyncStorageService, { AsyncStorageKeys } from "./AsyncStorageService";
-import { decodeJWT } from "@/utilities/Helpers";
+import {
+  decodeJWT,
+  throwErrorWithMessage,
+  throwError,
+} from "@/utilities/Helpers";
 
 export enum AppleAuthError {
-  CANCELED = "User canceled sign in",
-  FAILED = "Apple sign in failed",
-  INVALID_RESPONSE = "Invalid response from Apple",
-  NOT_HANDLED = "Apple sign in not handled",
-  UNKNOWN = "Unknown error with Apple sign in",
+  CANCELED = "Apple Login failed: The user canceled the authorization attempt",
+  WRONG_SIGN_IN_METHOD = "Apple Login failed: Account already exists for a different sign in method",
 }
 
 class AppleAuthService {
@@ -30,8 +31,8 @@ class AppleAuthService {
           email: credential.email,
         },
       };
-    } catch (error) {
-      this.handleError(error);
+    } catch (error: any) {
+      throwError(error);
     }
   }
 
@@ -44,12 +45,11 @@ class AppleAuthService {
       if (!appleUserId) {
         throw new Error("Social sign out failed: Apple user ID not found");
       }
-
       await AppleAuthentication.signOutAsync({
         user: appleUserId,
       });
-    } catch (error) {
-      return this.handleError(error);
+    } catch (error: any) {
+      throwErrorWithMessage("Apple Social sign out failed: ", error);
     }
   }
 
@@ -94,26 +94,11 @@ class AppleAuthService {
 
       return { success: true, user: loggedInUser };
     } catch (error: Parse.Error | any) {
-      return this.handleError(error);
-    }
-  }
-
-  private handleError(error: any) {
-    if (error.code) {
-      switch (error.code) {
-        case "ERR_CANCELED":
-          throw new Error(AppleAuthError.CANCELED);
-        case "ERR_FAILED":
-          throw new Error(AppleAuthError.FAILED);
-        case "ERR_INVALID_RESPONSE":
-          throw new Error(AppleAuthError.INVALID_RESPONSE);
-        case "ERR_NOT_HANDLED":
-          throw new Error(AppleAuthError.NOT_HANDLED);
-        case "ERR_UNKNOWN":
-          throw new Error(AppleAuthError.UNKNOWN);
+      if (error.code === Parse.Error.EMAIL_TAKEN) {
+        throw new Error(AppleAuthError.WRONG_SIGN_IN_METHOD);
       }
+      throwErrorWithMessage("Apple Login failed: ", error);
     }
-    throw new Error("Apple sign in failed : " + error.message);
   }
 }
 

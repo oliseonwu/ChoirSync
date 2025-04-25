@@ -13,20 +13,30 @@ import { router } from "expo-router";
 
 import { useUser } from "@/contexts/UserContext";
 import { userManagementService } from "@/services/UserManagementService";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, LoginMethod } from "@/hooks/useAuth";
+import { useCallback, useMemo, useLayoutEffect, useState } from "react";
+import AsyncStorageService, {
+  AsyncStorageKeys,
+} from "@/services/AsyncStorageService";
 const { height, width } = getWindowSize();
 export default function Profile() {
   const { getCurrentUserData } = useUser();
   const currentUserData = getCurrentUserData();
   const { performLogout } = useAuth();
+  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
+
+  useLayoutEffect(() => {
+    getLoginMethod().then((loginMethod) => {
+      setShowChangePassword(loginMethod === "email");
+    });
+  }, []);
 
   const deleteUser = async () => {
     try {
       await userManagementService.deleteCurrentUser();
       await performLogout();
-      router.dismissAll();
     } catch (error) {
-      console.log("Error", error);
+      console.log("Error deleting user", error);
     }
   };
 
@@ -41,6 +51,27 @@ export default function Profile() {
     );
   };
 
+  const getLoginMethod = async () => {
+    const loginMethod = (await AsyncStorageService.getItem(
+      AsyncStorageKeys.SIGN_IN_METHOD
+    )) as LoginMethod;
+
+    return loginMethod;
+  };
+
+  const ChangePasswordComponent = useMemo(() => {
+    return (
+      showChangePassword && (
+        <MenuItemOne
+          label="Change Password"
+          onPress={() => {
+            router.push("/(authenticated)/(Settings)/changePassword");
+          }}
+        />
+      )
+    );
+  }, [showChangePassword]);
+
   return (
     <View style={[globalStyles.container, { paddingTop: height * 0.05 }]}>
       <View style={styles.infoSection}>
@@ -49,7 +80,7 @@ export default function Profile() {
           value={currentUserData?.firstName || "N/A"}
           onPress={() => {
             router.push({
-              pathname: "/(authenticated)/(Settings)/editUser",
+              pathname: "/(authenticated)/(Settings)/editname",
               params: {
                 type: "firstName", // or "lastName"
                 title: "Edit First Name",
@@ -63,7 +94,7 @@ export default function Profile() {
           value={currentUserData?.lastName || "N/A"}
           onPress={() => {
             router.push({
-              pathname: "/(authenticated)/(Settings)/editUser",
+              pathname: "/(authenticated)/(Settings)/editname",
               params: {
                 type: "lastName", // or "lastName"
                 title: "Edit Last Name",
@@ -72,16 +103,15 @@ export default function Profile() {
             });
           }}
         />
+
         <View style={styles.separator} />
         <MenuItemOne
           label="Email"
           value={currentUserData?.email || "N/A"}
-          onPress={() => {
-            console.log("email pressed");
-          }}
           borderBottomWidth={moderateScale(0.5)}
           disabled={true}
         />
+        {ChangePasswordComponent}
       </View>
       <View style={{ flex: 1 }} />
       <TouchableOpacity

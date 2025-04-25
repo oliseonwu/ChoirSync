@@ -56,7 +56,6 @@ export default function SettingsScreen() {
         style: "destructive",
         onPress: async () => {
           await performLogout();
-          router.dismissAll();
         },
       },
     ]);
