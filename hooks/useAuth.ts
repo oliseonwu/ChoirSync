@@ -15,7 +15,6 @@ import { AppleAuthError, appleAuthService } from "@/services/AppleAuthService";
 import { Alert } from "react-native";
 import { useUser } from "@/contexts/UserContext";
 import Parse from "@/services/Parse";
-
 import { userManagementService } from "@/services/UserManagementService";
 import { emailAuthService } from "@/services/EmailAuthService";
 
@@ -29,7 +28,6 @@ export const useAuth = () => {
   const { resetCurrentTrack } = useCurrentTrack();
   const { resetRecordings } = useRecordings();
   const { updateCurrentUserData, getCurrentUserData } = useUser();
-
   const getCurrentUser = async () => {
     const user = await Parse.User.currentAsync();
     return user;
@@ -77,24 +75,7 @@ export const useAuth = () => {
         method = "email";
       }
 
-      // 6. Navigate to start screen
-      router.dismissAll();
-
-      // 1. Reset app state
-      resetCurrentTrack();
-      resetRecordings();
-
-      // 2. Logout from social provider if applicable
-      await socialLogoutMethod(method);
-
-      // 3. Clear AsyncStorage
-      await AsyncStorageService.clear();
-
-      // 4. Delete push notification token
-      await notificationService.deletePushNotificationToken();
-
-      // 5. Logout from Parse
-      await Parse.User.logOut();
+      await handleLogoutProcess(method);
 
       return { success: true };
     } catch (error: any) {
@@ -108,6 +89,27 @@ export const useAuth = () => {
     } finally {
       hideLoading();
     }
+  };
+
+  const handleLogoutProcess = async (method: LoginMethod) => {
+    // 1. Navigate to start screen
+    router.dismissAll();
+
+    // 2. Reset app state
+    resetCurrentTrack();
+    resetRecordings();
+
+    // 3. Logout from social provider if applicable
+    await socialLogoutMethod(method);
+
+    // 4. Clear AsyncStorage
+    await AsyncStorageService.clear();
+
+    // 5. Delete push notification token
+    await notificationService.deletePushNotificationToken();
+
+    // 6. Logout from Parse
+    await Parse.User.logOut();
   };
 
   const performLogin = async (

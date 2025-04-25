@@ -72,6 +72,24 @@ class SongService {
     }
   }
 
+  async deleteAllUserSongs(db: SQLiteDatabase, user: Parse.User | null = null) {
+    const currentUser = user || (await Parse.User.currentAsync());
+
+    if (!currentUser) {
+      throw new Error("No user found");
+    }
+
+    try {
+      const result = await db.runAsync(
+        "DELETE FROM Songs WHERE user_id = ?",
+        currentUser.id
+      );
+      return result;
+    } catch (error) {
+      console.error("[SQLite] Error deleting all songs for user:", error);
+    }
+  }
+
   /**
    * Fetches songs from the database
    * @param db - The database instance

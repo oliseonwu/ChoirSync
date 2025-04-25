@@ -82,7 +82,7 @@ export default function LoginBottomSheet({
         buttonStyle={{ marginTop: verticalScale(10) }}
         onPress={() => {
           dismissBottomSheet();
-          // router.navigate("/email");
+          onGoogleButtonPress();
         }}
         visible={Platform.OS === "android"}
       />

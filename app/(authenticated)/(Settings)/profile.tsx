@@ -15,6 +15,8 @@ import { useUser } from "@/contexts/UserContext";
 import { userManagementService } from "@/services/UserManagementService";
 import { useAuth, LoginMethod } from "@/hooks/useAuth";
 import { useCallback, useMemo, useLayoutEffect, useState } from "react";
+import { useSQLiteContext } from "expo-sqlite";
+import songService from "@/services/sqlite/songService";
 import AsyncStorageService, {
   AsyncStorageKeys,
 } from "@/services/AsyncStorageService";
@@ -24,7 +26,7 @@ export default function Profile() {
   const currentUserData = getCurrentUserData();
   const { performLogout } = useAuth();
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-
+  const localDb = useSQLiteContext();
   useLayoutEffect(() => {
     getLoginMethod().then((loginMethod) => {
       setShowChangePassword(loginMethod === "email");
@@ -33,6 +35,7 @@ export default function Profile() {
 
   const deleteUser = async () => {
     try {
+      await songService.deleteAllUserSongs(localDb);
       await userManagementService.deleteCurrentUser();
       await performLogout();
     } catch (error) {

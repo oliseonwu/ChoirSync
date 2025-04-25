@@ -9,6 +9,7 @@ import { moderateScale, verticalScale } from "@/utilities/TrueScale";
 import CloseIcon from "@/assets/images/SVG/close-light.svg";
 import { memo, useCallback } from "react";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+import { Platform } from "react-native";
 
 type Props = {
   children: React.ReactNode;
@@ -79,9 +80,11 @@ const styles = StyleSheet.create({
     margin: "2%",
     marginBottom: "0.8%",
     backgroundColor: "#F1F1F1",
-    borderRadius: moderateScale(45),
-    borderTopLeftRadius: moderateScale(40),
-    borderTopRightRadius: moderateScale(40),
+    borderRadius: Platform.OS === "ios" ? moderateScale(45) : moderateScale(10),
+    borderTopLeftRadius:
+      Platform.OS === "ios" ? moderateScale(40) : moderateScale(10),
+    borderTopRightRadius:
+      Platform.OS === "ios" ? moderateScale(40) : moderateScale(10),
     paddingBottom: verticalScale(28),
   },
   background: {
