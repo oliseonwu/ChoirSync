@@ -70,11 +70,13 @@ const ExistingUserPasswordPage = () => {
           />
         </View>
 
-        <Link style={styles.forgotPasswordLink} href="/forgotPassword">
-          <Text style={[globalStyles.regularText, styles.forgotPasswordText]}>
-            Forgot your password?
-          </Text>
-        </Link>
+        <View style={styles.forgotPasswordContainer}>
+          <Link style={styles.forgotPasswordLink} href="/forgotPassword">
+            <Text style={[globalStyles.regularText, styles.forgotPasswordText]}>
+              Forgot your password?
+            </Text>
+          </Link>
+        </View>
         <LoadingButton
           isLoading={isLoading}
           onPress={handleSubmit}
@@ -93,8 +95,11 @@ const styles = StyleSheet.create({
   forgotPasswordLink: {
     marginBottom: verticalScale(12),
   },
+  forgotPasswordContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
   forgotPasswordText: {
-    textAlign: "center",
     textDecorationLine: "underline",
   },
 });

@@ -10,12 +10,14 @@
     "test": "jest --watchAll",
     "profiler": "react-devtools",
     "dev:build:ios": "eas build --profile development-IOS --platform ios",
-    "dev:build:ios:physical": "eas build --profile development-IOS-physical --platform ios",
     "dev:build:android": "eas build --profile development-APK --platform android",
+    "dev:build:ios:physical": "eas build --profile development-IOS-physical --platform ios",
     "dev:build:android:local": "eas build --profile development-APK --platform android --local",
+    "dev:build:preview:android:local": "eas build --profile preview --platform android --local",
     "dev:build:preview": "eas build --profile preview",
     "dev:update:ios:preview": "eas update --channel preview --platform ios",
-    "dev:update:preview": "eas update --channel preview"
+    "dev:update:preview": "eas update --channel preview",
+    "dev:publish:app": "eas build"
   },
   "jest": {
     "preset": "jest-expo"
