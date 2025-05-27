@@ -93,7 +93,7 @@ export const useAuth = () => {
 
   const handleLogoutProcess = async (method: LoginMethod) => {
     // 1. Navigate to start screen
-    router.dismissAll();
+    router.canGoBack() && router.dismissAll();
 
     // 2. Reset app state
     resetCurrentTrack();

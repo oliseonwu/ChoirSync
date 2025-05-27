@@ -41,9 +41,15 @@ android/
 expo-env.d.ts
 # @end expo-cli
 
+# env files
 .env
 .env.local
 
+# Cloud Code
+choirSyncCloud/
 
-choirSyncCloud/.parse.project
-choirSyncCloud/.parse.local
+# APKs
+*.apk
+
+
+
